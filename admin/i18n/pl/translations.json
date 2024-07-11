@@ -1,0 +1,13 @@
+{
+    "Username": "Nazwa użytkownika",
+    "midas-aquatemp adapter settings": "Ustawienia adaptera dla midas-aquatemp",
+    "option1": "opcja 1",
+    "option2": "Opcja 2",
+    "password": "Hasło",
+    "refresh": "Odśwież dane (s)",
+    "staticText": "Api-Level 1: AquaTemp-Accounts, utworzone przed wersją 1.5.8, Api-Level 2: HiTemp-Accounts Api-Level 3: AquaTemp-Accounts, utworzone przy użyciu nowszej wersji aplikacji",
+    "staticText1": "Api-Level 1: Konta AquaTemp, utworzone przed wersją 1.5.8",
+    "staticText2": "Poziom API 2: Konta HiTemp",
+    "staticText3": "Api-Level 3: Konta AquaTemp, utworzone przy użyciu nowszej wersji aplikacji",
+    "username": "Nazwa użytkownika"
+}

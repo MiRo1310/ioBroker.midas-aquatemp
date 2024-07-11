@@ -1,0 +1,13 @@
+{
+    "Username": "用户名",
+    "midas-aquatemp adapter settings": "midas-aquatemp的适配器设置",
+    "option1": "选项1",
+    "option2": "选项2",
+    "password": "密码",
+    "refresh": "刷新数据（秒）",
+    "staticText": "Api 级别 1：AquaTemp-Accounts，在 v.1.5.8 之前创建，Api 级别 2：HiTemp-Accounts Api 级别 3：AquaTemp-Accounts，使用较新的应用程序版本创建",
+    "staticText1": "Api 级别 1：AquaTemp-Accounts，在 v.1.5.8 之前创建",
+    "staticText2": "API 级别 2：HiTemp 帐户",
+    "staticText3": "Api 级别 3：AquaTemp-Accounts，使用较新的应用程序版本创建",
+    "username": "用户名"
+}
