@@ -1,0 +1,7 @@
+{
+  "version": 3,
+  "sources": ["../../src/lib/endPoints.ts"],
+  "sourcesContent": ["import { useStore } from \"./store\";\r\nconst store = useStore();\r\n\r\nexport function setupEndpoints(): void {\r\n    const apiLevel = store.apiLevel;\r\n    if (apiLevel == 1) {\r\n        store.cloudURL = \"https://cloud.linked-go.com/cloudservice/api\";\r\n        return\r\n    }\r\n    if (apiLevel == 2) {\r\n        store.cloudURL = \"https://cloud.linked-go.com/cloudservice/api\";\r\n        return\r\n    }\r\n    if (apiLevel == 3) {\r\n        store.cloudURL = \"https://cloud.linked-go.com:449/crmservice/api\";\r\n    }\r\n\r\n}\r\n"],
+  "mappings": ";;;;;;;;;;;;;;;;;;AAAA;AAAA;AAAA;AAAA;AAAA;AAAA,mBAAyB;AACzB,MAAM,YAAQ,uBAAS;AAEhB,SAAS,iBAAuB;AACnC,QAAM,WAAW,MAAM;AACvB,MAAI,YAAY,GAAG;AACf,UAAM,WAAW;AACjB;AAAA,EACJ;AACA,MAAI,YAAY,GAAG;AACf,UAAM,WAAW;AACjB;AAAA,EACJ;AACA,MAAI,YAAY,GAAG;AACf,UAAM,WAAW;AAAA,EACrB;AAEJ;",
+  "names": []
+}

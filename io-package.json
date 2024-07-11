@@ -1,0 +1,109 @@
+{
+	"common": {
+		"name": "midas-aquatemp",
+		"version": "0.0.1",
+		"news": {
+			"0.0.1": {
+				"en": "initial release",
+				"de": "Erstveröffentlichung",
+				"ru": "Начальная версия",
+				"pt": "lançamento inicial",
+				"nl": "Eerste uitgave",
+				"fr": "Première version",
+				"it": "Versione iniziale",
+				"es": "Versión inicial",
+				"pl": "Pierwsze wydanie",
+				"uk": "Початкова версія",
+				"zh-cn": "首次出版"
+			}
+		},
+		"title": "Midas Aquatemp",
+		"titleLang": {
+			"en": "Midas Aquatemp",
+			"de": "Midas Aquatemp",
+			"ru": "Мидас Акватемп",
+			"pt": "Midas Aquatemp",
+			"nl": "Midas Aquatemp",
+			"fr": "Midas Aquatemp",
+			"it": "Midas Aquatemp",
+			"es": "Midas Aquatemp",
+			"pl": "Aquatemp Midasa",
+			"uk": "Мідас Акватемп",
+			"zh-cn": "迈达斯水温"
+		},
+		"desc": {
+			"en": "midas-aquatemp",
+			"de": "midas-aquatemp",
+			"ru": "midas-aquatemp",
+			"pt": "midas-aquatemp",
+			"nl": "midas-aquatemp",
+			"fr": "midas-aquatemp",
+			"it": "midas-aquatemp",
+			"es": "midas-aquatemp",
+			"pl": "midas-aquatemp",
+			"uk": "midas-aquatemp",
+			"zh-cn": "midas-aquatemp"
+		},
+		"authors": ["Miro1310 <michael.roling@gmx.de>", "oxident"],
+		"keywords": ["heat pump", "pool heating", "poolsana"],
+		"licenseInformation": {
+			"type": "free",
+			"license": "MIT"
+		},
+		"platform": "Javascript/Node.js",
+		"main": "build/main.js",
+		"icon": "midas-aquatemp.png",
+		"enabled": true,
+		"extIcon": "https://raw.githubusercontent.com/Miro1310/ioBroker.midas-aquatemp/main/admin/midas-aquatemp.png",
+		"readme": "https://github.com/Miro1310/ioBroker.midas-aquatemp/blob/main/README.md",
+		"loglevel": "info",
+		"tier": 3,
+		"mode": "daemon",
+		"type": "climate-control",
+		"compact": true,
+		"connectionType": "cloud",
+		"dataSource": "poll",
+		"adminUI": {
+			"config": "json"
+		},
+		"dependencies": [
+			{
+				"js-controller": ">=3.3.22"
+			}
+		],
+		"globalDependencies": [
+			{
+				"admin": ">=5.1.13"
+			}
+		]
+	},
+	"native": {
+		"username": "",
+		"password": "",
+		"refresh": 60
+	},
+	"objects": [],
+	"instanceObjects": [
+		{
+			"_id": "info",
+			"type": "channel",
+			"common": {
+				"name": "Information"
+			},
+			"native": {}
+		},
+		{
+			"_id": "info.connection",
+			"type": "state",
+			"common": {
+				"role": "indicator.connected",
+				"name": "Device or service connected",
+				"type": "boolean",
+				"read": true,
+				"write": false,
+				"def": false
+			},
+			"native": {}
+		}
+	]
+}

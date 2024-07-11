@@ -1,0 +1,64 @@
+{
+	"i18n": true,
+	"type": "panel",
+	"items": {
+		"username": {
+			"type": "text",
+			"label": "Username",
+			"newLine": true,
+			"sm": 2
+		},
+		"password": {
+			"type": "password",
+			"label": "password",
+			"newLine": true,
+			"sm": 2
+		},
+
+		"refresh": {
+			"type": "number",
+			"label": "refresh",
+			"min": 60,
+			"default": 60,
+			"newLine": true
+		},
+
+		"selectApi": {
+			"type": "select",
+			"label": "Api Level",
+			"sm": 1,
+			"default": 3,
+
+			"options": [
+				{
+					"value": 1,
+					"label": "API 1"
+				},
+				{
+					"value": 2,
+					"label": "API 2"
+				},
+				{
+					"value": 3,
+					"label": "API 3"
+				}
+			],
+			"newLine": true
+		},
+		"text1": {
+			"type": "staticText",
+			"text": "staticText1",
+			"newLine": true
+		},
+		"text2": {
+			"type": "staticText",
+			"text": "staticText2",
+			"newLine": true
+		},
+		"text3": {
+			"type": "staticText",
+			"text": "staticText3",
+			"newLine": true
+		}
+	}
+}
