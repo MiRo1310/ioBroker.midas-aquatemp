@@ -16,16 +16,18 @@ var __copyProps = (to, from, except, desc) => {
   return to;
 };
 var __toCommonJS = (mod) => __copyProps(__defProp({}, "__esModule", { value: true }), mod);
-var protocolCodes_exports = {};
-__export(protocolCodes_exports, {
+var axiosParameter_exports = {};
+__export(axiosParameter_exports, {
+  getAxiosUpdateDevicePowerParams: () => getAxiosUpdateDevicePowerParams,
+  getAxiosUpdateDeviceSetTempParams: () => getAxiosUpdateDeviceSetTempParams,
   getProtocolCodes: () => getProtocolCodes
 });
-module.exports = __toCommonJS(protocolCodes_exports);
+module.exports = __toCommonJS(axiosParameter_exports);
 const getProtocolCodes = (deviceCode) => {
   return {
-    "device_code": deviceCode,
-    "deviceCode": deviceCode,
-    "protocal_codes": [
+    device_code: deviceCode,
+    deviceCode,
+    protocal_codes: [
       "Power",
       "Mode",
       "Manual-mute",
@@ -63,7 +65,7 @@ const getProtocolCodes = (deviceCode) => {
       "T6",
       "T7"
     ],
-    "protocalCodes": [
+    protocalCodes: [
       "Power",
       "Mode",
       "Manual-mute",
@@ -103,8 +105,64 @@ const getProtocolCodes = (deviceCode) => {
     ]
   };
 };
+const getAxiosUpdateDevicePowerParams = ({
+  deviceCode,
+  value,
+  protocolCode
+}) => {
+  return {
+    param: [
+      {
+        device_code: deviceCode,
+        deviceCode,
+        protocol_code: protocolCode,
+        protocolCode,
+        value
+      }
+    ]
+  };
+};
+const getAxiosUpdateDeviceSetTempParams = ({
+  deviceCode,
+  sTemperature
+}) => {
+  return {
+    param: [
+      {
+        device_code: deviceCode,
+        deviceCode,
+        protocol_code: "R01",
+        protocolCode: "R01",
+        value: sTemperature
+      },
+      {
+        device_code: deviceCode,
+        deviceCode,
+        protocol_code: "R02",
+        protocolCode: "R02",
+        value: sTemperature
+      },
+      {
+        device_code: deviceCode,
+        deviceCode,
+        protocol_code: "R03",
+        protocolCode: "R03",
+        value: sTemperature
+      },
+      {
+        device_code: deviceCode,
+        deviceCode,
+        protocol_code: "Set_Temp",
+        protocolCode: "Set_Temp",
+        value: sTemperature
+      }
+    ]
+  };
+};
 // Annotate the CommonJS export names for ESM import in node:
 0 && (module.exports = {
+  getAxiosUpdateDevicePowerParams,
+  getAxiosUpdateDeviceSetTempParams,
   getProtocolCodes
 });
-//# sourceMappingURL=protocolCodes.js.map
+//# sourceMappingURL=axiosParameter.js.map

@@ -1,12 +1,13 @@
 import axios from "axios";
 import { MidasAquatemp } from "../main";
 import { saveValue } from "./saveValue";
+import { initStore } from "./store";
 import { updateDeviceStatus } from "./updateDeviceStatus";
-import { useStore } from "./store";
-const store = useStore();
+
 let _this: MidasAquatemp;
 
 export async function updateDeviceID(): Promise<void> {
+	const store = initStore();
 	if (!_this) {
 		_this = MidasAquatemp.getInstance();
 	}

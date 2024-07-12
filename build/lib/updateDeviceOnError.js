@@ -34,22 +34,27 @@ module.exports = __toCommonJS(updateDeviceOnError_exports);
 var import_axios = __toESM(require("axios"));
 var import_saveValue = require("./saveValue");
 var import_store = require("./store");
-const store = (0, import_store.useStore)();
-function updateDeviceErrorMsg() {
-  const { token, apiLevel, cloudURL, device: deviceCode } = store;
-  if (token) {
-    var sURL = "";
-    if (apiLevel < 3) {
-      sURL = cloudURL + "/app/device/getFaultDataByDeviceCode.json";
-    } else {
-      sURL = cloudURL + "/app/device/getFaultDataByDeviceCode";
-    }
-    import_axios.default.post(sURL, {
-      "device_code": deviceCode,
-      "deviceCode": deviceCode
-    }, {
-      headers: { "x-token": token }
-    }).then(function(response) {
+async function updateDeviceErrorMsg() {
+  const store = (0, import_store.initStore)();
+  try {
+    const { token, apiLevel, cloudURL, device: deviceCode } = store;
+    if (token) {
+      let sURL = "";
+      if (apiLevel < 3) {
+        sURL = cloudURL + "/app/device/getFaultDataByDeviceCode.json";
+      } else {
+        sURL = cloudURL + "/app/device/getFaultDataByDeviceCode";
+      }
+      const response = await import_axios.default.post(
+        sURL,
+        {
+          device_code: deviceCode,
+          deviceCode
+        },
+        {
+          headers: { "x-token": token }
+        }
+      );
       if (parseInt(response.data.error_code) == 0) {
         (0, import_saveValue.saveValue)("error", true, "boolean");
         if (apiLevel < 3) {
@@ -66,13 +71,12 @@ function updateDeviceErrorMsg() {
       store.token = "", store.device = "", store.reachable = false;
       (0, import_saveValue.saveValue)("info.connection", false, "boolean");
       return;
-    }).catch(function(error) {
-      store.token = "", store.device = "", store.reachable = false;
-      (0, import_saveValue.saveValue)("info.connection", false, "boolean");
-      return;
-    });
+    }
+    return;
+  } catch (error) {
+    store._this.log.error(JSON.stringify(error));
+    store._this.log.error(JSON.stringify(error.stack));
   }
-  return;
 }
 // Annotate the CommonJS export names for ESM import in node:
 0 && (module.exports = {

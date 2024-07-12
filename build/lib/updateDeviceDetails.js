@@ -32,129 +32,96 @@ __export(updateDeviceDetails_exports, {
 });
 module.exports = __toCommonJS(updateDeviceDetails_exports);
 var import_axios = __toESM(require("axios"));
-var import_protocolCodes = require("./protocolCodes");
+var import_axiosParameter = require("./axiosParameter");
+var import_endPoints = require("./endPoints");
 var import_saveValue = require("./saveValue");
 var import_store = require("./store");
-const store = (0, import_store.useStore)();
-function updateDeviceDetails() {
-  const { apiLevel, token, device: deviceCode, cloudURL, product } = store;
-  if (token) {
-    var sURL;
-    if (apiLevel < 3) {
-      sURL = cloudURL + "/app/device/getDataByCode.json";
-    } else {
-      sURL = cloudURL + "/app/device/getDataByCode";
-    }
-    import_axios.default.post(sURL, (0, import_protocolCodes.getProtocolCodes)(deviceCode), {
-      headers: { "x-token": token }
-    }).then(function(response) {
+const isAuaTemp_Poolsana = (product) => {
+  const store = (0, import_store.initStore)();
+  if (product == store.AQUATEMP_POOLSANA) {
+    return true;
+  } else if (product == store.AQUATEMP_OTHER1) {
+    return false;
+  }
+  return null;
+};
+const saveValues = (value, product) => {
+  const isAquaTemp_Poolsana = isAuaTemp_Poolsana(product);
+  if (isAquaTemp_Poolsana == null) {
+    return;
+  }
+  (0, import_saveValue.saveValue)(
+    "consumption",
+    parseFloat(findCodeVal(value, isAquaTemp_Poolsana ? "T07" : "T7")) * parseFloat(findCodeVal(value, "T14")),
+    "number"
+  );
+  (0, import_saveValue.saveValue)("suctionTemp", parseFloat(findCodeVal(value, isAquaTemp_Poolsana ? "T01" : "T1")), "number");
+  (0, import_saveValue.saveValue)("tempIn", parseFloat(findCodeVal(value, isAquaTemp_Poolsana ? "T02" : "T2")), "number");
+  (0, import_saveValue.saveValue)("tempOut", parseFloat(findCodeVal(value, isAquaTemp_Poolsana ? "T03" : "T3")), "number");
+  (0, import_saveValue.saveValue)("coilTemp", parseFloat(findCodeVal(value, isAquaTemp_Poolsana ? "T04" : "T4")), "number");
+  (0, import_saveValue.saveValue)("ambient", parseFloat(findCodeVal(value, isAquaTemp_Poolsana ? "T05" : "T5")), "number");
+  (0, import_saveValue.saveValue)("exhaust", parseFloat(findCodeVal(value, isAquaTemp_Poolsana ? "T06" : "T6")), "number");
+  (0, import_saveValue.saveValue)("rotor", parseInt(findCodeVal(value, "T17")), "number");
+};
+async function updateDeviceDetails() {
+  const store = (0, import_store.initStore)();
+  try {
+    const { apiLevel, token, device: deviceCode, product } = store;
+    if (token) {
+      const { sURL } = (0, import_endPoints.getSUrlUpdateDeviceId)();
+      const response = await import_axios.default.post(sURL, (0, import_axiosParameter.getProtocolCodes)(deviceCode), {
+        headers: { "x-token": token }
+      });
+      store._this.log.info("DeviceDetails: " + JSON.stringify(response.data));
       if (parseInt(response.data.error_code) == 0) {
+        let responseValue;
         if (apiLevel < 3) {
-          (0, import_saveValue.saveValue)("rawJSON", JSON.stringify(response.data.object_result), "string");
-          if (findCodeVal(response.data.object_result, "Power") == "1") {
-            if (product == store.AQUATEMP_POOLSANA) {
-              (0, import_saveValue.saveValue)("consumption", parseFloat(findCodeVal(response.data.object_result, "T07")) * parseFloat(findCodeVal(response.data.object_result, "T14")), "number");
-              (0, import_saveValue.saveValue)("suctionTemp", parseFloat(findCodeVal(response.data.object_result, "T01")), "number");
-              (0, import_saveValue.saveValue)("tempIn", parseFloat(findCodeVal(response.data.object_result, "T02")), "number");
-              (0, import_saveValue.saveValue)("tempOut", parseFloat(findCodeVal(response.data.object_result, "T03")), "number");
-              (0, import_saveValue.saveValue)("coilTemp", parseFloat(findCodeVal(response.data.object_result, "T04")), "number");
-              (0, import_saveValue.saveValue)("ambient", parseFloat(findCodeVal(response.data.object_result, "T05")), "number");
-              (0, import_saveValue.saveValue)("exhaust", parseFloat(findCodeVal(response.data.object_result, "T06")), "number");
-            } else if (product == store.AQUATEMP_OTHER1) {
-              (0, import_saveValue.saveValue)("consumption", parseFloat(findCodeVal(response.data.object_result, "T7")) * parseFloat(findCodeVal(response.data.object_result, "T14")), "number");
-              (0, import_saveValue.saveValue)("suctionTemp", parseFloat(findCodeVal(response.data.object_result, "T1")), "number");
-              (0, import_saveValue.saveValue)("tempIn", parseFloat(findCodeVal(response.data.object_result, "T2")), "number");
-              (0, import_saveValue.saveValue)("tempOut", parseFloat(findCodeVal(response.data.object_result, "T3")), "number");
-              (0, import_saveValue.saveValue)("coilTemp", parseFloat(findCodeVal(response.data.object_result, "T4")), "number");
-              (0, import_saveValue.saveValue)("ambient", parseFloat(findCodeVal(response.data.object_result, "T5")), "number");
-              (0, import_saveValue.saveValue)("exhaust", parseFloat(findCodeVal(response.data.object_result, "T6")), "number");
-            }
-            (0, import_saveValue.saveValue)("rotor", parseInt(findCodeVal(response.data.object_result, "T17")), "number");
-          } else {
-            (0, import_saveValue.saveValue)("consumption", 0, "number");
-            (0, import_saveValue.saveValue)("rotor", 0, "number");
-          }
-          if (findCodeVal(response.data.object_result, "Mode") == 1) {
-            (0, import_saveValue.saveValue)("tempSet", parseFloat(findCodeVal(response.data.object_result, "R02")), "number");
-          } else if (findCodeVal(response.data.object_result, "Mode") == 0) {
-            (0, import_saveValue.saveValue)("tempSet", parseFloat(findCodeVal(response.data.object_result, "R01")), "number");
-          } else if (findCodeVal(response.data.object_result, "Mode") == 2) {
-            (0, import_saveValue.saveValue)("tempSet", parseFloat(findCodeVal(response.data.object_result, "R03")), "number");
-          }
-          if (findCodeVal(response.data.object_result, "Manual-mute") == "1") {
-            (0, import_saveValue.saveValue)("silent", true, "boolean");
-          } else {
-            (0, import_saveValue.saveValue)("silent", false, "boolean");
-          }
-          if (findCodeVal(response.data.object_result, "Power") == "1") {
-            (0, import_saveValue.saveValue)("state", true, "boolean");
-            (0, import_saveValue.saveValue)("mode", findCodeVal(response.data.object_result, "Mode"), "string");
-          } else {
-            (0, import_saveValue.saveValue)("state", false, "boolean");
-            (0, import_saveValue.saveValue)("mode", "-1", "string");
-          }
-          (0, import_saveValue.saveValue)("info.connection", true, "boolean");
+          responseValue = response.data.object_result;
         } else {
-          (0, import_saveValue.saveValue)("rawJSON", JSON.stringify(response.data.objectResult), "string");
-          if (findCodeVal(response.data.objectResult, "Power") == "1") {
-            if (product == store.AQUATEMP_POOLSANA) {
-              (0, import_saveValue.saveValue)("consumption", parseFloat(findCodeVal(response.data.objectResult, "T07")) * parseFloat(findCodeVal(response.data.objectResult, "T14")), "number");
-              (0, import_saveValue.saveValue)("suctionTemp", parseFloat(findCodeVal(response.data.objectResult, "T01")), "number");
-              (0, import_saveValue.saveValue)("tempIn", parseFloat(findCodeVal(response.data.objectResult, "T02")), "number");
-              (0, import_saveValue.saveValue)("tempOut", parseFloat(findCodeVal(response.data.objectResult, "T03")), "number");
-              (0, import_saveValue.saveValue)("coilTemp", parseFloat(findCodeVal(response.data.objectResult, "T04")), "number");
-              (0, import_saveValue.saveValue)("ambient", parseFloat(findCodeVal(response.data.objectResult, "T05")), "number");
-              (0, import_saveValue.saveValue)("exhaust", parseFloat(findCodeVal(response.data.objectResult, "T06")), "number");
-            } else if (product == store.AQUATEMP_OTHER1) {
-              (0, import_saveValue.saveValue)("consumption", parseFloat(findCodeVal(response.data.objectResult, "T7")) * parseFloat(findCodeVal(response.data.objectResult, "T14")), "number");
-              (0, import_saveValue.saveValue)("suctionTemp", parseFloat(findCodeVal(response.data.objectResult, "T1")), "number");
-              (0, import_saveValue.saveValue)("tempIn", parseFloat(findCodeVal(response.data.objectResult, "T2")), "number");
-              (0, import_saveValue.saveValue)("tempOut", parseFloat(findCodeVal(response.data.objectResult, "T3")), "number");
-              (0, import_saveValue.saveValue)("coilTemp", parseFloat(findCodeVal(response.data.objectResult, "T4")), "number");
-              (0, import_saveValue.saveValue)("ambient", parseFloat(findCodeVal(response.data.objectResult, "T5")), "number");
-              (0, import_saveValue.saveValue)("exhaust", parseFloat(findCodeVal(response.data.objectResult, "T6")), "number");
-            }
-            (0, import_saveValue.saveValue)("rotor", parseInt(findCodeVal(response.data.objectResult, "T17")), "number");
-          } else {
-            (0, import_saveValue.saveValue)("consumption", 0, "number");
-            (0, import_saveValue.saveValue)("rotor", 0, "number");
-          }
-          if (findCodeVal(response.data.objectResult, "Mode") == 1) {
-            (0, import_saveValue.saveValue)("tempSet", parseFloat(findCodeVal(response.data.objectResult, "R02")), "number");
-          } else if (findCodeVal(response.data.objectResult, "Mode") == 0) {
-            (0, import_saveValue.saveValue)("tempSet", parseFloat(findCodeVal(response.data.objectResult, "R01")), "number");
-          } else if (findCodeVal(response.data.objectResult, "Mode") == 2) {
-            (0, import_saveValue.saveValue)("tempSet", parseFloat(findCodeVal(response.data.objectResult, "R03")), "number");
-          }
-          if (findCodeVal(response.data.objectResult, "Manual-mute") == "1") {
-            (0, import_saveValue.saveValue)("silent", true, "boolean");
-          } else {
-            (0, import_saveValue.saveValue)("silent", false, "boolean");
-          }
-          if (findCodeVal(response.data.objectResult, "Power") == "1") {
-            (0, import_saveValue.saveValue)("state", true, "boolean");
-            (0, import_saveValue.saveValue)("mode", findCodeVal(response.data.objectResult, "Mode"), "string");
-          } else {
-            (0, import_saveValue.saveValue)("state", false, "boolean");
-            (0, import_saveValue.saveValue)("mode", "-1", "string");
-          }
-          (0, import_saveValue.saveValue)("info.connection", true, "boolean");
+          responseValue = response.data.objectResult;
         }
-      } else {
-        (0, import_saveValue.saveValue)("info.connection", false, "boolean");
-        store.token = "", store.device = "", store.reachable = false;
+        (0, import_saveValue.saveValue)("rawJSON", JSON.stringify(responseValue), "string");
+        if (findCodeVal(responseValue, "Power") == "1") {
+          saveValues(responseValue, product);
+        } else {
+          (0, import_saveValue.saveValue)("consumption", 0, "number");
+          (0, import_saveValue.saveValue)("rotor", 0, "number");
+        }
+        if (findCodeVal(responseValue, "Mode") == 1) {
+          (0, import_saveValue.saveValue)("tempSet", parseFloat(findCodeVal(responseValue, "R02")), "number");
+        } else if (findCodeVal(response.data.object_result, "Mode") == 0) {
+          (0, import_saveValue.saveValue)("tempSet", parseFloat(findCodeVal(responseValue, "R01")), "number");
+        } else if (findCodeVal(response.data.object_result, "Mode") == 2) {
+          (0, import_saveValue.saveValue)("tempSet", parseFloat(findCodeVal(responseValue, "R03")), "number");
+        }
+        if (findCodeVal(responseValue, "Manual-mute") == "1") {
+          (0, import_saveValue.saveValue)("silent", true, "boolean");
+        } else {
+          (0, import_saveValue.saveValue)("silent", false, "boolean");
+        }
+        if (findCodeVal(responseValue, "Power") == "1") {
+          (0, import_saveValue.saveValue)("state", true, "boolean");
+          (0, import_saveValue.saveValue)("mode", findCodeVal(responseValue, "Mode"), "string");
+        } else {
+          (0, import_saveValue.saveValue)("state", false, "boolean");
+          (0, import_saveValue.saveValue)("mode", "-1", "string");
+        }
+        (0, import_saveValue.saveValue)("info.connection", true, "boolean");
         return;
       }
-    }).catch(function(error) {
-      store.token = "", store.device = "", store.reachable = false;
+      store._this.log.error("Error: " + JSON.stringify(response.data));
       (0, import_saveValue.saveValue)("info.connection", false, "boolean");
+      store.token = "", store.device = "", store.reachable = false;
       return;
-    });
+    }
+    return;
+  } catch (error) {
+    store._this.log.error(JSON.stringify(error));
+    store._this.log.error(JSON.stringify(error.stack));
   }
-  return;
 }
 function findCodeVal(result, code) {
-  for (var i = 0; i < result.length; i++) {
+  for (let i = 0; i < result.length; i++) {
     if (result[i].code.indexOf(code) >= 0) {
       return result[i].value;
     }

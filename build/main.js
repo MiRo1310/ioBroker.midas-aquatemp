@@ -31,15 +31,17 @@ __export(main_exports, {
   MidasAquatemp: () => MidasAquatemp
 });
 module.exports = __toCommonJS(main_exports);
+var import_store = require("./lib/store");
 var utils = __toESM(require("@iobroker/adapter-core"));
 var import_axios = __toESM(require("axios"));
+var import_axiosParameter = require("./lib/axiosParameter");
 var import_createState = require("./lib/createState");
 var import_encryptPassword = require("./lib/encryptPassword");
 var import_endPoints = require("./lib/endPoints");
 var import_saveValue = require("./lib/saveValue");
-var import_store = require("./lib/store");
 var import_token = require("./lib/token");
-const store = (0, import_store.useStore)();
+var import_utils = require("./lib/utils");
+const store = (0, import_store.initStore)();
 let updateIntervall;
 let tokenRefreshTimer;
 class MidasAquatemp extends utils.Adapter {
@@ -69,8 +71,6 @@ class MidasAquatemp extends utils.Adapter {
     (0, import_encryptPassword.encryptPassword)(password);
     (0, import_createState.createObjects)();
     clearValues();
-    const cloudURL = store.cloudURL;
-    const encryptedPassword = store.encryptedPassword;
     await (0, import_token.updateToken)();
     function clearValues() {
       (0, import_saveValue.saveValue)("error", true, "boolean");
@@ -78,126 +78,101 @@ class MidasAquatemp extends utils.Adapter {
       (0, import_saveValue.saveValue)("state", false, "boolean");
       (0, import_saveValue.saveValue)("rawJSON", null, "string");
     }
-    function updateDevicePower(deviceCode, power) {
-      const token = store.token;
-      var powerOpt;
-      var powerMode = 2;
-      if (power == -1) {
-        powerOpt = 0;
-        powerMode = -1;
-      } else if (power == 0) {
-        powerOpt = 1;
-        powerMode = 0;
-      } else if (power == 1) {
-        powerOpt = 1;
-        powerMode = 1;
-      } else if (power == 2) {
-        powerOpt = 1;
-        powerMode = 2;
-      } else {
-        return;
-      }
-      if (token != "") {
-        var sURL = "";
-        if (store.apiLevel < 3) {
-          sURL = cloudURL + "/app/device/control.json";
-        } else {
-          sURL = cloudURL + "/app/device/control";
+    async function updateDevicePower(deviceCode, power) {
+      try {
+        const token = store.token;
+        const { powerMode, powerOpt } = (0, import_utils.getPowerMode)(power);
+        if (powerOpt === null || powerMode === null) {
+          return;
         }
-        import_axios.default.post(sURL, {
-          "param": [{
-            "device_code": deviceCode,
-            "deviceCode": deviceCode,
-            "protocol_code": "Power",
-            "protocolCode": "Power",
-            "value": powerOpt
-          }]
-        }, {
-          headers: { "x-token": token }
-        }).then(function(response) {
+        if (token && token != "") {
+          const { sURL } = (0, import_endPoints.getSUrl)();
+          const response = await import_axios.default.post(
+            sURL,
+            (0, import_axiosParameter.getAxiosUpdateDevicePowerParams)({ deviceCode, value: powerOpt, protocolCode: "Power" }),
+            {
+              headers: { "x-token": token }
+            }
+          );
+          store._this.log.info("DeviceStatus: " + JSON.stringify(response.data));
           if (parseInt(response.data.error_code) == 0) {
             (0, import_saveValue.saveValue)("mode", power.toString(), "string");
             if (power >= 0)
               updateDeviceMode(store.device, power);
-          } else {
-            store.resetOnErrorHandler();
+            return;
           }
-        }).catch(function(error) {
+          store._this.log.error("Error: " + JSON.stringify(response.data));
           store.resetOnErrorHandler();
-        });
+          (0, import_saveValue.saveValue)("info.connection", false, "boolean");
+        }
+      } catch (error) {
+        store._this.log.error(JSON.stringify(error));
+        store._this.log.error(JSON.stringify(error.stack));
       }
     }
-    function updateDeviceMode(devicecode, mode) {
+    async function updateDeviceMode(deviceCode, mode) {
       const token = store.token;
-      if (token != "") {
-        var sURL = "";
-        if (store.apiLevel < 3) {
-          sURL = cloudURL + "/app/device/control.json";
-        } else {
-          sURL = cloudURL + "/app/device/control";
-        }
-        import_axios.default.post(sURL, {
-          "param": [{
-            "device_code": devicecode,
-            "deviceCode": devicecode,
-            "protocol_code": "mode",
-            "protocolCode": "mode",
-            "value": mode
-          }]
-        }, {
-          headers: { "x-token": token }
-        }).then(function(response) {
+      try {
+        if (token && token != "") {
+          const { sURL } = (0, import_endPoints.getSUrl)();
+          const response = await import_axios.default.post(
+            sURL,
+            (0, import_axiosParameter.getAxiosUpdateDevicePowerParams)({ deviceCode, value: mode, protocolCode: "mode" }),
+            {
+              headers: { "x-token": token }
+            }
+          );
+          store._this.log.info("DeviceStatus: " + JSON.stringify(response.data));
           if (parseInt(response.data.error_code) == 0) {
             (0, import_saveValue.saveValue)("mode", mode, "string");
             return;
           }
+          store._this.log.error("Error: " + JSON.stringify(response.data));
           store.resetOnErrorHandler();
-        }).catch(function(error) {
-          store.resetOnErrorHandler();
-        });
+          (0, import_saveValue.saveValue)("info.connection", false, "boolean");
+        }
+      } catch (error) {
+        store._this.log.error(JSON.stringify(error));
+        store._this.log.error(JSON.stringify(error.stack));
       }
     }
-    function updateDeviceSilent(deviceCode, silent) {
-      const token = store.token;
-      var silentMode;
-      if (silent) {
-        silentMode = "1";
-      } else {
-        silentMode = "0";
-      }
-      if (token != "") {
-        var sURL = "";
-        if (store.apiLevel < 3) {
-          sURL = cloudURL + "/app/device/control.json";
+    async function updateDeviceSilent(deviceCode, silent) {
+      try {
+        const token = store.token;
+        let silentMode;
+        if (silent) {
+          silentMode = "1";
         } else {
-          sURL = cloudURL + "/app/device/control";
+          silentMode = "0";
         }
-        import_axios.default.post(sURL, {
-          "param": [{
-            "device_code": deviceCode,
-            "deviceCode": deviceCode,
-            "protocol_code": "Manual-mute",
-            "protocolCode": "Manual-mute",
-            "value": silentMode
-          }]
-        }, {
-          headers: { "x-token": token }
-        }).then(function(response) {
+        if (token && token != "") {
+          const { sURL } = (0, import_endPoints.getSUrl)();
+          const response = await import_axios.default.post(
+            sURL,
+            (0, import_axiosParameter.getAxiosUpdateDevicePowerParams)({ deviceCode, value: silentMode, protocolCode: "Manual-mute" }),
+            {
+              headers: { "x-token": token }
+            }
+          );
+          store._this.log.info("DeviceStatus: " + JSON.stringify(response.data));
           if (parseInt(response.data.error_code) == 0) {
             (0, import_saveValue.saveValue)("silent", silent, "boolean");
-          } else {
-            store.resetOnErrorHandler();
+            return;
           }
-        }).catch(function(error) {
+          store._this.log.error("Error: " + JSON.stringify(response.data));
           store.resetOnErrorHandler();
-        });
+          (0, import_saveValue.saveValue)("info.connection", false, "boolean");
+        }
+      } catch (error) {
+        store._this.log.error(JSON.stringify(error));
+        store._this.log.error(JSON.stringify(error.stack));
       }
     }
     const updateDeviceSetTemp = async (deviceCode, temperature) => {
       try {
         const token = store.token;
-        var sTemperature = temperature.toString().replace(",", ".");
-        const result = await this.getStateAsync(dpRoot + ".mode");
+        const sTemperature = temperature.toString().replace(",", ".");
+        const result = await store._this.getStateAsync(dpRoot + ".mode");
         if (!result || !result.val) {
           return;
         }
@@ -211,66 +186,42 @@ class MidasAquatemp extends utils.Adapter {
         } else if (sMode == "2") {
           sMode = "R03";
         }
-        if (token != "") {
-          var sURL = "";
-          if (store.apiLevel < 3) {
-            sURL = cloudURL + "/app/device/control.json";
-          } else {
-            sURL = cloudURL + "/app/device/control";
-          }
-          const response = await import_axios.default.post(sURL, {
-            "param": [
-              {
-                "device_code": deviceCode,
-                "deviceCode": deviceCode,
-                "protocol_code": "R01",
-                "protocolCode": "R01",
-                "value": sTemperature
-              },
-              {
-                "device_code": deviceCode,
-                "deviceCode": deviceCode,
-                "protocol_code": "R02",
-                "protocolCode": "R02",
-                "value": sTemperature
-              },
-              {
-                "device_code": deviceCode,
-                "deviceCode": deviceCode,
-                "protocol_code": "R03",
-                "protocolCode": "R03",
-                "value": sTemperature
-              },
-              {
-                "device_code": deviceCode,
-                "deviceCode": deviceCode,
-                "protocol_code": "Set_Temp",
-                "protocolCode": "Set_Temp",
-                "value": sTemperature
-              }
-            ]
-          }, {
-            headers: { "x-token": token }
-          });
+        if (token && token != "") {
+          const { sURL } = (0, import_endPoints.getSUrl)();
+          const response = await import_axios.default.post(
+            sURL,
+            (0, import_axiosParameter.getAxiosUpdateDeviceSetTempParams)({ deviceCode, sTemperature }),
+            {
+              headers: { "x-token": token }
+            }
+          );
+          store._this.log.info("DeviceStatus: " + JSON.stringify(response.data));
           if (parseInt(response.data.error_code) == 0) {
             (0, import_saveValue.saveValue)("tempSet", temperature, "number");
-          } else {
-            store.resetOnErrorHandler();
+            return;
           }
+          store._this.log.error("Error: " + JSON.stringify(response.data));
+          store.resetOnErrorHandler();
+          (0, import_saveValue.saveValue)("info.connection", false, "boolean");
         }
       } catch (error) {
-        this.log.error(JSON.stringify(error));
+        store._this.log.error(JSON.stringify(error));
       }
     };
-    updateIntervall = this.setInterval(async () => {
-      await (0, import_token.updateToken)();
-      const mode = await this.getStateAsync(dpRoot + ".mode");
-      if (mode && !mode.ack && mode.val) {
-        updateDevicePower(store.device, mode.val);
-      }
-      const silent = await this.getStateAsync(dpRoot + ".silent");
-      if (silent && !silent.ack && silent.val) {
-        updateDevicePower(store.device, silent.val);
+    updateIntervall = store._this.setInterval(async () => {
+      try {
+        await (0, import_token.updateToken)();
+        const mode = await store._this.getStateAsync(dpRoot + ".mode");
+        if (mode && !mode.ack && mode.val) {
+          updateDevicePower(store.device, mode.val);
+        }
+        const silent = await this.getStateAsync(dpRoot + ".silent");
+        if (silent && !silent.ack && silent.val) {
+          updateDevicePower(store.device, silent.val);
+        }
+      } catch (error) {
+        store._this.log.error(JSON.stringify(error));
+        store._this.log.error(JSON.stringify(error.stack));
       }
     }, store.interval * 1e3);
     tokenRefreshTimer = setInterval(function() {
@@ -278,26 +229,31 @@ class MidasAquatemp extends utils.Adapter {
       (0, import_token.updateToken)();
     }, 36e5);
     this.on("stateChange", async (id, state) => {
-      if (id === dpRoot + ".mode" && state && !state.ack) {
-        (0, import_token.updateToken)();
-        const mode = await this.getStateAsync(dpRoot + ".mode");
-        if (mode && mode.val) {
-          updateDevicePower(store.device, mode.val);
+      try {
+        if (id === dpRoot + ".mode" && state && !state.ack) {
+          (0, import_token.updateToken)();
+          const mode = await this.getStateAsync(dpRoot + ".mode");
+          if (mode && mode.val) {
+            updateDevicePower(store.device, mode.val);
+          }
         }
-      }
-      if (id === dpRoot + ".silent" && state && !state.ack) {
-        (0, import_token.updateToken)();
-        const silent = await this.getStateAsync(dpRoot + ".silent");
-        if (silent && silent.val) {
-          updateDevicePower(store.device, silent.val);
+        if (id === dpRoot + ".silent" && state && !state.ack) {
+          (0, import_token.updateToken)();
+          const silent = await this.getStateAsync(dpRoot + ".silent");
+          if (silent && silent.val) {
+            updateDeviceSilent(store.device, silent.val);
+          }
         }
-      }
-      if (id === dpRoot + ".tempSet" && state && !state.ack) {
-        (0, import_token.updateToken)();
-        const tempSet = await this.getStateAsync(dpRoot + ".tempSet");
-        if (tempSet && tempSet.val) {
-          updateDeviceSetTemp(store.device, tempSet.val);
+        if (id === dpRoot + ".tempSet" && state && !state.ack) {
+          (0, import_token.updateToken)();
+          const tempSet = await this.getStateAsync(dpRoot + ".tempSet");
+          if (tempSet && tempSet.val) {
+            updateDeviceSetTemp(store.device, tempSet.val);
+          }
         }
+      } catch (error) {
+        store._this.log.error(JSON.stringify(error));
+        store._this.log.error(JSON.stringify(error.stack));
       }
     });
     this.subscribeStates("*");

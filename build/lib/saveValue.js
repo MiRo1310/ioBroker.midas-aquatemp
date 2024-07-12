@@ -23,14 +23,14 @@ __export(saveValue_exports, {
 module.exports = __toCommonJS(saveValue_exports);
 var import_main = require("../main");
 var import_store = require("./store");
-const store = (0, import_store.useStore)();
 let _this;
 const saveValue = (key, value, stateType) => {
+  const store = (0, import_store.initStore)();
   const dpRoot = store.getDpRoot();
   if (!_this) {
     _this = import_main.MidasAquatemp.getInstance();
   }
-  var dp = dpRoot + "." + key;
+  const dp = dpRoot + "." + key;
   if (!_this.objectExists(dp)) {
     _this.setObjectNotExists(dp, {
       type: "state",

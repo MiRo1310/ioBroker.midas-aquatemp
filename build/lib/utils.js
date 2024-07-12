@@ -16,19 +16,39 @@ var __copyProps = (to, from, except, desc) => {
   return to;
 };
 var __toCommonJS = (mod) => __copyProps(__defProp({}, "__esModule", { value: true }), mod);
-var encryptPassword_exports = {};
-__export(encryptPassword_exports, {
-  encryptPassword: () => encryptPassword
+var utils_exports = {};
+__export(utils_exports, {
+  getPowerMode: () => getPowerMode
 });
-module.exports = __toCommonJS(encryptPassword_exports);
-var import_crypto = require("crypto");
-var import_store = require("./store");
-function encryptPassword(password) {
-  const store = (0, import_store.initStore)();
-  store.encryptedPassword = (0, import_crypto.createHash)("md5").update(password).digest("hex");
-}
+module.exports = __toCommonJS(utils_exports);
+const getPowerMode = (power) => {
+  switch (power) {
+    case -1:
+      return {
+        powerOpt: 0,
+        powerMode: -1
+      };
+    case 0:
+      return {
+        powerOpt: 1,
+        powerMode: 0
+      };
+    case 1:
+      return {
+        powerOpt: 1,
+        powerMode: 1
+      };
+    case 2:
+      return {
+        powerOpt: 1,
+        powerMode: 2
+      };
+    default:
+      return { powerOpt: null, powerMode: null };
+  }
+};
 // Annotate the CommonJS export names for ESM import in node:
 0 && (module.exports = {
-  encryptPassword
+  getPowerMode
 });
-//# sourceMappingURL=encryptPassword.js.map
+//# sourceMappingURL=utils.js.map

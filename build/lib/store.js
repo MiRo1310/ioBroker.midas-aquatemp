@@ -18,42 +18,47 @@ var __copyProps = (to, from, except, desc) => {
 var __toCommonJS = (mod) => __copyProps(__defProp({}, "__esModule", { value: true }), mod);
 var store_exports = {};
 __export(store_exports, {
-  useStore: () => useStore
+  initStore: () => initStore
 });
 module.exports = __toCommonJS(store_exports);
 var import_saveValue = require("./saveValue");
-const store = {
-  _this: "",
-  token: "",
-  instance: null,
-  username: "",
-  encryptedPassword: "",
-  cloudURL: "",
-  apiLevel: 3,
-  interval: 6e4,
-  device: "",
-  product: "",
-  reachable: false,
-  // ProductIDs:
-  // Gruppe 1:
-  // 1132174963097280512: Midas/Poolsana InverPro
-  AQUATEMP_POOLSANA: "1132174963097280512",
-  // Gruppe 2:
-  // 1442284873216843776:
-  AQUATEMP_OTHER1: "1442284873216843776",
-  getDpRoot: function() {
-    return `midas-aquatemp.${this.instance}`;
-  },
-  resetOnErrorHandler: function() {
-    this.token = "";
-    this.device = "";
-    this.reachable = false;
-    (0, import_saveValue.saveValue)("info.connection", false, "boolean");
+let store;
+function initStore() {
+  if (!store) {
+    store = {
+      _this: "",
+      token: "",
+      instance: null,
+      username: "",
+      encryptedPassword: "",
+      cloudURL: "",
+      apiLevel: 3,
+      interval: 6e4,
+      device: "",
+      product: "",
+      reachable: false,
+      // ProductIDs:
+      // Gruppe 1:
+      // 1132174963097280512: Midas/Poolsana InverPro
+      AQUATEMP_POOLSANA: "1132174963097280512",
+      // Gruppe 2:
+      // 1442284873216843776:
+      AQUATEMP_OTHER1: "1442284873216843776",
+      getDpRoot: function() {
+        return `midas-aquatemp.${this.instance}`;
+      },
+      resetOnErrorHandler: function() {
+        this.token = "";
+        this.device = "";
+        this.reachable = false;
+        (0, import_saveValue.saveValue)("info.connection", false, "boolean");
+      }
+    };
   }
-};
-const useStore = () => store;
+  return store;
+}
 // Annotate the CommonJS export names for ESM import in node:
 0 && (module.exports = {
-  useStore
+  initStore
 });
 //# sourceMappingURL=store.js.map

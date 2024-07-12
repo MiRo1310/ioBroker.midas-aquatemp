@@ -2,11 +2,12 @@ import axios from "axios";
 import { getProtocolCodes } from "./axiosParameter";
 import { getSUrlUpdateDeviceId } from "./endPoints";
 import { saveValue } from "./saveValue";
-import { useStore } from "./store";
+import { initStore } from "./store";
 
-const store = useStore();
+
 
 const isAuaTemp_Poolsana = (product: string): boolean | null => {
+	const store = initStore();
 	if (product == store.AQUATEMP_POOLSANA) {
 		return true;
 	} else if (product == store.AQUATEMP_OTHER1) {
@@ -44,6 +45,7 @@ const saveValues = (value: any, product: string): void => {
 };
 
 export async function updateDeviceDetails(): Promise<void> {
+	const store = initStore();
 	try {
 		const { apiLevel, token, device: deviceCode, product } = store;
 		if (token) {

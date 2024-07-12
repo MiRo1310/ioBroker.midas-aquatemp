@@ -22,6 +22,8 @@
 
 ### **WORK IN PROGRESS**
 
+-   FIX: #7 Error with useStore()
+
 ### 0.0.1 (11.07.2024)
 
 -   (Miro1310) initial release

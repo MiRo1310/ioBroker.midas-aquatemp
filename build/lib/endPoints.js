@@ -18,12 +18,15 @@ var __copyProps = (to, from, except, desc) => {
 var __toCommonJS = (mod) => __copyProps(__defProp({}, "__esModule", { value: true }), mod);
 var endPoints_exports = {};
 __export(endPoints_exports, {
+  getOptionsAnsSUrl: () => getOptionsAnsSUrl,
+  getSUrl: () => getSUrl,
+  getSUrlUpdateDeviceId: () => getSUrlUpdateDeviceId,
   setupEndpoints: () => setupEndpoints
 });
 module.exports = __toCommonJS(endPoints_exports);
 var import_store = require("./store");
-const store = (0, import_store.useStore)();
 function setupEndpoints() {
+  const store = (0, import_store.initStore)();
   const apiLevel = store.apiLevel;
   if (apiLevel == 1) {
     store.cloudURL = "https://cloud.linked-go.com/cloudservice/api";
@@ -37,8 +40,51 @@ function setupEndpoints() {
     store.cloudURL = "https://cloud.linked-go.com:449/crmservice/api";
   }
 }
+const getSUrl = () => {
+  const store = (0, import_store.initStore)();
+  const cloudURL = store.cloudURL;
+  if (store.apiLevel < 3) {
+    return { sURL: cloudURL + "/app/device/control.json" };
+  }
+  return { sURL: cloudURL + "/app/device/control" };
+};
+const getSUrlUpdateDeviceId = () => {
+  const store = (0, import_store.initStore)();
+  if (store.apiLevel < 3) {
+    return { sURL: store.cloudURL + "/app/device/getDataByCode.json" };
+  }
+  return { sURL: store.cloudURL + "/app/device/getDataByCode" };
+};
+const getOptionsAnsSUrl = () => {
+  const store = (0, import_store.initStore)();
+  const cloudURL = store.cloudURL;
+  const apiLevel = store.apiLevel;
+  const encryptedPassword = store.encryptedPassword;
+  const username = store.username;
+  if (apiLevel < 3) {
+    return {
+      sUrl: cloudURL + "/app/user/login.json",
+      options: {
+        user_name: username,
+        password: encryptedPassword,
+        type: "2"
+      }
+    };
+  }
+  return {
+    sUrl: cloudURL + "/app/user/login",
+    options: {
+      userName: username,
+      password: encryptedPassword,
+      type: "2"
+    }
+  };
+};
 // Annotate the CommonJS export names for ESM import in node:
 0 && (module.exports = {
+  getOptionsAnsSUrl,
+  getSUrl,
+  getSUrlUpdateDeviceId,
   setupEndpoints
 });
 //# sourceMappingURL=endPoints.js.map

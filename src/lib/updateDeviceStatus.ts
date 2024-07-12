@@ -1,10 +1,11 @@
 import axios from "axios";
 import { saveValue } from "./saveValue";
-import { useStore } from "./store";
+import { initStore } from "./store";
 import { updateDeviceDetails } from "./updateDeviceDetails";
 import { updateDeviceErrorMsg } from "./updateDeviceOnError";
-const store = useStore();
+
 export async function updateDeviceStatus(): Promise<void> {
+	const store = initStore();
 	const { apiLevel, token, device: deviceCode, cloudURL } = store;
 	if (token) {
 		let sURL = "";

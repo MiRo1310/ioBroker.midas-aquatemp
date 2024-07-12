@@ -1,8 +1,8 @@
 import { CreateObjects } from "../types";
-import { useStore } from "./store";
-const store = useStore();
+import { initStore } from "./store";
 
 export const createObjects = (): void => {
+	const store = initStore();
 	const _this = store._this;
 	const dpRoot = store.getDpRoot();
 

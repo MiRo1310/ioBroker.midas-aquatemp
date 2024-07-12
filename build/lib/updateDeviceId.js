@@ -34,45 +34,49 @@ module.exports = __toCommonJS(updateDeviceId_exports);
 var import_axios = __toESM(require("axios"));
 var import_main = require("../main");
 var import_saveValue = require("./saveValue");
-var import_updateDeviceStatus = require("./updateDeviceStatus");
 var import_store = require("./store");
-const store = (0, import_store.useStore)();
+var import_updateDeviceStatus = require("./updateDeviceStatus");
 let _this;
 async function updateDeviceID() {
+  const store = (0, import_store.initStore)();
   if (!_this) {
     _this = import_main.MidasAquatemp.getInstance();
   }
   const { token, apiLevel, cloudURL } = store;
   if (token) {
     _this.log.info("Token: " + token);
-    var sURL;
+    let sURL;
     if (apiLevel < 3) {
       sURL = cloudURL + "/app/device/deviceList.json";
     } else {
       sURL = cloudURL + "/app/device/deviceList";
     }
-    const response = await import_axios.default.post(sURL, {
-      "productIds": [
-        "1132174963097280512",
-        "1245226668902080512",
-        "1656269521923575808",
-        "1663080854333558784",
-        "1596427678569979904",
-        "1674238226096406528",
-        "1650063968998252544",
-        "1668781858447085568",
-        "1186904563333062656",
-        "1158905952238313472",
-        "1442284873216843776",
-        "1732565142225256450",
-        "1548963836789501952",
-        "1669159229372477440",
-        "1650758828508766208",
-        "1664085465655808000"
-      ]
-    }, {
-      headers: { "x-token": token }
-    });
+    const response = await import_axios.default.post(
+      sURL,
+      {
+        productIds: [
+          "1132174963097280512",
+          "1245226668902080512",
+          "1656269521923575808",
+          "1663080854333558784",
+          "1596427678569979904",
+          "1674238226096406528",
+          "1650063968998252544",
+          "1668781858447085568",
+          "1186904563333062656",
+          "1158905952238313472",
+          "1442284873216843776",
+          "1732565142225256450",
+          "1548963836789501952",
+          "1669159229372477440",
+          "1650758828508766208",
+          "1664085465655808000"
+        ]
+      },
+      {
+        headers: { "x-token": token }
+      }
+    );
     if (response && response.status == 200) {
       if (response.data.error_code == 0) {
         if (apiLevel < 3) {
@@ -91,7 +95,6 @@ async function updateDeviceID() {
           if (store.device != "" && store.product) {
             await (0, import_updateDeviceStatus.updateDeviceStatus)();
           }
-          ;
         } else {
           store.device = "";
           (0, import_saveValue.saveValue)("info.connection", false, "boolean");

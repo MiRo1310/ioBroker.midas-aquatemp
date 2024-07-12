@@ -3,7 +3,9 @@
  */
 
 // The adapter-core module gives you access to the core ioBroker functions
-// you need to create an adapter
+// you need to create an
+import { initStore } from "./lib/store";
+const store = initStore();
 
 import * as utils from "@iobroker/adapter-core";
 import axios from "axios";
@@ -12,11 +14,9 @@ import { createObjects } from "./lib/createState";
 import { encryptPassword } from "./lib/encryptPassword";
 import { getSUrl, setupEndpoints } from "./lib/endPoints";
 import { saveValue } from "./lib/saveValue";
-import { useStore } from "./lib/store";
+
 import { updateToken } from "./lib/token";
 import { getPowerMode } from "./lib/utils";
-
-const store = useStore();
 
 let updateIntervall: ioBroker.Interval | undefined;
 let tokenRefreshTimer: NodeJS.Timeout | undefined;
@@ -88,6 +88,8 @@ export class MidasAquatemp extends utils.Adapter {
 					}
 					store._this.log.error("Error: " + JSON.stringify(response.data));
 					store.resetOnErrorHandler();
+					saveValue("info.connection", false, "boolean");
+
 				}
 			} catch (error: any) {
 				store._this.log.error(JSON.stringify(error));
@@ -115,6 +117,7 @@ export class MidasAquatemp extends utils.Adapter {
 					}
 					store._this.log.error("Error: " + JSON.stringify(response.data));
 					store.resetOnErrorHandler();
+					saveValue("info.connection", false, "boolean");
 				}
 			} catch (error: any) {
 				store._this.log.error(JSON.stringify(error));
@@ -150,6 +153,7 @@ export class MidasAquatemp extends utils.Adapter {
 					}
 					store._this.log.error("Error: " + JSON.stringify(response.data));
 					store.resetOnErrorHandler();
+					saveValue("info.connection", false, "boolean");
 				}
 			} catch (error: any) {
 				store._this.log.error(JSON.stringify(error));
@@ -196,6 +200,7 @@ export class MidasAquatemp extends utils.Adapter {
 					store._this.log.error("Error: " + JSON.stringify(response.data));
 
 					store.resetOnErrorHandler();
+					saveValue("info.connection", false, "boolean");
 				}
 			} catch (error: any) {
 				store._this.log.error(JSON.stringify(error));

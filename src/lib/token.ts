@@ -1,11 +1,13 @@
 import axios from "axios";
 import { getOptionsAnsSUrl } from "./endPoints";
-import { useStore } from "./store";
+import { saveValue } from "./saveValue";
+import { initStore } from "./store";
 import { updateDeviceID } from "./updateDeviceId";
 
-const store = useStore();
+
 
 async function getToken(): Promise<void> {
+	const store = initStore();
 	const _this = store._this;
 	try {
 		const { token, apiLevel } = store;
@@ -38,6 +40,7 @@ async function getToken(): Promise<void> {
 }
 
 export const updateToken = async (): Promise<void> => {
+	const store = initStore();
 	try {
 		await getToken();
 
@@ -47,6 +50,7 @@ export const updateToken = async (): Promise<void> => {
 		}
 
 		store.resetOnErrorHandler();
+		saveValue("info.connection", false, "boolean");
 		return;
 	} catch (error: any) {
 		store._this.log.error("Error in updateToken(): " + JSON.stringify(error));

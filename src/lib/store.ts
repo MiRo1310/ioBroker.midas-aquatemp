@@ -19,34 +19,38 @@ interface Store {
 	resetOnErrorHandler: () => void;
 }
 
-const store: Store = {
-	_this: "" as unknown as MidasAquatemp,
-	token: "",
-	instance: null,
-	username: "",
-	encryptedPassword: "",
-	cloudURL: "",
-	apiLevel: 3,
-	interval: 60000,
-	device: "",
-	product: "",
-	reachable: false,
-	// ProductIDs:
-	// Gruppe 1:
-	// 1132174963097280512: Midas/Poolsana InverPro
-	AQUATEMP_POOLSANA: "1132174963097280512",
-	// Gruppe 2:
-	// 1442284873216843776:
-	AQUATEMP_OTHER1: "1442284873216843776",
-	getDpRoot: function () {
-		return `midas-aquatemp.${this.instance}`;
-	},
-	resetOnErrorHandler: function () {
-		this.token = "";
-		this.device = "";
-		this.reachable = false;
-		saveValue("info.connection", false, "boolean");
-	},
-};
-
-export const useStore = (): Store => store;
+let store: Store;
+export function initStore(): Store {
+	if (!store) {
+		store = {
+			_this: "" as unknown as MidasAquatemp,
+			token: "",
+			instance: null,
+			username: "",
+			encryptedPassword: "",
+			cloudURL: "",
+			apiLevel: 3,
+			interval: 60000,
+			device: "",
+			product: "",
+			reachable: false,
+			// ProductIDs:
+			// Gruppe 1:
+			// 1132174963097280512: Midas/Poolsana InverPro
+			AQUATEMP_POOLSANA: "1132174963097280512",
+			// Gruppe 2:
+			// 1442284873216843776:
+			AQUATEMP_OTHER1: "1442284873216843776",
+			getDpRoot: function () {
+				return `midas-aquatemp.${this.instance}`;
+			},
+			resetOnErrorHandler: function () {
+				this.token = "";
+				this.device = "";
+				this.reachable = false;
+				saveValue("info.connection", false, "boolean");
+			},
+		};
+	}
+	return store
+}

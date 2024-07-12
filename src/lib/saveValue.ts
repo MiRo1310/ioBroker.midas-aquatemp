@@ -1,9 +1,9 @@
 import { MidasAquatemp } from "../main";
-import { useStore } from "./store";
+import { initStore } from "./store";
 let _this: MidasAquatemp;
 
 export const saveValue = (key: string, value: ioBroker.StateValue, stateType: ioBroker.CommonType): void => {
-	const store = useStore();
+	const store = initStore();
 	const dpRoot = store.getDpRoot();
 	if (!_this) {
 		_this = MidasAquatemp.getInstance();

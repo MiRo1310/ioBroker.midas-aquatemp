@@ -32,34 +32,19 @@ __export(token_exports, {
 });
 module.exports = __toCommonJS(token_exports);
 var import_axios = __toESM(require("axios"));
+var import_endPoints = require("./endPoints");
+var import_saveValue = require("./saveValue");
 var import_store = require("./store");
 var import_updateDeviceId = require("./updateDeviceId");
-const store = (0, import_store.useStore)();
 async function getToken() {
   var _a, _b, _c, _d;
+  const store = (0, import_store.initStore)();
   const _this = store._this;
   try {
-    const { token, apiLevel, cloudURL, encryptedPassword } = store;
+    const { token, apiLevel } = store;
     if (!token) {
       _this.log.info("Request token");
-      var options;
-      var sUrl = "";
-      const username = store.username;
-      if (apiLevel < 3) {
-        sUrl = cloudURL + "/app/user/login.json";
-        options = {
-          "user_name": username,
-          "password": encryptedPassword,
-          "type": "2"
-        };
-      } else {
-        sUrl = cloudURL + "/app/user/login";
-        options = {
-          "userName": username,
-          "password": encryptedPassword,
-          "type": "2"
-        };
-      }
+      const { sUrl, options } = (0, import_endPoints.getOptionsAnsSUrl)();
       const response = await import_axios.default.post(sUrl, options);
       if (response.status == 200) {
         if (apiLevel < 3) {
@@ -76,17 +61,24 @@ async function getToken() {
     }
     return;
   } catch (error) {
-    _this.log.error("Error in getToken(): " + error);
+    _this.log.error("Error in getToken(): " + JSON.stringify(error));
   }
 }
 const updateToken = async () => {
-  await getToken();
-  if (store.token) {
-    await (0, import_updateDeviceId.updateDeviceID)();
+  const store = (0, import_store.initStore)();
+  try {
+    await getToken();
+    if (store.token) {
+      await (0, import_updateDeviceId.updateDeviceID)();
+      return;
+    }
+    store.resetOnErrorHandler();
+    (0, import_saveValue.saveValue)("info.connection", false, "boolean");
     return;
+  } catch (error) {
+    store._this.log.error("Error in updateToken(): " + JSON.stringify(error));
+    store._this.log.error("Error in updateToken(): " + JSON.stringify(error.stack));
   }
-  store.resetOnErrorHandler();
-  return;
 };
 // Annotate the CommonJS export names for ESM import in node:
 0 && (module.exports = {

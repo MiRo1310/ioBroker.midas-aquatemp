@@ -36,27 +36,31 @@ var import_saveValue = require("./saveValue");
 var import_store = require("./store");
 var import_updateDeviceDetails = require("./updateDeviceDetails");
 var import_updateDeviceOnError = require("./updateDeviceOnError");
-const store = (0, import_store.useStore)();
 async function updateDeviceStatus() {
+  const store = (0, import_store.initStore)();
   const { apiLevel, token, device: deviceCode, cloudURL } = store;
   if (token) {
-    var sURL = "";
+    let sURL = "";
     if (apiLevel < 3) {
       sURL = cloudURL + "/app/device/getDeviceStatus.json";
     } else {
       sURL = cloudURL + "/app/device/getDeviceStatus";
     }
-    const response = await import_axios.default.post(sURL, {
-      "device_code": deviceCode,
-      "deviceCode": deviceCode
-    }, {
-      headers: { "x-token": token }
-    });
+    const response = await import_axios.default.post(
+      sURL,
+      {
+        device_code: deviceCode,
+        deviceCode
+      },
+      {
+        headers: { "x-token": token }
+      }
+    );
     if (parseInt(response.data.error_code) == 0) {
       if (apiLevel < 3) {
         if (response.data.object_result["is_fault"] == true) {
           (0, import_saveValue.saveValue)("error", true, "boolean");
-          const objDetails = (0, import_updateDeviceDetails.updateDeviceDetails)();
+          (0, import_updateDeviceDetails.updateDeviceDetails)();
           (0, import_updateDeviceOnError.updateDeviceErrorMsg)();
         } else {
           (0, import_saveValue.saveValue)("error", false, "boolean");

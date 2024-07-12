@@ -1,7 +1,8 @@
-import { useStore } from "./store";
-const store = useStore();
+import { initStore } from "./store";
+
 
 export function setupEndpoints(): void {
+	const store = initStore();
 	const apiLevel = store.apiLevel;
 	if (apiLevel == 1) {
 		store.cloudURL = "https://cloud.linked-go.com/cloudservice/api";
@@ -16,8 +17,10 @@ export function setupEndpoints(): void {
 	}
 }
 export const getSUrl = (): {
+
 	sURL: string;
 } => {
+	const store = initStore();
 	const cloudURL = store.cloudURL;
 	if (store.apiLevel < 3) {
 		return { sURL: cloudURL + "/app/device/control.json" };
@@ -26,6 +29,7 @@ export const getSUrl = (): {
 };
 
 export const getSUrlUpdateDeviceId = (): { sURL: string } => {
+	const store = initStore();
 	if (store.apiLevel < 3) {
 		return { sURL: store.cloudURL + "/app/device/getDataByCode.json" };
 	}
@@ -41,6 +45,7 @@ export const getOptionsAnsSUrl = (): {
 		type: string;
 	};
 } => {
+	const store = initStore();
 	const cloudURL = store.cloudURL;
 	const apiLevel = store.apiLevel;
 	const encryptedPassword = store.encryptedPassword;

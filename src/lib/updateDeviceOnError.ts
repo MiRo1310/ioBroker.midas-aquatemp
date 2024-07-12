@@ -1,9 +1,10 @@
 import axios from "axios";
 import { saveValue } from "./saveValue";
-import { useStore } from "./store";
-const store = useStore();
+import { initStore } from "./store";
+
 
 export async function updateDeviceErrorMsg(): Promise<void> {
+	const store = initStore();
 	try {
 		const { token, apiLevel, cloudURL, device: deviceCode } = store;
 		if (token) {
