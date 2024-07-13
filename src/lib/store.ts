@@ -52,5 +52,5 @@ export function initStore(): Store {
 			},
 		};
 	}
-	return store
+	return store;
 }

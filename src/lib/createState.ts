@@ -1,7 +1,7 @@
 import { CreateObjects } from "../types";
 import { initStore } from "./store";
 
-export const createObjects = (): void => {
+export const createObjects = async (): Promise<void> => {
 	const store = initStore();
 	const _this = store._this;
 	const dpRoot = store.getDpRoot();
@@ -378,12 +378,16 @@ export const createObjects = (): void => {
 			role: "state",
 		},
 	];
-
-	objects.forEach(({ id, name, role, unit, type, def }) => {
-		_this.setObjectNotExists(id, {
-			type: "state",
-			common: { read: true, write: false, type: type, unit, role, name, def },
-			native: {},
+	try {
+		objects.forEach(async ({ id, name, role, unit, type, def }) => {
+			_this.log.info("Create object: " + id);
+			await _this.setObjectNotExistsAsync(id, {
+				type: "state",
+				common: { read: true, write: false, type: type, unit, role, name, def },
+				native: {},
+			});
 		});
-	});
+	} catch (error: any) {
+		_this.log.error(`Error in createObjects: ${error.message}, stack: ${error.stack}`);
+	}
 };

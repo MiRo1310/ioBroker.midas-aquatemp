@@ -2,7 +2,6 @@ import axios from "axios";
 import { saveValue } from "./saveValue";
 import { initStore } from "./store";
 
-
 export async function updateDeviceErrorMsg(): Promise<void> {
 	const store = initStore();
 	try {

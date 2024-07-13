@@ -1,11 +1,12 @@
-export const getProtocolCodes = (
-	deviceCode: string,
-): {
-	device_code: string;
-	deviceCode: string;
-	protocal_codes: string[];
-	protocalCodes: string[];
-} => {
+import {
+	InputGetAxiosUpdateDevicePowerParams,
+	InputGetAxiosUpdateDeviceSetTempParams,
+	ReturnGetAxiosUpdateDevicePowerParams,
+	ReturnGetAxiosUpdateDeviceSetTempParams,
+	ReturnGetProtocolCodes,
+} from "src/types";
+
+export const getProtocolCodes = (deviceCode: string): ReturnGetProtocolCodes => {
 	return {
 		device_code: deviceCode,
 		deviceCode: deviceCode,
@@ -92,21 +93,7 @@ export const getAxiosUpdateDevicePowerParams = ({
 	deviceCode,
 	value,
 	protocolCode,
-}: {
-	deviceCode: string;
-	value: number | string;
-	protocolCode: string;
-}): {
-	param: [
-		{
-			device_code: string;
-			deviceCode: string;
-			protocol_code: string;
-			protocolCode: string;
-			value: number | string;
-		},
-	];
-} => {
+}: InputGetAxiosUpdateDevicePowerParams): ReturnGetAxiosUpdateDevicePowerParams => {
 	return {
 		param: [
 			{
@@ -123,41 +110,7 @@ export const getAxiosUpdateDevicePowerParams = ({
 export const getAxiosUpdateDeviceSetTempParams = ({
 	deviceCode,
 	sTemperature,
-}: {
-	deviceCode: string;
-	sTemperature: string;
-}): {
-	param: [
-		{
-			device_code: string;
-			deviceCode: string;
-			protocol_code: string;
-			protocolCode: string;
-			value: string;
-		},
-		{
-			device_code: string;
-			deviceCode: string;
-			protocol_code: string;
-			protocolCode: string;
-			value: string;
-		},
-		{
-			device_code: string;
-			deviceCode: string;
-			protocol_code: string;
-			protocolCode: string;
-			value: string;
-		},
-		{
-			device_code: string;
-			deviceCode: string;
-			protocol_code: string;
-			protocolCode: string;
-			value: string;
-		},
-	];
-} => {
+}: InputGetAxiosUpdateDeviceSetTempParams): ReturnGetAxiosUpdateDeviceSetTempParams => {
 	return {
 		param: [
 			{
@@ -188,6 +141,29 @@ export const getAxiosUpdateDeviceSetTempParams = ({
 				protocolCode: "Set_Temp",
 				value: sTemperature,
 			},
+		],
+	};
+};
+
+export const getAxiosGetUpdateDeviceIdParams = (): { productIds: string[] } => {
+	return {
+		productIds: [
+			"1132174963097280512",
+			"1245226668902080512",
+			"1656269521923575808",
+			"1663080854333558784",
+			"1596427678569979904",
+			"1674238226096406528",
+			"1650063968998252544",
+			"1668781858447085568",
+			"1186904563333062656",
+			"1158905952238313472",
+			"1442284873216843776",
+			"1732565142225256450",
+			"1548963836789501952",
+			"1669159229372477440",
+			"1650758828508766208",
+			"1664085465655808000",
 		],
 	};
 };

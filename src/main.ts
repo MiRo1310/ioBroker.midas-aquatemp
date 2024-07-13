@@ -19,7 +19,7 @@ import { updateToken } from "./lib/token";
 import { getPowerMode } from "./lib/utils";
 
 let updateIntervall: ioBroker.Interval | undefined;
-let tokenRefreshTimer: NodeJS.Timeout | undefined;
+let tokenRefreshTimer: ioBroker.Interval | undefined;
 
 export class MidasAquatemp extends utils.Adapter {
 	private static instance: MidasAquatemp;
@@ -38,6 +38,7 @@ export class MidasAquatemp extends utils.Adapter {
 	}
 
 	private async onReady(): Promise<void> {
+
 		store._this = this;
 		store.instance = this.instance;
 
@@ -51,8 +52,8 @@ export class MidasAquatemp extends utils.Adapter {
 
 		setupEndpoints();
 		encryptPassword(password);
-		createObjects();
-
+		await createObjects();
+		this.log.info("Objects created");
 		clearValues();
 		await updateToken();
 
@@ -89,7 +90,6 @@ export class MidasAquatemp extends utils.Adapter {
 					store._this.log.error("Error: " + JSON.stringify(response.data));
 					store.resetOnErrorHandler();
 					saveValue("info.connection", false, "boolean");
-
 				}
 			} catch (error: any) {
 				store._this.log.error(JSON.stringify(error));
@@ -227,7 +227,7 @@ export class MidasAquatemp extends utils.Adapter {
 			}
 		}, store.interval * 1000);
 
-		tokenRefreshTimer = setInterval(function () {
+		tokenRefreshTimer = this.setInterval(function () {
 			// Token verfällt nach 60min
 			store.token = "";
 			//log("Token nach Intervall verworfen.")
@@ -274,7 +274,7 @@ export class MidasAquatemp extends utils.Adapter {
 	private onUnload(callback: () => void): void {
 		try {
 			this.clearInterval(updateIntervall);
-			clearInterval(tokenRefreshTimer);
+			this.clearInterval(tokenRefreshTimer);
 
 			callback();
 		} catch (e) {

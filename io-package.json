@@ -51,7 +51,7 @@
 			"license": "MIT"
 		},
 		"platform": "Javascript/Node.js",
-		"main": "build/main.js",
+		"main": "build/src/main.js",
 		"icon": "midas-aquatemp.png",
 		"enabled": true,
 		"extIcon": "https://raw.githubusercontent.com/Miro1310/ioBroker.midas-aquatemp/main/admin/midas-aquatemp.png",

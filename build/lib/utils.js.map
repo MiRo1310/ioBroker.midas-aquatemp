@@ -1,7 +1,0 @@
-{
-  "version": 3,
-  "sources": ["../../src/lib/utils.ts"],
-  "sourcesContent": ["export const getPowerMode = (\n\tpower: number,\n): {\n\tpowerOpt: number | null;\n\tpowerMode: number | null;\n} => {\n\tswitch (power) {\n\t\tcase -1:\n\t\t\t// aus\n\t\t\treturn {\n\t\t\t\tpowerOpt: 0,\n\t\t\t\tpowerMode: -1,\n\t\t\t};\n\t\tcase 0:\n\t\t\t// an und k\u00FChlen\n\t\t\treturn {\n\t\t\t\tpowerOpt: 1,\n\t\t\t\tpowerMode: 0,\n\t\t\t};\n\t\tcase 1:\n\t\t\t// an und heizen\n\t\t\treturn {\n\t\t\t\tpowerOpt: 1,\n\t\t\t\tpowerMode: 1,\n\t\t\t};\n\t\tcase 2:\n\t\t\t// an und auto\n\t\t\treturn {\n\t\t\t\tpowerOpt: 1,\n\t\t\t\tpowerMode: 2,\n\t\t\t};\n\t\tdefault:\n\t\t\t// log(\"ung\u00FClter Zustand!\");\n\t\t\treturn { powerOpt: null, powerMode: null };\n\t}\n};\n"],
-  "mappings": ";;;;;;;;;;;;;;;;;;AAAA;AAAA;AAAA;AAAA;AAAA;AAAO,MAAM,eAAe,CAC3B,UAII;AACJ,UAAQ,OAAO;AAAA,IACd,KAAK;AAEJ,aAAO;AAAA,QACN,UAAU;AAAA,QACV,WAAW;AAAA,MACZ;AAAA,IACD,KAAK;AAEJ,aAAO;AAAA,QACN,UAAU;AAAA,QACV,WAAW;AAAA,MACZ;AAAA,IACD,KAAK;AAEJ,aAAO;AAAA,QACN,UAAU;AAAA,QACV,WAAW;AAAA,MACZ;AAAA,IACD,KAAK;AAEJ,aAAO;AAAA,QACN,UAAU;AAAA,QACV,WAAW;AAAA,MACZ;AAAA,IACD;AAEC,aAAO,EAAE,UAAU,MAAM,WAAW,KAAK;AAAA,EAC3C;AACD;",
-  "names": []
-}

@@ -1,4 +1,5 @@
 import axios from "axios";
+import { getUpdateDeviceStatusSUrl } from "./endPoints";
 import { saveValue } from "./saveValue";
 import { initStore } from "./store";
 import { updateDeviceDetails } from "./updateDeviceDetails";
@@ -6,15 +7,9 @@ import { updateDeviceErrorMsg } from "./updateDeviceOnError";
 
 export async function updateDeviceStatus(): Promise<void> {
 	const store = initStore();
-	const { apiLevel, token, device: deviceCode, cloudURL } = store;
+	const { token, device: deviceCode } = store;
 	if (token) {
-		let sURL = "";
-
-		if (apiLevel < 3) {
-			sURL = cloudURL + "/app/device/getDeviceStatus.json";
-		} else {
-			sURL = cloudURL + "/app/device/getDeviceStatus";
-		}
+		const { sURL } = getUpdateDeviceStatusSUrl();
 
 		const response = await axios.post(
 			sURL,
@@ -28,43 +23,25 @@ export async function updateDeviceStatus(): Promise<void> {
 		);
 
 		if (parseInt(response.data.error_code) == 0) {
-			if (apiLevel < 3) {
-				if (response.data.object_result["is_fault"] == true) {
-					// TODO: Fehlerbeschreibung abrufen
-					//clearValues();
-					saveValue("error", true, "boolean");
-					updateDeviceDetails();
-
-					updateDeviceErrorMsg();
-				} else {
-					// kein Fehler
-					saveValue("error", false, "boolean");
-					saveValue("errorMessage", "", "string");
-					saveValue("errorCode", "", "string");
-					saveValue("errorLevel", 0, "number");
-					updateDeviceDetails();
-				}
-			} else {
-				if (response.data.objectResult["is_fault"] == true) {
-					// TODO: Fehlerbeschreibung abrufen
-					//clearValues();
-					saveValue("error", true, "boolean");
-					updateDeviceDetails();
-					updateDeviceErrorMsg();
-				} else {
-					// kein Fehler
-					saveValue("error", false, "boolean");
-					saveValue("errorMessage", "", "string");
-					saveValue("errorCode", "", "string");
-					saveValue("errorLevel", 0, "number");
-					updateDeviceDetails();
-				}
+			if (response.data?.object_result?.["is_fault"] || response.data?.objectResult?.["isFault"]) {
+				// TODO: Fehlerbeschreibung abrufen
+				//clearValues();
+				saveValue("error", true, "boolean");
+				updateDeviceDetails();
+				updateDeviceErrorMsg();
+				return;
 			}
-		} else {
-			// log("Fehler in updateDeviceStatus(): " + JSON.stringify(response.data), "error");
+			// kein Fehler
+			saveValue("error", false, "boolean");
+			saveValue("errorMessage", "", "string");
+			saveValue("errorCode", "", "string");
+			saveValue("errorLevel", 0, "number");
+			updateDeviceDetails();
 
-			saveValue("info.connection", false, "boolean");
+			return;
 		}
+		saveValue("info.connection", false, "boolean");
+		return;
 	}
 	(store.token = ""), (store.device = ""), (store.reachable = false);
 }
