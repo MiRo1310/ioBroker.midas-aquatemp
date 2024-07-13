@@ -1,7 +1,0 @@
-{
-  "version": 3,
-  "sources": ["../../src/lib/saveValue.ts"],
-  "sourcesContent": ["import { MidasAquatemp } from \"../main\";\nimport { initStore } from \"./store\";\nlet _this: MidasAquatemp;\n\nexport const saveValue = (key: string, value: ioBroker.StateValue, stateType: ioBroker.CommonType): void => {\n\tconst store = initStore();\n\tconst dpRoot = store.getDpRoot();\n\tif (!_this) {\n\t\t_this = MidasAquatemp.getInstance();\n\t}\n\tconst dp = dpRoot + \".\" + key;\n\n\tif (!_this.objectExists(dp)) {\n\t\t_this.setObjectNotExists(dp, {\n\t\t\ttype: \"state\",\n\t\t\tcommon: {\n\t\t\t\tname: key,\n\t\t\t\ttype: stateType,\n\t\t\t\trole: \"value\",\n\t\t\t\tread: true,\n\t\t\t\twrite: false,\n\t\t\t},\n\t\t\tnative: {},\n\t\t});\n\t\treturn;\n\t}\n\n\t_this.setState(dp, value, true);\n};\n"],
-  "mappings": ";;;;;;;;;;;;;;;;;;AAAA;AAAA;AAAA;AAAA;AAAA;AAAA,kBAA8B;AAC9B,mBAA0B;AAC1B,IAAI;AAEG,MAAM,YAAY,CAAC,KAAa,OAA4B,cAAyC;AAC3G,QAAM,YAAQ,wBAAU;AACxB,QAAM,SAAS,MAAM,UAAU;AAC/B,MAAI,CAAC,OAAO;AACX,YAAQ,0BAAc,YAAY;AAAA,EACnC;AACA,QAAM,KAAK,SAAS,MAAM;AAE1B,MAAI,CAAC,MAAM,aAAa,EAAE,GAAG;AAC5B,UAAM,mBAAmB,IAAI;AAAA,MAC5B,MAAM;AAAA,MACN,QAAQ;AAAA,QACP,MAAM;AAAA,QACN,MAAM;AAAA,QACN,MAAM;AAAA,QACN,MAAM;AAAA,QACN,OAAO;AAAA,MACR;AAAA,MACA,QAAQ,CAAC;AAAA,IACV,CAAC;AACD;AAAA,EACD;AAEA,QAAM,SAAS,IAAI,OAAO,IAAI;AAC/B;",
-  "names": []
-}

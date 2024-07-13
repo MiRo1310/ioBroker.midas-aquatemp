@@ -1,10 +1,8 @@
 import axios from "axios";
-import { getOptionsAnsSUrl } from "./endPoints";
+import { getOptionsAndSUrl } from "./endPoints";
 import { saveValue } from "./saveValue";
 import { initStore } from "./store";
 import { updateDeviceID } from "./updateDeviceId";
-
-
 
 async function getToken(): Promise<void> {
 	const store = initStore();
@@ -14,18 +12,15 @@ async function getToken(): Promise<void> {
 
 		if (!token) {
 			_this.log.info("Request token");
-
-			const { sUrl, options } = getOptionsAnsSUrl();
-
+			const { sUrl, options } = getOptionsAndSUrl();
 			const response = await axios.post(sUrl, options);
-
 			if (response.status == 200) {
-				if (apiLevel < 3) {
-					store.token = response.data?.object_result?.["x-token"];
-				} else {
-					store.token = response.data?.objectResult?.["x-token"];
-				}
-				_this.log.info("Login ok! Token: " + token);
+				store.token =
+					apiLevel < 3
+						? (store.token = response.data?.object_result?.["x-token"])
+						: (store.token = response.data?.objectResult?.["x-token"]);
+
+				_this.log.info("Login ok! Token: " + store.token);
 				return;
 			}
 

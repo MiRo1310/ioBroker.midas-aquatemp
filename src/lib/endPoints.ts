@@ -1,6 +1,5 @@
 import { initStore } from "./store";
 
-
 export function setupEndpoints(): void {
 	const store = initStore();
 	const apiLevel = store.apiLevel;
@@ -17,7 +16,6 @@ export function setupEndpoints(): void {
 	}
 }
 export const getSUrl = (): {
-
 	sURL: string;
 } => {
 	const store = initStore();
@@ -36,7 +34,7 @@ export const getSUrlUpdateDeviceId = (): { sURL: string } => {
 	return { sURL: store.cloudURL + "/app/device/getDataByCode" };
 };
 
-export const getOptionsAnsSUrl = (): {
+export const getOptionsAndSUrl = (): {
 	sUrl: string;
 	options: {
 		userName?: string;
@@ -68,4 +66,20 @@ export const getOptionsAnsSUrl = (): {
 			type: "2",
 		},
 	};
+};
+
+export const getUpdateDeviceStatusSUrl = (): { sURL: string } => {
+	const store = initStore();
+	if (store.apiLevel < 3) {
+		return { sURL: store.cloudURL + "/app/device/getDeviceStatus.json" };
+	}
+	return { sURL: store.cloudURL + "/app/device/getDeviceStatus" };
+};
+
+export const getUpdateDeviceIdSUrl = (): { sURL: string } => {
+	const store = initStore();
+	if (store.apiLevel < 3) {
+		return { sURL: store.cloudURL + "/app/device/deviceList.json" };
+	}
+	return { sURL: store.cloudURL + "/app/device/deviceList" };
 };

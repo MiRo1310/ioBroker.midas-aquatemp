@@ -4,8 +4,6 @@ import { getSUrlUpdateDeviceId } from "./endPoints";
 import { saveValue } from "./saveValue";
 import { initStore } from "./store";
 
-
-
 const isAuaTemp_Poolsana = (product: string): boolean | null => {
 	const store = initStore();
 	if (product == store.AQUATEMP_POOLSANA) {
@@ -65,16 +63,7 @@ export async function updateDeviceDetails(): Promise<void> {
 				}
 
 				saveValue("rawJSON", JSON.stringify(responseValue), "string");
-
-				if (findCodeVal(responseValue, "Power") == "1") {
-					saveValues(responseValue, product);
-				} else {
-					saveValue("consumption", 0, "number");
-					saveValue("rotor", 0, "number");
-				}
-
-				// Ziel-Temperatur Set_Temp
-				//saveValue("tempSet", parseFloat(findCodeVal(body.object_result, "Set_Temp")), "number");
+				saveValues(responseValue, product);
 
 				// Ziel-Temperatur anhand Modus
 				if (findCodeVal(responseValue, "Mode") == 1) {
@@ -110,7 +99,9 @@ export async function updateDeviceDetails(): Promise<void> {
 
 			store._this.log.error("Error: " + JSON.stringify(response.data));
 			saveValue("info.connection", false, "boolean");
-			(store.token = ""), (store.device = ""), (store.reachable = false);
+			store.token = "";
+			store.device = "";
+			store.reachable = false;
 			return;
 		}
 		return;
@@ -120,14 +111,6 @@ export async function updateDeviceDetails(): Promise<void> {
 	}
 }
 
-function findCodeVal(result: any, code: string): any {
-	// printLog("Suche Wert " + code, 1);
-	for (let i = 0; i < result.length; i++) {
-		// printLog(result[i].code, 1);
-		if (result[i].code.indexOf(code) >= 0) {
-			// printLog("Wert gefunden: " + result[i].value, 1);
-			return result[i].value;
-		}
-	}
-	return "";
+function findCodeVal(result: { value: string; code: string }[], code: string): any {
+	return result.find((item) => item.code === code)?.value || "";
 }
