@@ -5,21 +5,21 @@
 // The adapter-core module gives you access to the core ioBroker functions
 // you need to create an
 import { initStore } from "./lib/store";
-const store = initStore();
 
 import * as utils from "@iobroker/adapter-core";
-import axios from "axios";
-import { getAxiosUpdateDevicePowerParams, getAxiosUpdateDeviceSetTempParams } from "./lib/axiosParameter";
 import { createObjects } from "./lib/createState";
 import { encryptPassword } from "./lib/encryptPassword";
-import { getSUrl, setupEndpoints } from "./lib/endPoints";
+import { setupEndpoints } from "./lib/endPoints";
 import { saveValue } from "./lib/saveValue";
 
 import { updateToken } from "./lib/token";
-import { getPowerMode } from "./lib/utils";
+
+import { updateDevicePower } from "./lib/updateDevicePower";
+import { updateDeviceSilent } from "./lib/updateDeviceSilent";
+import { updateDeviceSetTemp } from "./lib/updateDeviceSetTemp";
 
 let updateIntervall: ioBroker.Interval | undefined;
-let tokenRefreshTimer: NodeJS.Timeout | undefined;
+let tokenRefreshTimer: ioBroker.Interval | undefined;
 
 export class MidasAquatemp extends utils.Adapter {
 	private static instance: MidasAquatemp;
@@ -38,7 +38,7 @@ export class MidasAquatemp extends utils.Adapter {
 	}
 
 	private async onReady(): Promise<void> {
-
+		const store = initStore();
 		store._this = this;
 		store.instance = this.instance;
 
@@ -52,7 +52,8 @@ export class MidasAquatemp extends utils.Adapter {
 
 		setupEndpoints();
 		encryptPassword(password);
-		createObjects();
+		await createObjects();
+		this.log.info("Objects created");
 		clearValues();
 		await updateToken();
 
@@ -62,149 +63,6 @@ export class MidasAquatemp extends utils.Adapter {
 			saveValue("state", false, "boolean");
 			saveValue("rawJSON", null, "string");
 		}
-
-		async function updateDevicePower(deviceCode: string, power: number): Promise<void> {
-			try {
-				const token = store.token;
-				const { powerMode, powerOpt } = getPowerMode(power);
-				if (powerOpt === null || powerMode === null) {
-					return;
-				}
-				if (token && token != "") {
-					const { sURL } = getSUrl();
-					const response = await axios.post(
-						sURL,
-						getAxiosUpdateDevicePowerParams({ deviceCode, value: powerOpt, protocolCode: "Power" }),
-						{
-							headers: { "x-token": token },
-						},
-					);
-
-					store._this.log.info("DeviceStatus: " + JSON.stringify(response.data));
-					if (parseInt(response.data.error_code) == 0) {
-						saveValue("mode", power.toString(), "string");
-						if (power >= 0) updateDeviceMode(store.device, power);
-						return;
-					}
-					store._this.log.error("Error: " + JSON.stringify(response.data));
-					store.resetOnErrorHandler();
-					saveValue("info.connection", false, "boolean");
-				}
-			} catch (error: any) {
-				store._this.log.error(JSON.stringify(error));
-				store._this.log.error(JSON.stringify(error.stack));
-			}
-		}
-
-		async function updateDeviceMode(deviceCode: string, mode: any): Promise<void> {
-			const token = store.token;
-			try {
-				if (token && token != "") {
-					const { sURL } = getSUrl();
-					const response = await axios.post(
-						sURL,
-						getAxiosUpdateDevicePowerParams({ deviceCode: deviceCode, value: mode, protocolCode: "mode" }),
-						{
-							headers: { "x-token": token },
-						},
-					);
-					store._this.log.info("DeviceStatus: " + JSON.stringify(response.data));
-
-					if (parseInt(response.data.error_code) == 0) {
-						saveValue("mode", mode, "string");
-						return;
-					}
-					store._this.log.error("Error: " + JSON.stringify(response.data));
-					store.resetOnErrorHandler();
-					saveValue("info.connection", false, "boolean");
-				}
-			} catch (error: any) {
-				store._this.log.error(JSON.stringify(error));
-				store._this.log.error(JSON.stringify(error.stack));
-			}
-		}
-
-		async function updateDeviceSilent(deviceCode: string, silent: any): Promise<void> {
-			try {
-				const token = store.token;
-				let silentMode;
-
-				if (silent) {
-					silentMode = "1";
-				} else {
-					silentMode = "0";
-				}
-
-				if (token && token != "") {
-					const { sURL } = getSUrl();
-					const response = await axios.post(
-						sURL,
-						getAxiosUpdateDevicePowerParams({ deviceCode, value: silentMode, protocolCode: "Manual-mute" }),
-						{
-							headers: { "x-token": token },
-						},
-					);
-					store._this.log.info("DeviceStatus: " + JSON.stringify(response.data));
-
-					if (parseInt(response.data.error_code) == 0) {
-						saveValue("silent", silent, "boolean");
-						return;
-					}
-					store._this.log.error("Error: " + JSON.stringify(response.data));
-					store.resetOnErrorHandler();
-					saveValue("info.connection", false, "boolean");
-				}
-			} catch (error: any) {
-				store._this.log.error(JSON.stringify(error));
-				store._this.log.error(JSON.stringify(error.stack));
-			}
-		}
-
-		const updateDeviceSetTemp = async (deviceCode: string, temperature: number): Promise<void> => {
-			try {
-				const token = store.token;
-				const sTemperature = temperature.toString().replace(",", ".");
-				const result = await store._this.getStateAsync(dpRoot + ".mode");
-				if (!result || !result.val) {
-					return;
-				}
-				let sMode = result.val;
-				if (sMode == "-1") {
-					//log("Gerät einschalten um Temperatur zu ändern!", 'warn');
-					return;
-				} else if (sMode == "0") {
-					sMode = "R01"; // Kühlen
-				} else if (sMode == "1") {
-					sMode = "R02"; // Heizen
-				} else if (sMode == "2") {
-					sMode = "R03"; // Auto
-				}
-
-				if (token && token != "") {
-					const { sURL } = getSUrl();
-
-					const response = await axios.post(
-						sURL,
-						getAxiosUpdateDeviceSetTempParams({ deviceCode, sTemperature }),
-						{
-							headers: { "x-token": token },
-						},
-					);
-					store._this.log.info("DeviceStatus: " + JSON.stringify(response.data));
-
-					if (parseInt(response.data.error_code) == 0) {
-						saveValue("tempSet", temperature, "number");
-						return;
-					}
-					store._this.log.error("Error: " + JSON.stringify(response.data));
-
-					store.resetOnErrorHandler();
-					saveValue("info.connection", false, "boolean");
-				}
-			} catch (error: any) {
-				store._this.log.error(JSON.stringify(error));
-			}
-		};
 
 		updateIntervall = store._this.setInterval(async () => {
 			try {
@@ -226,7 +84,7 @@ export class MidasAquatemp extends utils.Adapter {
 			}
 		}, store.interval * 1000);
 
-		tokenRefreshTimer = setInterval(function () {
+		tokenRefreshTimer = this.setInterval(function () {
 			// Token verfällt nach 60min
 			store.token = "";
 			//log("Token nach Intervall verworfen.")
@@ -273,7 +131,7 @@ export class MidasAquatemp extends utils.Adapter {
 	private onUnload(callback: () => void): void {
 		try {
 			this.clearInterval(updateIntervall);
-			clearInterval(tokenRefreshTimer);
+			this.clearInterval(tokenRefreshTimer);
 
 			callback();
 		} catch (e) {

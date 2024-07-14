@@ -18,6 +18,10 @@ async function getToken() {
             _this.log.info("Request token");
             const { sUrl, options } = (0, endPoints_1.getOptionsAndSUrl)();
             const response = await axios_1.default.post(sUrl, options);
+            if (!response) {
+                _this.log.error("No response from server");
+                return;
+            }
             if (response.status == 200) {
                 store.token =
                     apiLevel < 3

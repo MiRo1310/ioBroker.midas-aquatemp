@@ -2,7 +2,7 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.createObjects = void 0;
 const store_1 = require("./store");
-const createObjects = () => {
+const createObjects = async () => {
     const store = (0, store_1.initStore)();
     const _this = store._this;
     const dpRoot = store.getDpRoot();
@@ -378,13 +378,19 @@ const createObjects = () => {
             role: "state",
         },
     ];
-    objects.forEach(({ id, name, role, unit, type, def }) => {
-        _this.setObjectNotExists(id, {
-            type: "state",
-            common: { read: true, write: false, type: type, unit, role, name, def },
-            native: {},
-        });
-    });
+    try {
+        for (const { id, name, role, unit, type, def } of objects) {
+            _this.log.info("Create object: " + id);
+            await _this.setObjectNotExistsAsync(id, {
+                type: "state",
+                common: { read: true, write: false, type: type, unit, role, name, def },
+                native: {},
+            });
+        }
+    }
+    catch (error) {
+        _this.log.error(`Error in createObjects: ${error.message}, stack: ${error.stack}`);
+    }
 };
 exports.createObjects = createObjects;
 //# sourceMappingURL=createState.js.map

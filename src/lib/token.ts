@@ -4,6 +4,8 @@ import { saveValue } from "./saveValue";
 import { initStore } from "./store";
 import { updateDeviceID } from "./updateDeviceId";
 
+
+
 async function getToken(): Promise<void> {
 	const store = initStore();
 	const _this = store._this;
@@ -14,6 +16,10 @@ async function getToken(): Promise<void> {
 			_this.log.info("Request token");
 			const { sUrl, options } = getOptionsAndSUrl();
 			const response = await axios.post(sUrl, options);
+			if (!response) {
+				_this.log.error("No response from server");
+				return;
+			}
 			if (response.status == 200) {
 				store.token =
 					apiLevel < 3
