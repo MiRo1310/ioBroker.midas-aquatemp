@@ -66,11 +66,10 @@ export class MidasAquatemp extends utils.Adapter {
 
 		updateIntervall = store._this.setInterval(async () => {
 			try {
-				// regelmäßig Token und Zustand abfragen
-				await updateToken();
 
+				// await updateToken();
 				const mode = await store._this.getStateAsync(dpRoot + ".mode");
-				// gewünschte Änderungen ausführen
+
 				if (mode && !mode.ack && mode.val) {
 					updateDevicePower(store.device, mode.val as number);
 				}
@@ -84,17 +83,15 @@ export class MidasAquatemp extends utils.Adapter {
 			}
 		}, store.interval * 1000);
 
-		tokenRefreshTimer = this.setInterval(function () {
-			// Token verfällt nach 60min
+		tokenRefreshTimer = this.setInterval(async function () {
 			store.token = "";
-			//log("Token nach Intervall verworfen.")
-			updateToken();
+			store._this.log.info("Token will be refreshed.");
+			await updateToken();
 		}, 3600000);
 
 		this.on("stateChange", async (id, state) => {
 			try {
 				if (id === dpRoot + ".mode" && state && !state.ack) {
-					updateToken();
 					const mode = await this.getStateAsync(dpRoot + ".mode");
 					if (mode && mode.val) {
 						updateDevicePower(store.device, mode.val as number);
@@ -102,7 +99,6 @@ export class MidasAquatemp extends utils.Adapter {
 				}
 
 				if (id === dpRoot + ".silent" && state && !state.ack) {
-					updateToken();
 					const silent = await this.getStateAsync(dpRoot + ".silent");
 					if (silent && silent.val) {
 						updateDeviceSilent(store.device, silent.val as number);
@@ -110,7 +106,6 @@ export class MidasAquatemp extends utils.Adapter {
 				}
 
 				if (id === dpRoot + ".tempSet" && state && !state.ack) {
-					updateToken();
 					const tempSet = await this.getStateAsync(dpRoot + ".tempSet");
 					if (tempSet && tempSet.val) {
 						updateDeviceSetTemp(store.device, tempSet.val as number);

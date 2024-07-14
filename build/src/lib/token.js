@@ -23,10 +23,12 @@ async function getToken() {
                 return;
             }
             if (response.status == 200) {
-                store.token =
-                    apiLevel < 3
-                        ? (store.token = response.data?.object_result?.["x-token"])
-                        : (store.token = response.data?.objectResult?.["x-token"]);
+                if (apiLevel < 3) {
+                    store.token = response.data?.object_result?.["x-token"];
+                }
+                else {
+                    store.token = response.data?.objectResult?.["x-token"];
+                }
                 _this.log.info("Login ok! Token: " + store.token);
                 return;
             }
@@ -34,7 +36,6 @@ async function getToken() {
             store.token = null;
             return;
         }
-        return;
     }
     catch (error) {
         _this.log.error("Error in getToken(): " + JSON.stringify(error));

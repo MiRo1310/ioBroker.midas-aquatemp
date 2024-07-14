@@ -79,10 +79,8 @@ class MidasAquatemp extends utils.Adapter {
         }
         updateIntervall = store._this.setInterval(async () => {
             try {
-                // regelmäßig Token und Zustand abfragen
-                await (0, token_1.updateToken)();
+                // await updateToken();
                 const mode = await store._this.getStateAsync(dpRoot + ".mode");
-                // gewünschte Änderungen ausführen
                 if (mode && !mode.ack && mode.val) {
                     (0, updateDevicePower_1.updateDevicePower)(store.device, mode.val);
                 }
@@ -96,30 +94,26 @@ class MidasAquatemp extends utils.Adapter {
                 store._this.log.error(JSON.stringify(error.stack));
             }
         }, store.interval * 1000);
-        tokenRefreshTimer = this.setInterval(function () {
-            // Token verfällt nach 60min
+        tokenRefreshTimer = this.setInterval(async function () {
             store.token = "";
-            //log("Token nach Intervall verworfen.")
-            (0, token_1.updateToken)();
+            store._this.log.info("Token will be refreshed.");
+            await (0, token_1.updateToken)();
         }, 3600000);
         this.on("stateChange", async (id, state) => {
             try {
                 if (id === dpRoot + ".mode" && state && !state.ack) {
-                    (0, token_1.updateToken)();
                     const mode = await this.getStateAsync(dpRoot + ".mode");
                     if (mode && mode.val) {
                         (0, updateDevicePower_1.updateDevicePower)(store.device, mode.val);
                     }
                 }
                 if (id === dpRoot + ".silent" && state && !state.ack) {
-                    (0, token_1.updateToken)();
                     const silent = await this.getStateAsync(dpRoot + ".silent");
                     if (silent && silent.val) {
                         (0, updateDeviceSilent_1.updateDeviceSilent)(store.device, silent.val);
                     }
                 }
                 if (id === dpRoot + ".tempSet" && state && !state.ack) {
-                    (0, token_1.updateToken)();
                     const tempSet = await this.getStateAsync(dpRoot + ".tempSet");
                     if (tempSet && tempSet.val) {
                         (0, updateDeviceSetTemp_1.updateDeviceSetTemp)(store.device, tempSet.val);

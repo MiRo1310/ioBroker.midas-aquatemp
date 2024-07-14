@@ -1,13 +1,11 @@
 import axios from "axios";
 import { getOptionsAndSUrl } from "./endPoints";
 import { saveValue } from "./saveValue";
-import { initStore } from "./store";
+import { initStore as useStore } from "./store";
 import { updateDeviceID } from "./updateDeviceId";
 
-
-
 async function getToken(): Promise<void> {
-	const store = initStore();
+	const store = useStore();
 	const _this = store._this;
 	try {
 		const { token, apiLevel } = store;
@@ -21,10 +19,13 @@ async function getToken(): Promise<void> {
 				return;
 			}
 			if (response.status == 200) {
-				store.token =
-					apiLevel < 3
-						? (store.token = response.data?.object_result?.["x-token"])
-						: (store.token = response.data?.objectResult?.["x-token"]);
+
+				if (apiLevel < 3) {
+					store.token = response.data?.object_result?.["x-token"]
+				}
+				else {
+					store.token = response.data?.objectResult?.["x-token"]
+				}
 
 				_this.log.info("Login ok! Token: " + store.token);
 				return;
@@ -34,14 +35,13 @@ async function getToken(): Promise<void> {
 			store.token = null;
 			return;
 		}
-		return;
 	} catch (error) {
 		_this.log.error("Error in getToken(): " + JSON.stringify(error));
 	}
 }
 
 export const updateToken = async (): Promise<void> => {
-	const store = initStore();
+	const store = useStore();
 	try {
 		await getToken();
 

@@ -38,13 +38,13 @@ export async function updateDeviceID(): Promise<void> {
 		}
 
 		if (apiLevel < 3) {
-			store.device = response.data.object_result[0].device_code;
-			store.product = response.data.object_result[0].product_id;
-			store.reachable = response.data.object_result[0].device_status == "ONLINE";
+			store.device = response.data.object_result[0]?.device_code;
+			store.product = response.data.object_result[0]?.product_id;
+			store.reachable = response.data.object_result[0]?.device_status == "ONLINE";
 		} else {
-			store.device = response.data.objectResult[0].deviceCode;
-			store.product = response.data.objectResult[0].productId;
-			store.reachable = response.data.objectResult[0].deviceStatus == "ONLINE";
+			store.device = response.data.objectResult[0]?.deviceCode;
+			store.product = response.data.objectResult[0]?.productId;
+			store.reachable = response.data.objectResult[0]?.deviceStatus == "ONLINE";
 		}
 
 		saveValue("DeviceCode", store.device, "string");

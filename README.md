@@ -22,8 +22,9 @@
 
 ### **WORK IN PROGRESS**
 
--   FIX: Get token
+-   FEAT: Add writeable states
 -   FEAT: Data is also updated when the heating is off
+-   FIX: Get token
 -   FIX: #7 Error with useStore()
 
 ### 0.0.1 (11.07.2024)
