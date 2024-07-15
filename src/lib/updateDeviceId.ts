@@ -36,7 +36,7 @@ export async function updateDeviceID(): Promise<void> {
 			(store.token = ""), (store.device = ""), (store.reachable = false);
 			return;
 		}
-		if (!response.data.object_result[0]?.device_code || !response.data.objectResult[0]?.deviceCode) {
+		if (!response.data?.object_result?.[0].device_code && !response.data?.objectResult?.[0].deviceCode) {
 			_this.log.error("Error in updateDeviceID(): No device code found");
 			_this.log.error("Response: " + JSON.stringify(response));
 			return;

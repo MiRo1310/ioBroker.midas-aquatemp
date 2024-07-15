@@ -66,6 +66,7 @@ export class MidasAquatemp extends utils.Adapter {
 
 		updateIntervall = store._this.setInterval(async () => {
 			try {
+
 				await updateToken();
 				const mode = await store._this.getStateAsync(dpRoot + ".mode");
 
@@ -107,7 +108,6 @@ export class MidasAquatemp extends utils.Adapter {
 				}
 
 				if (id === dpRoot + ".tempSet" && state && !state.ack) {
-					this.log.debug("TempSet: " + JSON.stringify(state));
 					const tempSet = await this.getStateAsync(dpRoot + ".tempSet");
 					if (tempSet && tempSet.val) {
 						updateDeviceSetTemp(store.device, tempSet.val as number);
@@ -136,11 +136,13 @@ export class MidasAquatemp extends utils.Adapter {
 		}
 	}
 }
+let adapter
 
 if (require.main !== module) {
 	// Export the constructor in compact mode
-	module.exports = (options: Partial<utils.AdapterOptions> | undefined) => new MidasAquatemp(options);
+	adapter = (options: Partial<utils.AdapterOptions> | undefined) => new MidasAquatemp(options);
 } else {
 	// otherwise start the instance directly
 	(() => new MidasAquatemp())();
 }
+export { adapter }
