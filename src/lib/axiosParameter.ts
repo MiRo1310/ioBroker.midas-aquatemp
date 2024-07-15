@@ -1,6 +1,10 @@
-import { InputGetAxiosUpdateDevicePowerParams, InputGetAxiosUpdateDeviceSetTempParams, ReturnGetAxiosUpdateDevicePowerParams, ReturnGetAxiosUpdateDeviceSetTempParams, ReturnGetProtocolCodes } from "../types";
-
-
+import {
+	InputGetAxiosUpdateDevicePowerParams,
+	InputGetAxiosUpdateDeviceSetTempParams,
+	ReturnGetAxiosUpdateDevicePowerParams,
+	ReturnGetAxiosUpdateDeviceSetTempParams,
+	ReturnGetProtocolCodes,
+} from "../types";
 
 export const getProtocolCodes = (deviceCode: string): ReturnGetProtocolCodes => {
 	return {

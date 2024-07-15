@@ -19,12 +19,10 @@ async function getToken(): Promise<void> {
 				return;
 			}
 			if (response.status == 200) {
-
 				if (apiLevel < 3) {
-					store.token = response.data?.object_result?.["x-token"]
-				}
-				else {
-					store.token = response.data?.objectResult?.["x-token"]
+					store.token = response.data?.object_result?.["x-token"];
+				} else {
+					store.token = response.data?.objectResult?.["x-token"];
 				}
 
 				_this.log.info("Login ok! Token: " + store.token);

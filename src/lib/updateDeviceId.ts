@@ -36,6 +36,11 @@ export async function updateDeviceID(): Promise<void> {
 			(store.token = ""), (store.device = ""), (store.reachable = false);
 			return;
 		}
+		if (!response.data.object_result[0]?.device_code || !response.data.objectResult[0]?.deviceCode) {
+			_this.log.error("Error in updateDeviceID(): No device code found");
+			_this.log.error("Response: " + JSON.stringify(response));
+			return;
+		}
 
 		if (apiLevel < 3) {
 			store.device = response.data.object_result[0]?.device_code;
@@ -46,6 +51,9 @@ export async function updateDeviceID(): Promise<void> {
 			store.product = response.data.objectResult[0]?.productId;
 			store.reachable = response.data.objectResult[0]?.deviceStatus == "ONLINE";
 		}
+		_this.log.debug("Device: " + store.device);
+		_this.log.debug("Product: " + store.product);
+		_this.log.debug("Reachable: " + store.reachable);
 
 		saveValue("DeviceCode", store.device, "string");
 		saveValue("ProductCode", store.product, "string");
@@ -53,6 +61,7 @@ export async function updateDeviceID(): Promise<void> {
 		if (store.reachable && store.device) {
 			saveValue("info.connection", true, "boolean");
 			if (store.device != "" && store.product) {
+				_this.log.debug("Update device status");
 				await updateDeviceStatus();
 			}
 			return;
