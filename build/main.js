@@ -28,7 +28,8 @@ var __toESM = (mod, isNodeMode, target) => (target = mod != null ? __create(__ge
 var __toCommonJS = (mod) => __copyProps(__defProp({}, "__esModule", { value: true }), mod);
 var main_exports = {};
 __export(main_exports, {
-  MidasAquatemp: () => MidasAquatemp
+  MidasAquatemp: () => MidasAquatemp,
+  adapter: () => adapter
 });
 module.exports = __toCommonJS(main_exports);
 var import_store = require("./lib/store");
@@ -143,13 +144,15 @@ class MidasAquatemp extends utils.Adapter {
     }
   }
 }
+let adapter;
 if (require.main !== module) {
-  module.exports = (options) => new MidasAquatemp(options);
+  adapter = (options) => new MidasAquatemp(options);
 } else {
   (() => new MidasAquatemp())();
 }
 // Annotate the CommonJS export names for ESM import in node:
 0 && (module.exports = {
-  MidasAquatemp
+  MidasAquatemp,
+  adapter
 });
 //# sourceMappingURL=main.js.map

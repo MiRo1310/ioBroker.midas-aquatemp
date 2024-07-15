@@ -136,11 +136,13 @@ export class MidasAquatemp extends utils.Adapter {
 		}
 	}
 }
+let adapter;
 
 if (require.main !== module) {
 	// Export the constructor in compact mode
-	module.exports = (options: Partial<utils.AdapterOptions> | undefined) => new MidasAquatemp(options);
+	adapter = (options: Partial<utils.AdapterOptions> | undefined) => new MidasAquatemp(options);
 } else {
 	// otherwise start the instance directly
 	(() => new MidasAquatemp())();
 }
+export { adapter };

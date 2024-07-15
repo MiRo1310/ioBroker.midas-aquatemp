@@ -40,7 +40,7 @@ var import_store = require("./store");
 var import_updateDeviceStatus = require("./updateDeviceStatus");
 let _this;
 async function updateDeviceID() {
-  var _a, _b, _c, _d, _e, _f, _g, _h;
+  var _a, _b, _c, _d, _e, _f, _g, _h, _i, _j;
   const store = (0, import_store.initStore)();
   try {
     if (!_this) {
@@ -63,19 +63,19 @@ async function updateDeviceID() {
       store.token = "", store.device = "", store.reachable = false;
       return;
     }
-    if (!((_a = response.data.object_result[0]) == null ? void 0 : _a.device_code) || !((_b = response.data.objectResult[0]) == null ? void 0 : _b.deviceCode)) {
+    if (!((_b = (_a = response.data) == null ? void 0 : _a.object_result) == null ? void 0 : _b[0].device_code) && !((_d = (_c = response.data) == null ? void 0 : _c.objectResult) == null ? void 0 : _d[0].deviceCode)) {
       _this.log.error("Error in updateDeviceID(): No device code found");
       _this.log.error("Response: " + JSON.stringify(response));
       return;
     }
     if (apiLevel < 3) {
-      store.device = (_c = response.data.object_result[0]) == null ? void 0 : _c.device_code;
-      store.product = (_d = response.data.object_result[0]) == null ? void 0 : _d.product_id;
-      store.reachable = ((_e = response.data.object_result[0]) == null ? void 0 : _e.device_status) == "ONLINE";
+      store.device = (_e = response.data.object_result[0]) == null ? void 0 : _e.device_code;
+      store.product = (_f = response.data.object_result[0]) == null ? void 0 : _f.product_id;
+      store.reachable = ((_g = response.data.object_result[0]) == null ? void 0 : _g.device_status) == "ONLINE";
     } else {
-      store.device = (_f = response.data.objectResult[0]) == null ? void 0 : _f.deviceCode;
-      store.product = (_g = response.data.objectResult[0]) == null ? void 0 : _g.productId;
-      store.reachable = ((_h = response.data.objectResult[0]) == null ? void 0 : _h.deviceStatus) == "ONLINE";
+      store.device = (_h = response.data.objectResult[0]) == null ? void 0 : _h.deviceCode;
+      store.product = (_i = response.data.objectResult[0]) == null ? void 0 : _i.productId;
+      store.reachable = ((_j = response.data.objectResult[0]) == null ? void 0 : _j.deviceStatus) == "ONLINE";
     }
     _this.log.debug("Device: " + store.device);
     _this.log.debug("Product: " + store.product);
