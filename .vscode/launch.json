@@ -6,7 +6,7 @@
 	"configurations": [
 		{
 			"name": "Launch normal",
-			"program": "${workspaceFolder}/build/src/main.js",
+			"program": "${workspaceFolder}/build/main.js",
 			"env": {},
 			"args": ["--instance", "0", "--force", "--logs", "--debug"],
 			"request": "launch",
@@ -24,7 +24,7 @@
 
 		{
 			"name": "Launch install",
-			"program": "${workspaceFolder}/build/src/main.js",
+			"program": "${workspaceFolder}/build/main.js",
 			"args": ["--instance", "0", "--force", "--logs", "--debug", "--install"],
 			"request": "launch",
 			"stopOnEntry": true,
