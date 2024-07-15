@@ -6,7 +6,6 @@ import { updateDeviceDetails } from "./updateDeviceDetails";
 import { updateDeviceErrorMsg } from "./updateDeviceOnError";
 
 export async function updateDeviceStatus(): Promise<void> {
-
 	const store = initStore();
 	try {
 		const { token, device: deviceCode } = store;
@@ -26,6 +25,7 @@ export async function updateDeviceStatus(): Promise<void> {
 
 			if (parseInt(response.data.error_code) == 0) {
 				if (response.data?.object_result?.["is_fault"] || response.data?.objectResult?.["isFault"]) {
+					store._this.log.error("Error in updateDeviceStatus(): " + JSON.stringify(response.data));
 					// TODO: Fehlerbeschreibung abrufen
 					//clearValues();
 					saveValue("error", true, "boolean");
@@ -50,5 +50,4 @@ export async function updateDeviceStatus(): Promise<void> {
 		store._this.log.error(JSON.stringify(error));
 		store._this.log.error(JSON.stringify(error.stack));
 	}
-
 }

@@ -56,6 +56,7 @@ async function updateDeviceStatus() {
       );
       if (parseInt(response.data.error_code) == 0) {
         if (((_b = (_a = response.data) == null ? void 0 : _a.object_result) == null ? void 0 : _b["is_fault"]) || ((_d = (_c = response.data) == null ? void 0 : _c.objectResult) == null ? void 0 : _d["isFault"])) {
+          store._this.log.error("Error in updateDeviceStatus(): " + JSON.stringify(response.data));
           (0, import_saveValue.saveValue)("error", true, "boolean");
           (0, import_updateDeviceDetails.updateDeviceDetails)();
           (0, import_updateDeviceOnError.updateDeviceErrorMsg)();

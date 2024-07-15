@@ -40,7 +40,7 @@ var import_store = require("./store");
 var import_updateDeviceStatus = require("./updateDeviceStatus");
 let _this;
 async function updateDeviceID() {
-  var _a, _b, _c, _d, _e, _f;
+  var _a, _b, _c, _d, _e, _f, _g, _h;
   const store = (0, import_store.initStore)();
   try {
     if (!_this) {
@@ -63,20 +63,29 @@ async function updateDeviceID() {
       store.token = "", store.device = "", store.reachable = false;
       return;
     }
-    if (apiLevel < 3) {
-      store.device = (_a = response.data.object_result[0]) == null ? void 0 : _a.device_code;
-      store.product = (_b = response.data.object_result[0]) == null ? void 0 : _b.product_id;
-      store.reachable = ((_c = response.data.object_result[0]) == null ? void 0 : _c.device_status) == "ONLINE";
-    } else {
-      store.device = (_d = response.data.objectResult[0]) == null ? void 0 : _d.deviceCode;
-      store.product = (_e = response.data.objectResult[0]) == null ? void 0 : _e.productId;
-      store.reachable = ((_f = response.data.objectResult[0]) == null ? void 0 : _f.deviceStatus) == "ONLINE";
+    if (!((_a = response.data.object_result[0]) == null ? void 0 : _a.device_code) || !((_b = response.data.objectResult[0]) == null ? void 0 : _b.deviceCode)) {
+      _this.log.error("Error in updateDeviceID(): No device code found");
+      _this.log.error("Response: " + JSON.stringify(response));
+      return;
     }
+    if (apiLevel < 3) {
+      store.device = (_c = response.data.object_result[0]) == null ? void 0 : _c.device_code;
+      store.product = (_d = response.data.object_result[0]) == null ? void 0 : _d.product_id;
+      store.reachable = ((_e = response.data.object_result[0]) == null ? void 0 : _e.device_status) == "ONLINE";
+    } else {
+      store.device = (_f = response.data.objectResult[0]) == null ? void 0 : _f.deviceCode;
+      store.product = (_g = response.data.objectResult[0]) == null ? void 0 : _g.productId;
+      store.reachable = ((_h = response.data.objectResult[0]) == null ? void 0 : _h.deviceStatus) == "ONLINE";
+    }
+    _this.log.debug("Device: " + store.device);
+    _this.log.debug("Product: " + store.product);
+    _this.log.debug("Reachable: " + store.reachable);
     (0, import_saveValue.saveValue)("DeviceCode", store.device, "string");
     (0, import_saveValue.saveValue)("ProductCode", store.product, "string");
     if (store.reachable && store.device) {
       (0, import_saveValue.saveValue)("info.connection", true, "boolean");
       if (store.device != "" && store.product) {
+        _this.log.debug("Update device status");
         await (0, import_updateDeviceStatus.updateDeviceStatus)();
       }
       return;

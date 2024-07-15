@@ -103,18 +103,21 @@ class MidasAquatemp extends utils.Adapter {
     this.on("stateChange", async (id, state) => {
       try {
         if (id === dpRoot + ".mode" && state && !state.ack) {
+          this.log.debug("Mode: " + JSON.stringify(state));
           const mode = await this.getStateAsync(dpRoot + ".mode");
           if (mode && mode.val) {
             (0, import_updateDevicePower.updateDevicePower)(store.device, mode.val);
           }
         }
         if (id === dpRoot + ".silent" && state && !state.ack) {
+          this.log.debug("Silent: " + JSON.stringify(state));
           const silent = await this.getStateAsync(dpRoot + ".silent");
           if (silent && silent.val) {
             (0, import_updateDeviceSilent.updateDeviceSilent)(store.device, silent.val);
           }
         }
         if (id === dpRoot + ".tempSet" && state && !state.ack) {
+          this.log.debug("TempSet: " + JSON.stringify(state));
           const tempSet = await this.getStateAsync(dpRoot + ".tempSet");
           if (tempSet && tempSet.val) {
             (0, import_updateDeviceSetTemp.updateDeviceSetTemp)(store.device, tempSet.val);
