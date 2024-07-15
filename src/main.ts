@@ -15,8 +15,8 @@ import { saveValue } from "./lib/saveValue";
 import { updateToken } from "./lib/token";
 
 import { updateDevicePower } from "./lib/updateDevicePower";
-import { updateDeviceSilent } from "./lib/updateDeviceSilent";
 import { updateDeviceSetTemp } from "./lib/updateDeviceSetTemp";
+import { updateDeviceSilent } from "./lib/updateDeviceSilent";
 
 let updateIntervall: ioBroker.Interval | undefined;
 let tokenRefreshTimer: ioBroker.Interval | undefined;
@@ -67,7 +67,7 @@ export class MidasAquatemp extends utils.Adapter {
 		updateIntervall = store._this.setInterval(async () => {
 			try {
 
-				// await updateToken();
+				await updateToken();
 				const mode = await store._this.getStateAsync(dpRoot + ".mode");
 
 				if (mode && !mode.ack && mode.val) {

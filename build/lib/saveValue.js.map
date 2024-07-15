@@ -1,0 +1,7 @@
+{
+  "version": 3,
+  "sources": ["../../src/lib/saveValue.ts"],
+  "sourcesContent": ["import { MidasAquatemp } from \"../main\";\nimport { initStore } from \"./store\";\nlet _this: MidasAquatemp;\n\nexport const saveValue = async (key: string, value: ioBroker.StateValue, stateType: ioBroker.CommonType): Promise<void> => {\n\n\tconst store = initStore();\n\tconst dpRoot = store.getDpRoot();\n\ttry {\n\t\tif (!_this) {\n\t\t\t_this = MidasAquatemp.getInstance();\n\t\t}\n\t\tconst dp = dpRoot + \".\" + key;\n\n\t\tif (!_this.objectExists(dp)) {\n\t\t\tawait _this.setObjectNotExists(dp, {\n\t\t\t\ttype: \"state\",\n\t\t\t\tcommon: {\n\t\t\t\t\tname: key,\n\t\t\t\t\ttype: stateType,\n\t\t\t\t\trole: \"value\",\n\t\t\t\t\tread: true,\n\t\t\t\t\twrite: false,\n\t\t\t\t},\n\t\t\t\tnative: {},\n\t\t\t});\n\t\t\treturn;\n\t\t}\n\n\t\t_this.setState(dp, value, true);\n\t} catch (err) {\n\t\t_this.log.error(\"Error in saveValue: \" + err);\n\t}\n};\n"],
+  "mappings": ";;;;;;;;;;;;;;;;;;AAAA;AAAA;AAAA;AAAA;AAAA;AAAA,kBAA8B;AAC9B,mBAA0B;AAC1B,IAAI;AAEG,MAAM,YAAY,OAAO,KAAa,OAA4B,cAAkD;AAE1H,QAAM,YAAQ,wBAAU;AACxB,QAAM,SAAS,MAAM,UAAU;AAC/B,MAAI;AACH,QAAI,CAAC,OAAO;AACX,cAAQ,0BAAc,YAAY;AAAA,IACnC;AACA,UAAM,KAAK,SAAS,MAAM;AAE1B,QAAI,CAAC,MAAM,aAAa,EAAE,GAAG;AAC5B,YAAM,MAAM,mBAAmB,IAAI;AAAA,QAClC,MAAM;AAAA,QACN,QAAQ;AAAA,UACP,MAAM;AAAA,UACN,MAAM;AAAA,UACN,MAAM;AAAA,UACN,MAAM;AAAA,UACN,OAAO;AAAA,QACR;AAAA,QACA,QAAQ,CAAC;AAAA,MACV,CAAC;AACD;AAAA,IACD;AAEA,UAAM,SAAS,IAAI,OAAO,IAAI;AAAA,EAC/B,SAAS,KAAK;AACb,UAAM,IAAI,MAAM,yBAAyB,GAAG;AAAA,EAC7C;AACD;",
+  "names": []
+}

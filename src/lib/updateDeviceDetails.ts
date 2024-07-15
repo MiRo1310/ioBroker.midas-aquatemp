@@ -37,7 +37,6 @@ const saveValues = (value: any, product: string): void => {
 	saveValue("ambient", parseFloat(findCodeVal(value, isAquaTemp_Poolsana ? "T05" : "T5")), "number");
 	// Kompressorausgang-Temperatur T06
 	saveValue("exhaust", parseFloat(findCodeVal(value, isAquaTemp_Poolsana ? "T06" : "T6")), "number");
-
 	// Lüfter-Drehzahl T17
 	saveValue("rotor", parseInt(findCodeVal(value, "T17")), "number");
 };

@@ -22,7 +22,6 @@
   },
   "dependencies": {
     "@iobroker/adapter-core": "^3.1.6",
-    "@types/axios": "^0.14.0",
     "axios": "^1.7.2"
   },
   "devDependencies": {
@@ -55,9 +54,10 @@
     "sinon-chai": "^3.7.0",
     "source-map-support": "^0.5.21",
     "ts-node": "^10.9.2",
-    "typescript": "~5.0.4"
+    "typescript": "~5.0.4",
+     "@types/axios": "^0.14.0"
   },
-  "main": "build/src/main.js",
+  "main": "build/main.js",
   "files": [
     "admin{,/!(src)/**}/!(tsconfig|tsconfig.*|.eslintrc).{json,json5}",
     "admin{,/!(src)/**}/*.{html,css,png,svg,jpg,js}",

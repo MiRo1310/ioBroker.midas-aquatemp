@@ -1,4 +1,4 @@
-import { getPowerMode } from "./utils";
+import { getPowerMode } from "./getSettings";
 import { initStore } from "./store";
 import { getSUrl } from "./endPoints";
 import { getAxiosUpdateDevicePowerParams } from "./axiosParameter";
