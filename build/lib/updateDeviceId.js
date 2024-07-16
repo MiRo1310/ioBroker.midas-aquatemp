@@ -40,7 +40,7 @@ var import_store = require("./store");
 var import_updateDeviceStatus = require("./updateDeviceStatus");
 let _this;
 async function updateDeviceID() {
-  var _a, _b, _c, _d, _e, _f, _g, _h, _i, _j;
+  var _a, _b, _c, _d, _e, _f, _g, _h, _i, _j, _k, _l;
   const store = (0, import_store.initStore)();
   try {
     if (!_this) {
@@ -54,28 +54,24 @@ async function updateDeviceID() {
     const response = await import_axios.default.post(sURL, (0, import_axiosParameter.getAxiosGetUpdateDeviceIdParams)(), {
       headers: { "x-token": token }
     });
-    if (!response || response.status !== 200) {
-      (0, import_saveValue.saveValue)("info.connection", false, "boolean");
+    _this.log.debug("UpdateDeviceID response: " + JSON.stringify(response.data));
+    if (!response || response.status !== 200 || response.data.error_code !== "0") {
+      store.resetOnErrorHandler();
       return;
     }
-    if (response.data.error_code !== "0") {
-      (0, import_saveValue.saveValue)("info.connection", false, "boolean");
-      store.token = "", store.device = "", store.reachable = false;
-      return;
-    }
-    if (!((_b = (_a = response.data) == null ? void 0 : _a.object_result) == null ? void 0 : _b[0].device_code) && !((_d = (_c = response.data) == null ? void 0 : _c.objectResult) == null ? void 0 : _d[0].deviceCode)) {
+    if (!((_c = (_b = (_a = response.data) == null ? void 0 : _a.object_result) == null ? void 0 : _b[0]) == null ? void 0 : _c.device_code) && !((_f = (_e = (_d = response.data) == null ? void 0 : _d.objectResult) == null ? void 0 : _e[0]) == null ? void 0 : _f.deviceCode)) {
       _this.log.error("Error in updateDeviceID(): No device code found");
-      _this.log.error("Response: " + JSON.stringify(response));
+      _this.log.error("Response: " + JSON.stringify(response.data));
       return;
     }
     if (apiLevel < 3) {
-      store.device = (_e = response.data.object_result[0]) == null ? void 0 : _e.device_code;
-      store.product = (_f = response.data.object_result[0]) == null ? void 0 : _f.product_id;
-      store.reachable = ((_g = response.data.object_result[0]) == null ? void 0 : _g.device_status) == "ONLINE";
+      store.device = (_g = response.data.object_result[0]) == null ? void 0 : _g.device_code;
+      store.product = (_h = response.data.object_result[0]) == null ? void 0 : _h.product_id;
+      store.reachable = ((_i = response.data.object_result[0]) == null ? void 0 : _i.device_status) == "ONLINE";
     } else {
-      store.device = (_h = response.data.objectResult[0]) == null ? void 0 : _h.deviceCode;
-      store.product = (_i = response.data.objectResult[0]) == null ? void 0 : _i.productId;
-      store.reachable = ((_j = response.data.objectResult[0]) == null ? void 0 : _j.deviceStatus) == "ONLINE";
+      store.device = (_j = response.data.objectResult[0]) == null ? void 0 : _j.deviceCode;
+      store.product = (_k = response.data.objectResult[0]) == null ? void 0 : _k.productId;
+      store.reachable = ((_l = response.data.objectResult[0]) == null ? void 0 : _l.deviceStatus) == "ONLINE";
     }
     _this.log.debug("Device: " + store.device);
     _this.log.debug("Product: " + store.product);
@@ -90,8 +86,8 @@ async function updateDeviceID() {
       }
       return;
     }
-    store.device = "";
-    (0, import_saveValue.saveValue)("info.connection", false, "boolean");
+    _this.log.debug("Device not reachable");
+    store.resetOnErrorHandler();
   } catch (error) {
     _this.log.error("Error in updateDeviceID(): " + JSON.stringify(error));
     _this.log.error("Error in updateDeviceID(): " + JSON.stringify(error.stack));

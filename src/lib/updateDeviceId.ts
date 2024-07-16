@@ -24,21 +24,17 @@ export async function updateDeviceID(): Promise<void> {
 			headers: { "x-token": token },
 		});
 
-		if (!response || response.status !== 200) {
+		_this.log.debug("UpdateDeviceID response: " + JSON.stringify(response.data));
+
+		if (!response || response.status !== 200 || response.data.error_code !== "0") {
 			// Login-Fehler
-			saveValue("info.connection", false, "boolean");
+			store.resetOnErrorHandler();
 			return;
 		}
 
-		if (response.data.error_code !== "0") {
-			// Login-Fehler
-			saveValue("info.connection", false, "boolean");
-			(store.token = ""), (store.device = ""), (store.reachable = false);
-			return;
-		}
-		if (!response.data?.object_result?.[0].device_code && !response.data?.objectResult?.[0].deviceCode) {
+		if (!response.data?.object_result?.[0]?.device_code && !response.data?.objectResult?.[0]?.deviceCode) {
 			_this.log.error("Error in updateDeviceID(): No device code found");
-			_this.log.error("Response: " + JSON.stringify(response));
+			_this.log.error("Response: " + JSON.stringify(response.data));
 			return;
 		}
 
@@ -66,9 +62,8 @@ export async function updateDeviceID(): Promise<void> {
 			}
 			return;
 		}
-		// offline
-		store.device = "";
-		saveValue("info.connection", false, "boolean");
+		_this.log.debug("Device not reachable");
+		store.resetOnErrorHandler();
 	} catch (error: any) {
 		_this.log.error("Error in updateDeviceID(): " + JSON.stringify(error));
 		_this.log.error("Error in updateDeviceID(): " + JSON.stringify(error.stack));
