@@ -38,6 +38,7 @@ var import_endPoints = require("./endPoints");
 var import_saveValue = require("./saveValue");
 var import_store = require("./store");
 var import_updateDeviceStatus = require("./updateDeviceStatus");
+var import_https = __toESM(require("https"));
 let _this;
 async function updateDeviceID() {
   var _a, _b, _c, _d, _e, _f, _g, _h, _i, _j, _k, _l;
@@ -51,10 +52,17 @@ async function updateDeviceID() {
       return;
     }
     const { sURL } = (0, import_endPoints.getUpdateDeviceIdSUrl)();
+    const httpsAgent = new import_https.default.Agent({
+      rejectUnauthorized: false
+      // Achtung: Dies birgt Sicherheitsrisiken
+    });
     const response = await import_axios.default.post(sURL, (0, import_axiosParameter.getAxiosGetUpdateDeviceIdParams)(), {
-      headers: { "x-token": token }
+      headers: { "x-token": token },
+      httpsAgent,
+      timeout: 5e3
     });
     _this.log.debug("UpdateDeviceID response: " + JSON.stringify(response.data));
+    _this.log.debug("UpdateDeviceID response status: " + JSON.stringify(response.status));
     if (!response || response.status !== 200 || response.data.error_code !== "0") {
       store.resetOnErrorHandler();
       return;

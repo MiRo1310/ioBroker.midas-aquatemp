@@ -4,6 +4,7 @@ import { saveValue } from "./saveValue";
 import { initStore as useStore } from "./store";
 import { updateDeviceID } from "./updateDeviceId";
 
+
 async function getToken(): Promise<void> {
 	const store = useStore();
 	const _this = store._this;
@@ -13,6 +14,7 @@ async function getToken(): Promise<void> {
 		if (!token) {
 			_this.log.info("Request token");
 			const { sUrl, options } = getOptionsAndSUrl();
+
 			const response = await axios.post(sUrl, options);
 			if (!response) {
 				_this.log.error("No response from server");

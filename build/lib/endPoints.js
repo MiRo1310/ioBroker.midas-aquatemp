@@ -1,7 +1,9 @@
 "use strict";
+var __create = Object.create;
 var __defProp = Object.defineProperty;
 var __getOwnPropDesc = Object.getOwnPropertyDescriptor;
 var __getOwnPropNames = Object.getOwnPropertyNames;
+var __getProtoOf = Object.getPrototypeOf;
 var __hasOwnProp = Object.prototype.hasOwnProperty;
 var __export = (target, all) => {
   for (var name in all)
@@ -15,6 +17,14 @@ var __copyProps = (to, from, except, desc) => {
   }
   return to;
 };
+var __toESM = (mod, isNodeMode, target) => (target = mod != null ? __create(__getProtoOf(mod)) : {}, __copyProps(
+  // If the importer is in node compatibility mode or this is not an ESM
+  // file that has been converted to a CommonJS file using a Babel-
+  // compatible transform (i.e. "__esModule" has not been set), then set
+  // "default" to the CommonJS "module.exports" for node compatibility.
+  isNodeMode || !mod || !mod.__esModule ? __defProp(target, "default", { value: mod, enumerable: true }) : target,
+  mod
+));
 var __toCommonJS = (mod) => __copyProps(__defProp({}, "__esModule", { value: true }), mod);
 var endPoints_exports = {};
 __export(endPoints_exports, {
@@ -27,6 +37,7 @@ __export(endPoints_exports, {
 });
 module.exports = __toCommonJS(endPoints_exports);
 var import_store = require("./store");
+var import_https = __toESM(require("https"));
 function setupEndpoints() {
   const store = (0, import_store.initStore)();
   const apiLevel = store.apiLevel;
@@ -57,6 +68,10 @@ const getSUrlUpdateDeviceId = () => {
   }
   return { sURL: store.cloudURL + "/app/device/getDataByCode" };
 };
+const httpsAgent = new import_https.default.Agent({
+  rejectUnauthorized: false
+  // Achtung: Dies birgt Sicherheitsrisiken
+});
 const getOptionsAndSUrl = () => {
   const store = (0, import_store.initStore)();
   const cloudURL = store.cloudURL;
@@ -70,7 +85,9 @@ const getOptionsAndSUrl = () => {
         user_name: username,
         password: encryptedPassword,
         type: "2"
-      }
+      },
+      httpsAgent,
+      timeout: 5e3
     };
   }
   return {
