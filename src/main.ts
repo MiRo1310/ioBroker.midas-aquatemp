@@ -49,6 +49,7 @@ export class MidasAquatemp extends utils.Adapter {
 		const password = this.config.password;
 		store.interval = this.config.refresh;
 		store.apiLevel = this.config.selectApi;
+		this.log.debug("API-Level: " + this.config.selectApi);
 
 		setupEndpoints();
 		encryptPassword(password);

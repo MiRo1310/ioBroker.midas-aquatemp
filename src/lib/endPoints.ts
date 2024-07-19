@@ -1,5 +1,4 @@
 import { initStore } from "./store";
-import https from "https";
 
 export function setupEndpoints(): void {
 	const store = initStore();
@@ -35,19 +34,18 @@ export const getSUrlUpdateDeviceId = (): { sURL: string } => {
 	return { sURL: store.cloudURL + "/app/device/getDataByCode" };
 };
 
-const httpsAgent = new https.Agent({
-	rejectUnauthorized: false, // Achtung: Dies birgt Sicherheitsrisiken
-});
+// const httpsAgent = new https.Agent({
+// 	rejectUnauthorized: false, // Achtung: Dies birgt Sicherheitsrisiken
+// });
 export const getOptionsAndSUrl = (): {
 	sUrl: string;
-	httpsAgent?: https.Agent;
-	timeout?: number;
+	// httpsAgent?: https.Agent;
+	// timeout?: number;
 	options: {
 		userName?: string;
 		user_name?: string;
 		password: string;
 		type: string;
-
 	};
 } => {
 	const store = initStore();
@@ -62,10 +60,9 @@ export const getOptionsAndSUrl = (): {
 				user_name: username,
 				password: encryptedPassword,
 				type: "2",
-
 			},
-			httpsAgent,
-			timeout: 5000,
+			// httpsAgent,
+			// timeout: 5000,
 		};
 	}
 	return {

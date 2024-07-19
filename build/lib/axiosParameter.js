@@ -18,7 +18,7 @@ var __copyProps = (to, from, except, desc) => {
 var __toCommonJS = (mod) => __copyProps(__defProp({}, "__esModule", { value: true }), mod);
 var axiosParameter_exports = {};
 __export(axiosParameter_exports, {
-  getAxiosGetUpdateDeviceIdParams: () => getAxiosGetUpdateDeviceIdParams,
+  getAxiosUpdateDeviceIdParams: () => getAxiosUpdateDeviceIdParams,
   getAxiosUpdateDevicePowerParams: () => getAxiosUpdateDevicePowerParams,
   getAxiosUpdateDeviceSetTempParams: () => getAxiosUpdateDeviceSetTempParams,
   getProtocolCodes: () => getProtocolCodes
@@ -160,7 +160,7 @@ const getAxiosUpdateDeviceSetTempParams = ({
     ]
   };
 };
-const getAxiosGetUpdateDeviceIdParams = () => {
+const getAxiosUpdateDeviceIdParams = () => {
   return {
     productIds: [
       "1132174963097280512",
@@ -184,7 +184,7 @@ const getAxiosGetUpdateDeviceIdParams = () => {
 };
 // Annotate the CommonJS export names for ESM import in node:
 0 && (module.exports = {
-  getAxiosGetUpdateDeviceIdParams,
+  getAxiosUpdateDeviceIdParams,
   getAxiosUpdateDevicePowerParams,
   getAxiosUpdateDeviceSetTempParams,
   getProtocolCodes

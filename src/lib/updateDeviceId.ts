@@ -1,11 +1,10 @@
 import axios from "axios";
 import { MidasAquatemp } from "../main";
-import { getAxiosGetUpdateDeviceIdParams } from "./axiosParameter";
+import { getAxiosUpdateDeviceIdParams } from "./axiosParameter";
 import { getUpdateDeviceIdSUrl } from "./endPoints";
 import { saveValue } from "./saveValue";
 import { initStore } from "./store";
 import { updateDeviceStatus } from "./updateDeviceStatus";
-import https from "https";
 
 let _this: MidasAquatemp;
 
@@ -20,14 +19,16 @@ export async function updateDeviceID(): Promise<void> {
 			return;
 		}
 		const { sURL } = getUpdateDeviceIdSUrl();
-		const httpsAgent = new https.Agent({
-			rejectUnauthorized: false, // Achtung: Dies birgt Sicherheitsrisiken
-		});
-
-		const response = await axios.post(sURL, getAxiosGetUpdateDeviceIdParams(), {
+		// const httpsAgent = new https.Agent({
+		// 	rejectUnauthorized: false, // Achtung: Dies birgt Sicherheitsrisiken
+		// });
+		const options = getAxiosUpdateDeviceIdParams();
+		_this.log.debug("UpdateDeviceID URL: " + sURL);
+		_this.log.debug("UpdateDeviceID options: " + JSON.stringify(options));
+		const response = await axios.post(sURL, options, {
 			headers: { "x-token": token },
-			httpsAgent,
-			timeout: 5000,
+			// httpsAgent,
+			// timeout: 5000,
 		});
 
 		_this.log.debug("UpdateDeviceID response: " + JSON.stringify(response.data));

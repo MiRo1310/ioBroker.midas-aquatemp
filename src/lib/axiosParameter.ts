@@ -145,7 +145,7 @@ export const getAxiosUpdateDeviceSetTempParams = ({
 	};
 };
 
-export const getAxiosGetUpdateDeviceIdParams = (): { productIds: string[] } => {
+export const getAxiosUpdateDeviceIdParams = (): { productIds: string[] } => {
 	return {
 		productIds: [
 			"1132174963097280512",

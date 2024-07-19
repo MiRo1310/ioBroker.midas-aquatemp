@@ -4,7 +4,6 @@ import { saveValue } from "./saveValue";
 import { initStore as useStore } from "./store";
 import { updateDeviceID } from "./updateDeviceId";
 
-
 async function getToken(): Promise<void> {
 	const store = useStore();
 	const _this = store._this;
