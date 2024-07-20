@@ -11,20 +11,21 @@ export const updateDeviceSetTemp = async (deviceCode: string, temperature: numbe
 		const token = store.token;
 		const sTemperature = temperature.toString().replace(",", ".");
 		const result = await store._this.getStateAsync(dpRoot + ".mode");
-		if (!result || !result.val) {
+		if (!(result && (result.val || result.val === 0))) {
 			return;
 		}
-		let sMode = result.val;
-		if (sMode == "-1") {
-			//log("Gerät einschalten um Temperatur zu ändern!", 'warn');
-			return;
-		} else if (sMode == "0") {
-			sMode = "R01"; // Kühlen
-		} else if (sMode == "1") {
-			sMode = "R02"; // Heizen
-		} else if (sMode == "2") {
-			sMode = "R03"; // Auto
-		}
+		// let sMode = result.val;
+		// // if (sMode == "-1") {
+		// // 	//log("Gerät einschalten um Temperatur zu ändern!", 'warn');
+		// // 	return;
+		// // } else
+		// if (sMode == "0") {
+		// 	sMode = "R01"; // Kühlen
+		// } else if (sMode == "1") {
+		// 	sMode = "R02"; // Heizen
+		// } else if (sMode == "2") {
+		// 	sMode = "R03"; // Auto
+		// }
 
 		if (token && token != "") {
 			const { sURL } = getSUrl();

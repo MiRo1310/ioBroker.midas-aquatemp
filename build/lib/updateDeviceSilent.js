@@ -31,21 +31,16 @@ __export(updateDeviceSilent_exports, {
   updateDeviceSilent: () => updateDeviceSilent
 });
 module.exports = __toCommonJS(updateDeviceSilent_exports);
+var import_axios = __toESM(require("axios"));
 var import_axiosParameter = require("./axiosParameter");
 var import_endPoints = require("./endPoints");
 var import_saveValue = require("./saveValue");
 var import_store = require("./store");
-var import_axios = __toESM(require("axios"));
 async function updateDeviceSilent(deviceCode, silent) {
   const store = (0, import_store.initStore)();
   try {
     const token = store.token;
-    let silentMode;
-    if (silent) {
-      silentMode = "1";
-    } else {
-      silentMode = "0";
-    }
+    const silentMode = silent ? "1" : "0";
     if (token && token != "") {
       const { sURL } = (0, import_endPoints.getSUrl)();
       const response = await import_axios.default.post(

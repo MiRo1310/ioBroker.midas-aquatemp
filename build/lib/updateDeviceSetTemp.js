@@ -43,18 +43,8 @@ const updateDeviceSetTemp = async (deviceCode, temperature) => {
     const token = store.token;
     const sTemperature = temperature.toString().replace(",", ".");
     const result = await store._this.getStateAsync(dpRoot + ".mode");
-    if (!result || !result.val) {
+    if (!(result && (result.val || result.val === 0))) {
       return;
-    }
-    let sMode = result.val;
-    if (sMode == "-1") {
-      return;
-    } else if (sMode == "0") {
-      sMode = "R01";
-    } else if (sMode == "1") {
-      sMode = "R02";
-    } else if (sMode == "2") {
-      sMode = "R03";
     }
     if (token && token != "") {
       const { sURL } = (0, import_endPoints.getSUrl)();

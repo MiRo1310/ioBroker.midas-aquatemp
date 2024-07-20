@@ -106,23 +106,20 @@ class MidasAquatemp extends utils.Adapter {
       try {
         if (id === dpRoot + ".mode" && state && !state.ack) {
           this.log.debug("Mode: " + JSON.stringify(state));
-          const mode = await this.getStateAsync(dpRoot + ".mode");
-          if (mode && mode.val) {
-            (0, import_updateDevicePower.updateDevicePower)(store.device, mode.val);
+          if (state && state.val) {
+            (0, import_updateDevicePower.updateDevicePower)(store.device, state.val);
           }
         }
         if (id === dpRoot + ".silent" && state && !state.ack) {
           this.log.debug("Silent: " + JSON.stringify(state));
-          const silent = await this.getStateAsync(dpRoot + ".silent");
-          if (silent && silent.val) {
-            (0, import_updateDeviceSilent.updateDeviceSilent)(store.device, silent.val);
+          if (state && state.val) {
+            (0, import_updateDeviceSilent.updateDeviceSilent)(store.device, state.val);
           }
         }
         if (id === dpRoot + ".tempSet" && state && !state.ack) {
           this.log.debug("TempSet: " + JSON.stringify(state));
-          const tempSet = await this.getStateAsync(dpRoot + ".tempSet");
-          if (tempSet && tempSet.val) {
-            (0, import_updateDeviceSetTemp.updateDeviceSetTemp)(store.device, tempSet.val);
+          if (state && state.val) {
+            (0, import_updateDeviceSetTemp.updateDeviceSetTemp)(store.device, state.val);
           }
         }
       } catch (error) {
@@ -130,7 +127,9 @@ class MidasAquatemp extends utils.Adapter {
         store._this.log.error(JSON.stringify(error.stack));
       }
     });
-    this.subscribeStates("*");
+    await this.subscribeStatesAsync(dpRoot + ".mode");
+    await this.subscribeStatesAsync(dpRoot + ".silent");
+    await this.subscribeStatesAsync(dpRoot + ".tempSet");
   }
   /**
    * Is called when adapter shuts down - callback has to be called under any circumstances!

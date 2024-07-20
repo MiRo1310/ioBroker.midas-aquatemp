@@ -1,20 +1,14 @@
+import axios from "axios";
 import { getAxiosUpdateDevicePowerParams } from "./axiosParameter";
 import { getSUrl } from "./endPoints";
 import { saveValue } from "./saveValue";
 import { initStore } from "./store";
-import axios from "axios";
 
-export async function updateDeviceSilent(deviceCode: string, silent: any): Promise<void> {
+export async function updateDeviceSilent(deviceCode: string, silent: boolean): Promise<void> {
 	const store = initStore();
 	try {
 		const token = store.token;
-		let silentMode;
-
-		if (silent) {
-			silentMode = "1";
-		} else {
-			silentMode = "0";
-		}
+		const silentMode = silent ? "1" : "0";
 
 		if (token && token != "") {
 			const { sURL } = getSUrl();

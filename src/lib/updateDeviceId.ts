@@ -25,6 +25,7 @@ export async function updateDeviceID(): Promise<void> {
 		const options = getAxiosUpdateDeviceIdParams();
 		_this.log.debug("UpdateDeviceID URL: " + sURL);
 		_this.log.debug("UpdateDeviceID options: " + JSON.stringify(options));
+
 		const response = await axios.post(sURL, options, {
 			headers: { "x-token": token },
 			// httpsAgent,
