@@ -99,7 +99,7 @@ export async function updateDeviceDetails(): Promise<void> {
 			store._this.log.error("Error: " + JSON.stringify(response.data));
 			saveValue("info.connection", false, "boolean");
 			store.token = "";
-			store.device = "";
+			// store.device = "";
 			store.reachable = false;
 			return;
 		}

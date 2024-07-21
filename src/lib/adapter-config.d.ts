@@ -8,6 +8,7 @@ declare global {
 			username: string;
 			refresh: number;
 			selectApi: number;
+			deviceMac: string;
 		}
 	}
 }

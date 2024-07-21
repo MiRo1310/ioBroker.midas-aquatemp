@@ -41,7 +41,9 @@ export async function updateDeviceErrorMsg(): Promise<void> {
 				return;
 			}
 			// Login-Fehler
-			(store.token = ""), (store.device = ""), (store.reachable = false);
+			(store.token = ""),
+				// , (store.device = "")
+				(store.reachable = false);
 			saveValue("info.connection", false, "boolean");
 			return;
 		}

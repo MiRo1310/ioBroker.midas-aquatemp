@@ -68,7 +68,8 @@ async function updateDeviceErrorMsg() {
         }
         return;
       }
-      store.token = "", store.device = "", store.reachable = false;
+      store.token = "", // , (store.device = "")
+      store.reachable = false;
       (0, import_saveValue.saveValue)("info.connection", false, "boolean");
       return;
     }

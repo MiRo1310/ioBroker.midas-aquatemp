@@ -107,7 +107,6 @@ async function updateDeviceDetails() {
       store._this.log.error("Error: " + JSON.stringify(response.data));
       (0, import_saveValue.saveValue)("info.connection", false, "boolean");
       store.token = "";
-      store.device = "";
       store.reachable = false;
       return;
     }

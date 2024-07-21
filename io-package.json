@@ -80,7 +80,8 @@
 	"native": {
 		"username": "",
 		"password": "",
-		"refresh": 60
+		"refresh": 60,
+		"deviceMac": ""
 	},
 	"objects": [],
 	"instanceObjects": [

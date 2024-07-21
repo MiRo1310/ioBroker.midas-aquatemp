@@ -2,7 +2,8 @@ import axios from "axios";
 import { getOptionsAndSUrl } from "./endPoints";
 import { saveValue } from "./saveValue";
 import { initStore as useStore } from "./store";
-import { updateDeviceID } from "./updateDeviceId";
+// import { updateDeviceID } from "./updateDeviceId";
+import { updateDeviceStatus } from "./updateDeviceStatus";
 
 async function getToken(): Promise<void> {
 	const store = useStore();
@@ -45,7 +46,8 @@ export const updateToken = async (): Promise<void> => {
 		await getToken();
 
 		if (store.token) {
-			await updateDeviceID();
+			await updateDeviceStatus();
+			// await updateDeviceID();
 			return;
 		}
 

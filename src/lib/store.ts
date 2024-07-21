@@ -46,7 +46,7 @@ export function initStore(): Store {
 			},
 			resetOnErrorHandler: function () {
 				this.token = "";
-				this.device = "";
+				// this.device = "";
 				this.reachable = false;
 				saveValue("info.connection", false, "boolean");
 			},

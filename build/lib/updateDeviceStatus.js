@@ -32,16 +32,21 @@ __export(updateDeviceStatus_exports, {
 });
 module.exports = __toCommonJS(updateDeviceStatus_exports);
 var import_axios = __toESM(require("axios"));
+var import_main = require("../main");
 var import_endPoints = require("./endPoints");
 var import_saveValue = require("./saveValue");
 var import_store = require("./store");
 var import_updateDeviceDetails = require("./updateDeviceDetails");
 var import_updateDeviceOnError = require("./updateDeviceOnError");
+let _this;
 async function updateDeviceStatus() {
-  var _a, _b, _c, _d;
+  var _a, _b, _c, _d, _e, _f;
   const store = (0, import_store.initStore)();
   try {
-    const { token, device: deviceCode } = store;
+    if (!_this) {
+      _this = import_main.MidasAquatemp.getInstance();
+    }
+    const { token, device: deviceCode, apiLevel } = store;
     if (token) {
       const { sURL } = (0, import_endPoints.getUpdateDeviceStatusSUrl)();
       const response = await import_axios.default.post(
@@ -54,8 +59,13 @@ async function updateDeviceStatus() {
           headers: { "x-token": token }
         }
       );
+      if (apiLevel < 3) {
+        store.reachable = ((_a = response.data.object_result[0]) == null ? void 0 : _a.device_status) == "ONLINE";
+      } else {
+        store.reachable = ((_b = response.data.objectResult[0]) == null ? void 0 : _b.deviceStatus) == "ONLINE";
+      }
       if (parseInt(response.data.error_code) == 0) {
-        if (((_b = (_a = response.data) == null ? void 0 : _a.object_result) == null ? void 0 : _b["is_fault"]) || ((_d = (_c = response.data) == null ? void 0 : _c.objectResult) == null ? void 0 : _d["isFault"])) {
+        if (((_d = (_c = response.data) == null ? void 0 : _c.object_result) == null ? void 0 : _d["is_fault"]) || ((_f = (_e = response.data) == null ? void 0 : _e.objectResult) == null ? void 0 : _f["isFault"])) {
           store._this.log.error("Error in updateDeviceStatus(): " + JSON.stringify(response.data));
           (0, import_saveValue.saveValue)("error", true, "boolean");
           (0, import_updateDeviceDetails.updateDeviceDetails)();
@@ -72,7 +82,8 @@ async function updateDeviceStatus() {
       (0, import_saveValue.saveValue)("info.connection", false, "boolean");
       return;
     }
-    store.token = "", store.device = "", store.reachable = false;
+    store.token = "", // , (store.device = ""),
+    store.reachable = false;
   } catch (error) {
     store._this.log.error(JSON.stringify(error));
     store._this.log.error(JSON.stringify(error.stack));

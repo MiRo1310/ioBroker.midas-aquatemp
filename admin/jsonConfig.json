@@ -22,6 +22,11 @@
 			"default": 60,
 			"newLine": true
 		},
+		"deviceMac": {
+			"type": "text",
+			"label": "Device Mac",
+			"sm": 3
+		},
 
 		"selectApi": {
 			"type": "select",

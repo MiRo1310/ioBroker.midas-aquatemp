@@ -1,14 +1,19 @@
 import axios from "axios";
+import { MidasAquatemp } from "../main";
 import { getUpdateDeviceStatusSUrl } from "./endPoints";
 import { saveValue } from "./saveValue";
 import { initStore } from "./store";
 import { updateDeviceDetails } from "./updateDeviceDetails";
 import { updateDeviceErrorMsg } from "./updateDeviceOnError";
+let _this: MidasAquatemp;
 
 export async function updateDeviceStatus(): Promise<void> {
 	const store = initStore();
 	try {
-		const { token, device: deviceCode } = store;
+		if (!_this) {
+			_this = MidasAquatemp.getInstance();
+		}
+		const { token, device: deviceCode, apiLevel } = store;
 		if (token) {
 			const { sURL } = getUpdateDeviceStatusSUrl();
 
@@ -22,6 +27,12 @@ export async function updateDeviceStatus(): Promise<void> {
 					headers: { "x-token": token },
 				},
 			);
+
+			if (apiLevel < 3) {
+				store.reachable = response.data.object_result[0]?.device_status == "ONLINE";
+			} else {
+				store.reachable = response.data.objectResult[0]?.deviceStatus == "ONLINE";
+			}
 
 			if (parseInt(response.data.error_code) == 0) {
 				if (response.data?.object_result?.["is_fault"] || response.data?.objectResult?.["isFault"]) {
@@ -45,7 +56,9 @@ export async function updateDeviceStatus(): Promise<void> {
 			saveValue("info.connection", false, "boolean");
 			return;
 		}
-		(store.token = ""), (store.device = ""), (store.reachable = false);
+		(store.token = ""),
+			// , (store.device = ""),
+			(store.reachable = false);
 	} catch (error: any) {
 		store._this.log.error(JSON.stringify(error));
 		store._this.log.error(JSON.stringify(error.stack));
