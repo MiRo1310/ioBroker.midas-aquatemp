@@ -15,6 +15,7 @@ interface Store {
 	device: string;
 	product: string;
 	reachable: boolean;
+	useDeviceMac: boolean;
 	getDpRoot: () => string;
 	resetOnErrorHandler: () => void;
 }
@@ -34,6 +35,7 @@ export function initStore(): Store {
 			device: "",
 			product: "",
 			reachable: false,
+			useDeviceMac: false,
 			// ProductIDs:
 			// Gruppe 1:
 			// 1132174963097280512: Midas/Poolsana InverPro

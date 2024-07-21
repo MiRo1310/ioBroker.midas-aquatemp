@@ -37,6 +37,7 @@ function initStore() {
       device: "",
       product: "",
       reachable: false,
+      useDeviceMac: false,
       // ProductIDs:
       // Gruppe 1:
       // 1132174963097280512: Midas/Poolsana InverPro

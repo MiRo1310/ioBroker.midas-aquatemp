@@ -4,8 +4,12 @@ import { getSUrlUpdateDeviceId } from "./endPoints";
 import { saveValue } from "./saveValue";
 import { initStore } from "./store";
 
-const isAuaTemp_Poolsana = (product: string): boolean | null => {
+const isAquaTemp_Poolsana = (product: string): boolean | null => {
 	const store = initStore();
+	if (store.useDeviceMac) {
+		return false;
+	}
+
 	if (product == store.AQUATEMP_POOLSANA) {
 		return true;
 	} else if (product == store.AQUATEMP_OTHER1) {
@@ -15,28 +19,29 @@ const isAuaTemp_Poolsana = (product: string): boolean | null => {
 };
 
 const saveValues = (value: any, product: string): void => {
-	const isAquaTemp_Poolsana = isAuaTemp_Poolsana(product);
-	if (isAquaTemp_Poolsana == null) {
+	const isAquaTempPoolsana = isAquaTemp_Poolsana(product);
+
+	if (isAquaTempPoolsana == null) {
 		return;
 	}
 	// Stromverbrauch T07 x T14 in Watt
 	saveValue(
 		"consumption",
-		parseFloat(findCodeVal(value, isAquaTemp_Poolsana ? "T07" : "T7")) * parseFloat(findCodeVal(value, "T14")),
+		parseFloat(findCodeVal(value, isAquaTempPoolsana ? "T07" : "T7")) * parseFloat(findCodeVal(value, "T14")),
 		"number",
 	);
 	// Luftansaug-Temperatur T01
-	saveValue("suctionTemp", parseFloat(findCodeVal(value, isAquaTemp_Poolsana ? "T01" : "T1")), "number");
+	saveValue("suctionTemp", parseFloat(findCodeVal(value, isAquaTempPoolsana ? "T01" : "T1")), "number");
 	// Inlet-Temperatur T02
-	saveValue("tempIn", parseFloat(findCodeVal(value, isAquaTemp_Poolsana ? "T02" : "T2")), "number");
+	saveValue("tempIn", parseFloat(findCodeVal(value, isAquaTempPoolsana ? "T02" : "T2")), "number");
 	// outlet-Temperatur T03
-	saveValue("tempOut", parseFloat(findCodeVal(value, isAquaTemp_Poolsana ? "T03" : "T3")), "number");
+	saveValue("tempOut", parseFloat(findCodeVal(value, isAquaTempPoolsana ? "T03" : "T3")), "number");
 	// Coil-Temperatur T04
-	saveValue("coilTemp", parseFloat(findCodeVal(value, isAquaTemp_Poolsana ? "T04" : "T4")), "number");
+	saveValue("coilTemp", parseFloat(findCodeVal(value, isAquaTempPoolsana ? "T04" : "T4")), "number");
 	// Umgebungs-Temperatur T05
-	saveValue("ambient", parseFloat(findCodeVal(value, isAquaTemp_Poolsana ? "T05" : "T5")), "number");
+	saveValue("ambient", parseFloat(findCodeVal(value, isAquaTempPoolsana ? "T05" : "T5")), "number");
 	// Kompressorausgang-Temperatur T06
-	saveValue("exhaust", parseFloat(findCodeVal(value, isAquaTemp_Poolsana ? "T06" : "T6")), "number");
+	saveValue("exhaust", parseFloat(findCodeVal(value, isAquaTempPoolsana ? "T06" : "T6")), "number");
 	// Lüfter-Drehzahl T17
 	saveValue("rotor", parseInt(findCodeVal(value, "T17")), "number");
 };

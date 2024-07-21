@@ -19,9 +19,6 @@ export async function updateDeviceID(): Promise<void> {
 			return;
 		}
 		const { sURL } = getUpdateDeviceIdSUrl();
-		// const httpsAgent = new https.Agent({
-		// 	rejectUnauthorized: false, // Achtung: Dies birgt Sicherheitsrisiken
-		// });
 		const options = getAxiosUpdateDeviceIdParams();
 		_this.log.debug("UpdateDeviceID URL: " + sURL);
 		_this.log.debug("UpdateDeviceID options: " + JSON.stringify(options));

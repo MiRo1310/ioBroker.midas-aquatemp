@@ -81,7 +81,8 @@
 		"username": "",
 		"password": "",
 		"refresh": 60,
-		"deviceMac": ""
+		"deviceMac": "",
+		"useDeviceMac": false
 	},
 	"objects": [],
 	"instanceObjects": [

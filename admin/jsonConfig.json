@@ -27,6 +27,12 @@
 			"label": "Device Mac",
 			"sm": 3
 		},
+		"useDeviceMac": {
+			"type": "checkbox",
+			"label": "Use Device Mac",
+			"sm": 1,
+			"newLine": false
+		},
 
 		"selectApi": {
 			"type": "select",

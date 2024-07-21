@@ -69,6 +69,7 @@ class MidasAquatemp extends utils.Adapter {
     store.interval = this.config.refresh;
     store.apiLevel = this.config.selectApi;
     store.device = this.config.deviceMac;
+    store.useDeviceMac = this.config.useDeviceMac;
     this.log.debug("API-Level: " + this.config.selectApi);
     (0, import_endPoints.setupEndpoints)();
     (0, import_encryptPassword.encryptPassword)(password);

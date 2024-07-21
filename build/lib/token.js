@@ -35,6 +35,7 @@ var import_axios = __toESM(require("axios"));
 var import_endPoints = require("./endPoints");
 var import_saveValue = require("./saveValue");
 var import_store = require("./store");
+var import_updateDeviceId = require("./updateDeviceId");
 var import_updateDeviceStatus = require("./updateDeviceStatus");
 async function getToken() {
   var _a, _b, _c, _d;
@@ -72,7 +73,11 @@ const updateToken = async () => {
   try {
     await getToken();
     if (store.token) {
-      await (0, import_updateDeviceStatus.updateDeviceStatus)();
+      if (store.useDeviceMac) {
+        await (0, import_updateDeviceStatus.updateDeviceStatus)();
+        return;
+      }
+      await (0, import_updateDeviceId.updateDeviceID)();
       return;
     }
     store.resetOnErrorHandler();

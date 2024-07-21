@@ -9,6 +9,7 @@ declare global {
 			refresh: number;
 			selectApi: number;
 			deviceMac: string;
+			useDeviceMac: boolean;
 		}
 	}
 }
