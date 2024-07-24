@@ -1,111 +1,131 @@
 {
-	"common": {
-		"name": "midas-aquatemp",
-		"version": "0.0.1",
-		"news": {
-			"0.0.1": {
-				"en": "initial release",
-				"de": "Erstveröffentlichung",
-				"ru": "Начальная версия",
-				"pt": "lançamento inicial",
-				"nl": "Eerste uitgave",
-				"fr": "Première version",
-				"it": "Versione iniziale",
-				"es": "Versión inicial",
-				"pl": "Pierwsze wydanie",
-				"uk": "Початкова версія",
-				"zh-cn": "首次出版"
-			}
-		},
-		"title": "Midas Aquatemp",
-		"titleLang": {
-			"en": "Midas Aquatemp",
-			"de": "Midas Aquatemp",
-			"ru": "Мидас Акватемп",
-			"pt": "Midas Aquatemp",
-			"nl": "Midas Aquatemp",
-			"fr": "Midas Aquatemp",
-			"it": "Midas Aquatemp",
-			"es": "Midas Aquatemp",
-			"pl": "Aquatemp Midasa",
-			"uk": "Мідас Акватемп",
-			"zh-cn": "迈达斯水温"
-		},
-		"desc": {
-			"en": "midas-aquatemp",
-			"de": "midas-aquatemp",
-			"ru": "midas-aquatemp",
-			"pt": "midas-aquatemp",
-			"nl": "midas-aquatemp",
-			"fr": "midas-aquatemp",
-			"it": "midas-aquatemp",
-			"es": "midas-aquatemp",
-			"pl": "midas-aquatemp",
-			"uk": "midas-aquatemp",
-			"zh-cn": "midas-aquatemp"
-		},
-		"authors": ["Miro1310 <michael.roling@gmx.de>", "oxident"],
-		"keywords": ["heat pump", "pool heating", "poolsana"],
-		"licenseInformation": {
-			"type": "free",
-			"license": "MIT"
-		},
-		"platform": "Javascript/Node.js",
-		"main": "build/main.js",
-		"icon": "midas-aquatemp.png",
-		"enabled": true,
-		"extIcon": "https://raw.githubusercontent.com/Miro1310/ioBroker.midas-aquatemp/main/admin/midas-aquatemp.png",
-		"readme": "https://github.com/Miro1310/ioBroker.midas-aquatemp/blob/main/README.md",
-		"loglevel": "info",
-		"tier": 3,
-		"mode": "daemon",
-		"type": "climate-control",
-		"compact": true,
-		"connectionType": "cloud",
-		"dataSource": "poll",
-		"adminUI": {
-			"config": "json"
-		},
-		"dependencies": [
-			{
-				"js-controller": ">=3.3.22"
-			}
-		],
-		"globalDependencies": [
-			{
-				"admin": ">=5.1.13"
-			}
-		]
-	},
-	"native": {
-		"username": "",
-		"password": "",
-		"refresh": 60,
-		"deviceMac": "",
-		"useDeviceMac": false
-	},
-	"objects": [],
-	"instanceObjects": [
-		{
-			"_id": "info",
-			"type": "channel",
-			"common": {
-				"name": "Information"
-			},
-			"native": {}
-		},
-		{
-			"_id": "info.connection",
-			"type": "state",
-			"common": {
-				"role": "indicator.connected",
-				"name": "Device or service connected",
-				"type": "boolean",
-				"read": true,
-				"write": false,
-				"def": false
-			},
-			"native": {}
-		}
-	]
+  "common": {
+    "name": "midas-aquatemp",
+    "version": "1.0.0",
+    "news": {
+      "1.0.0": {
+        "en": "FEAT: Add writeable states\nFEAT: Data is also updated when the heating is off\nFIX: Get token\nFIX: #7 Error with useStore()",
+        "de": "FEAT: Schreibbare Zustände hinzufügen\nFEAT: Daten werden auch aktualisiert, wenn die Heizung abgeschaltet ist\nFIX: Get token\nFIX: #7 Fehler mit useStore()",
+        "ru": "FEAT: Добавить состояния записи\nFEAT: Данные также обновляются, когда отопление отключено\nFIX: Get token\nFIX: #7 Ошибка с useStore()",
+        "pt": "FEAT: Adicionar estados escreventes\nFEAT: Os dados também são atualizados quando o aquecimento está desligado\nFIX: Get token\nFIX: #7 Erro com useStore()",
+        "nl": "FEAT: schrijfbare toestanden toevoegen\nFEAT: De gegevens worden ook bijgewerkt wanneer de verwarming uit is\nKrijg token\nFIX: #7 Fout bij gebruikStore()",
+        "fr": "FEUILLE: Ajouter des états lisibles\nFEAT: Les données sont également mises à jour lorsque le chauffage est éteint\nObtenez un jeton\nFIX: #7 Erreur avec useStore()",
+        "it": "FEAT: Aggiungi stati scrivibili\nCARAT: I dati vengono aggiornati anche quando il riscaldamento è spento\nFIX: Get token\nFIX: #7 Errore con useStore()",
+        "es": "FEAT: Añadir estados escribibles\nFEAT: Los datos también se actualizan cuando la calefacción está apagada\nFIX: Token\nFIX: #7 Error con useStore()",
+        "pl": "FEAT: Dodaj stany zapisywalne\nFEAT: Dane są również aktualizowane, gdy ogrzewanie jest wyłączone\nFIX: Pobierz żeton\nFIX: # 7 Błąd z useStore ()",
+        "uk": "FEAT: Додати написати штати\nFEAT: Дані також оновлено, коли опалення вимкнено\nFIX: Отримати токен\nFIX: #7 Помилка з використаннямStore()",
+        "zh-cn": "FEAT: 添加可写入状态\nFEAT: 数据也在加热关闭时更新\nFIX: 获取符号\nFIX: # 7 使用Store( ) 出错"
+      },
+      "0.0.1": {
+        "en": "initial release",
+        "de": "Erstveröffentlichung",
+        "ru": "Начальная версия",
+        "pt": "lançamento inicial",
+        "nl": "Eerste uitgave",
+        "fr": "Première version",
+        "it": "Versione iniziale",
+        "es": "Versión inicial",
+        "pl": "Pierwsze wydanie",
+        "uk": "Початкова версія",
+        "zh-cn": "首次出版"
+      }
+    },
+    "title": "Midas Aquatemp",
+    "titleLang": {
+      "en": "Midas Aquatemp",
+      "de": "Midas Aquatemp",
+      "ru": "Мидас Акватемп",
+      "pt": "Midas Aquatemp",
+      "nl": "Midas Aquatemp",
+      "fr": "Midas Aquatemp",
+      "it": "Midas Aquatemp",
+      "es": "Midas Aquatemp",
+      "pl": "Aquatemp Midasa",
+      "uk": "Мідас Акватемп",
+      "zh-cn": "迈达斯水温"
+    },
+    "desc": {
+      "en": "midas-aquatemp",
+      "de": "midas-aquatemp",
+      "ru": "midas-aquatemp",
+      "pt": "midas-aquatemp",
+      "nl": "midas-aquatemp",
+      "fr": "midas-aquatemp",
+      "it": "midas-aquatemp",
+      "es": "midas-aquatemp",
+      "pl": "midas-aquatemp",
+      "uk": "midas-aquatemp",
+      "zh-cn": "midas-aquatemp"
+    },
+    "authors": [
+      "Miro1310 <michael.roling@gmx.de>",
+      "oxident"
+    ],
+    "keywords": [
+      "heat pump",
+      "pool heating",
+      "poolsana"
+    ],
+    "licenseInformation": {
+      "type": "free",
+      "license": "MIT"
+    },
+    "platform": "Javascript/Node.js",
+    "main": "build/main.js",
+    "icon": "midas-aquatemp.png",
+    "enabled": true,
+    "extIcon": "https://raw.githubusercontent.com/Miro1310/ioBroker.midas-aquatemp/main/admin/midas-aquatemp.png",
+    "readme": "https://github.com/Miro1310/ioBroker.midas-aquatemp/blob/main/README.md",
+    "loglevel": "info",
+    "tier": 3,
+    "mode": "daemon",
+    "type": "climate-control",
+    "compact": true,
+    "connectionType": "cloud",
+    "dataSource": "poll",
+    "adminUI": {
+      "config": "json"
+    },
+    "dependencies": [
+      {
+        "js-controller": ">=3.3.22"
+      }
+    ],
+    "globalDependencies": [
+      {
+        "admin": ">=5.1.13"
+      }
+    ]
+  },
+  "native": {
+    "username": "",
+    "password": "",
+    "refresh": 60,
+    "deviceMac": "",
+    "useDeviceMac": false
+  },
+  "objects": [],
+  "instanceObjects": [
+    {
+      "_id": "info",
+      "type": "channel",
+      "common": {
+        "name": "Information"
+      },
+      "native": {}
+    },
+    {
+      "_id": "info.connection",
+      "type": "state",
+      "common": {
+        "role": "indicator.connected",
+        "name": "Device or service connected",
+        "type": "boolean",
+        "read": true,
+        "write": false,
+        "def": false
+      },
+      "native": {}
+    }
+  ]
 }

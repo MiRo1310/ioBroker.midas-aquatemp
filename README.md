@@ -19,8 +19,7 @@
 	Placeholder for the next version (at the beginning of the line):
 	### **WORK IN PROGRESS**
 -->
-
-### **WORK IN PROGRESS**
+### 1.0.0 (2024-07-24)
 
 -   FEAT: Add writeable states
 -   FEAT: Data is also updated when the heating is off
