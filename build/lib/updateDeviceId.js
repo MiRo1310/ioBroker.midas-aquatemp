@@ -56,8 +56,6 @@ async function updateDeviceID() {
     _this.log.debug("UpdateDeviceID options: " + JSON.stringify(options));
     const response = await import_axios.default.post(sURL, options, {
       headers: { "x-token": token }
-      // httpsAgent,
-      // timeout: 5000,
     });
     _this.log.debug("UpdateDeviceID response: " + JSON.stringify(response.data));
     _this.log.debug("UpdateDeviceID response status: " + JSON.stringify(response.status));

@@ -7,13 +7,10 @@ export async function updateDeviceErrorMsg(): Promise<void> {
 	try {
 		const { token, apiLevel, cloudURL, device: deviceCode } = store;
 		if (token) {
-			let sURL = "";
-
-			if (apiLevel < 3) {
-				sURL = cloudURL + "/app/device/getFaultDataByDeviceCode.json";
-			} else {
-				sURL = cloudURL + "/app/device/getFaultDataByDeviceCode";
-			}
+			const sURL =
+				apiLevel < 3
+					? cloudURL + "/app/device/getFaultDataByDeviceCode.json"
+					: cloudURL + "/app/device/getFaultDataByDeviceCode";
 
 			const response = await axios.post(
 				sURL,
@@ -33,18 +30,15 @@ export async function updateDeviceErrorMsg(): Promise<void> {
 					saveValue("errorMessage", response.data.object_result[0].description, "string");
 					saveValue("errorCode", response.data.object_result[0].fault_code, "string");
 					saveValue("errorLevel", response.data.object_result[0].error_level, "string");
-				} else {
-					saveValue("errorMessage", response.data.objectResult[0].description, "string");
-					saveValue("errorCode", response.data.objectResult[0].fault_code, "string");
-					saveValue("errorLevel", response.data.objectResult[0].error_level, "string");
+					return;
 				}
+				saveValue("errorMessage", response.data.objectResult[0].description, "string");
+				saveValue("errorCode", response.data.objectResult[0].fault_code, "string");
+				saveValue("errorLevel", response.data.objectResult[0].error_level, "string");
 				return;
 			}
 			// Login-Fehler
-			(store.token = ""),
-				// , (store.device = "")
-				(store.reachable = false);
-			saveValue("info.connection", false, "boolean");
+			store.resetOnErrorHandler();
 			return;
 		}
 		return;

@@ -63,7 +63,6 @@ async function updateDevicePower(deviceCode, power) {
       }
       store._this.log.error("Error: " + JSON.stringify(response.data));
       store.resetOnErrorHandler();
-      (0, import_saveValue.saveValue)("info.connection", false, "boolean");
     }
   } catch (error) {
     store._this.log.error(JSON.stringify(error));
@@ -90,7 +89,6 @@ async function updateDeviceMode(deviceCode, mode) {
       }
       store._this.log.error("Error: " + JSON.stringify(response.data));
       store.resetOnErrorHandler();
-      (0, import_saveValue.saveValue)("info.connection", false, "boolean");
     }
   } catch (error) {
     store._this.log.error(JSON.stringify(error));

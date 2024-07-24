@@ -57,7 +57,6 @@ async function updateDeviceSilent(deviceCode, silent) {
       }
       store._this.log.error("Error: " + JSON.stringify(response.data));
       store.resetOnErrorHandler();
-      (0, import_saveValue.saveValue)("info.connection", false, "boolean");
     }
   } catch (error) {
     store._this.log.error(JSON.stringify(error));

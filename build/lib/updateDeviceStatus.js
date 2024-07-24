@@ -59,11 +59,7 @@ async function updateDeviceStatus() {
           headers: { "x-token": token }
         }
       );
-      if (apiLevel < 3) {
-        store.reachable = ((_a = response.data.object_result[0]) == null ? void 0 : _a.device_status) == "ONLINE";
-      } else {
-        store.reachable = ((_b = response.data.objectResult[0]) == null ? void 0 : _b.deviceStatus) == "ONLINE";
-      }
+      store.reachable = apiLevel < 3 ? ((_a = response.data.object_result[0]) == null ? void 0 : _a.device_status) == "ONLINE" : ((_b = response.data.objectResult[0]) == null ? void 0 : _b.deviceStatus) == "ONLINE";
       if (parseInt(response.data.error_code) == 0) {
         if (((_d = (_c = response.data) == null ? void 0 : _c.object_result) == null ? void 0 : _d["is_fault"]) || ((_f = (_e = response.data) == null ? void 0 : _e.objectResult) == null ? void 0 : _f["isFault"])) {
           store._this.log.error("Error in updateDeviceStatus(): " + JSON.stringify(response.data));
@@ -79,11 +75,10 @@ async function updateDeviceStatus() {
         (0, import_updateDeviceDetails.updateDeviceDetails)();
         return;
       }
-      (0, import_saveValue.saveValue)("info.connection", false, "boolean");
+      store.resetOnErrorHandler();
       return;
     }
-    store.token = "", // , (store.device = ""),
-    store.reachable = false;
+    store.resetOnErrorHandler();
   } catch (error) {
     store._this.log.error(JSON.stringify(error));
     store._this.log.error(JSON.stringify(error.stack));

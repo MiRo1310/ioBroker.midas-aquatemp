@@ -50,6 +50,7 @@ function initStore() {
       },
       resetOnErrorHandler: function() {
         this.token = "";
+        this.device = "";
         this.reachable = false;
         (0, import_saveValue.saveValue)("info.connection", false, "boolean");
       }

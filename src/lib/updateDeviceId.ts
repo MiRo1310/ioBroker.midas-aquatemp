@@ -25,8 +25,6 @@ export async function updateDeviceID(): Promise<void> {
 
 		const response = await axios.post(sURL, options, {
 			headers: { "x-token": token },
-			// httpsAgent,
-			// timeout: 5000,
 		});
 
 		_this.log.debug("UpdateDeviceID response: " + JSON.stringify(response.data));

@@ -1,6 +1,5 @@
 import axios from "axios";
 import { getOptionsAndSUrl } from "./endPoints";
-import { saveValue } from "./saveValue";
 import { initStore as useStore } from "./store";
 import { updateDeviceID } from "./updateDeviceId";
 import { updateDeviceStatus } from "./updateDeviceStatus";
@@ -21,18 +20,17 @@ async function getToken(): Promise<void> {
 				return;
 			}
 			if (response.status == 200) {
-				if (apiLevel < 3) {
-					store.token = response.data?.object_result?.["x-token"];
-				} else {
-					store.token = response.data?.objectResult?.["x-token"];
-				}
+				store.token =
+					apiLevel < 3
+						? response.data?.object_result?.["x-token"]
+						: (store.token = response.data?.objectResult?.["x-token"]);
 
 				_this.log.info("Login ok! Token: " + store.token);
 				return;
 			}
 
 			_this.log.error("Login-error: " + response.data);
-			store.token = null;
+			store.resetOnErrorHandler();
 			return;
 		}
 	} catch (error) {
@@ -45,17 +43,15 @@ export const updateToken = async (): Promise<void> => {
 	try {
 		await getToken();
 
-		if (store.token) {
-			if (store.useDeviceMac) {
-				await updateDeviceStatus();
-				return;
-			}
-			await updateDeviceID();
+		if (!store.token) {
+			store.resetOnErrorHandler();
 			return;
 		}
-
-		store.resetOnErrorHandler();
-		saveValue("info.connection", false, "boolean");
+		if (store.useDeviceMac) {
+			await updateDeviceStatus();
+			return;
+		}
+		await updateDeviceID();
 		return;
 	} catch (error: any) {
 		store._this.log.error("Error in updateToken(): " + JSON.stringify(error));

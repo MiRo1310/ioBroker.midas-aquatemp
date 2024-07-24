@@ -28,11 +28,10 @@ export async function updateDeviceStatus(): Promise<void> {
 				},
 			);
 
-			if (apiLevel < 3) {
-				store.reachable = response.data.object_result[0]?.device_status == "ONLINE";
-			} else {
-				store.reachable = response.data.objectResult[0]?.deviceStatus == "ONLINE";
-			}
+			store.reachable =
+				apiLevel < 3
+					? response.data.object_result[0]?.device_status == "ONLINE"
+					: response.data.objectResult[0]?.deviceStatus == "ONLINE";
 
 			if (parseInt(response.data.error_code) == 0) {
 				if (response.data?.object_result?.["is_fault"] || response.data?.objectResult?.["isFault"]) {
@@ -53,12 +52,10 @@ export async function updateDeviceStatus(): Promise<void> {
 
 				return;
 			}
-			saveValue("info.connection", false, "boolean");
+			store.resetOnErrorHandler();
 			return;
 		}
-		(store.token = ""),
-			// , (store.device = ""),
-			(store.reachable = false);
+		store.resetOnErrorHandler();
 	} catch (error: any) {
 		store._this.log.error(JSON.stringify(error));
 		store._this.log.error(JSON.stringify(error.stack));

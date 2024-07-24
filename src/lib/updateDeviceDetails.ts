@@ -1,4 +1,5 @@
 import axios from "axios";
+import { Modes } from "../types";
 import { getProtocolCodes } from "./axiosParameter";
 import { getSUrlUpdateDeviceId } from "./endPoints";
 import { saveValue } from "./saveValue";
@@ -59,34 +60,22 @@ export async function updateDeviceDetails(): Promise<void> {
 			store._this.log.info("DeviceDetails: " + JSON.stringify(response.data));
 
 			if (parseInt(response.data.error_code) == 0) {
-				let responseValue: any;
-				if (apiLevel < 3) {
-					responseValue = response.data.object_result;
-				} else {
-					responseValue = response.data.objectResult;
-				}
+				const responseValue = apiLevel < 3 ? response.data.object_result : response.data.objectResult;
 
 				saveValue("rawJSON", JSON.stringify(responseValue), "string");
 				saveValues(responseValue, product);
 
+				const mode: number = findCodeVal(responseValue, "Mode");
+				const modes: Modes = {
+					1: "R02", // Heiz-Modus (-> R02)
+					0: "R01", // Kühl-Modus (-> R01)
+					2: "R03", // Auto-Modus (-> R03)
+				};
 				// Ziel-Temperatur anhand Modus
-				if (findCodeVal(responseValue, "Mode") == 1) {
-					// Heiz-Modus (-> R02)
-					saveValue("tempSet", parseFloat(findCodeVal(responseValue, "R02")), "number");
-				} else if (findCodeVal(response.data.object_result, "Mode") == 0) {
-					// Kühl-Modus (-> R01)
-					saveValue("tempSet", parseFloat(findCodeVal(responseValue, "R01")), "number");
-				} else if (findCodeVal(response.data.object_result, "Mode") == 2) {
-					// Auto-Modus (-> R03)
-					saveValue("tempSet", parseFloat(findCodeVal(responseValue, "R03")), "number");
-				}
+				saveValue("tempSet", parseFloat(findCodeVal(responseValue, modes[mode])), "number");
 
 				// Flüstermodus Manual-mute
-				if (findCodeVal(responseValue, "Manual-mute") == "1") {
-					saveValue("silent", true, "boolean");
-				} else {
-					saveValue("silent", false, "boolean");
-				}
+				saveValue("silent", findCodeVal(responseValue, "Manual-mute") == "1", "boolean");
 
 				// Zustand Power
 				if (findCodeVal(responseValue, "Power") == "1") {
@@ -102,10 +91,7 @@ export async function updateDeviceDetails(): Promise<void> {
 			}
 
 			store._this.log.error("Error: " + JSON.stringify(response.data));
-			saveValue("info.connection", false, "boolean");
-			store.token = "";
-			// store.device = "";
-			store.reachable = false;
+			store.resetOnErrorHandler();
 			return;
 		}
 		return;

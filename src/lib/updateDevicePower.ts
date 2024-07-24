@@ -30,7 +30,6 @@ export async function updateDevicePower(deviceCode: string, power: number): Prom
 			}
 			store._this.log.error("Error: " + JSON.stringify(response.data));
 			store.resetOnErrorHandler();
-			saveValue("info.connection", false, "boolean");
 		}
 	} catch (error: any) {
 		store._this.log.error(JSON.stringify(error));
@@ -59,7 +58,6 @@ async function updateDeviceMode(deviceCode: string, mode: any): Promise<void> {
 			}
 			store._this.log.error("Error: " + JSON.stringify(response.data));
 			store.resetOnErrorHandler();
-			saveValue("info.connection", false, "boolean");
 		}
 	} catch (error: any) {
 		store._this.log.error(JSON.stringify(error));

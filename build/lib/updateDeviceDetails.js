@@ -77,26 +77,20 @@ async function updateDeviceDetails() {
       });
       store._this.log.info("DeviceDetails: " + JSON.stringify(response.data));
       if (parseInt(response.data.error_code) == 0) {
-        let responseValue;
-        if (apiLevel < 3) {
-          responseValue = response.data.object_result;
-        } else {
-          responseValue = response.data.objectResult;
-        }
+        const responseValue = apiLevel < 3 ? response.data.object_result : response.data.objectResult;
         (0, import_saveValue.saveValue)("rawJSON", JSON.stringify(responseValue), "string");
         saveValues(responseValue, product);
-        if (findCodeVal(responseValue, "Mode") == 1) {
-          (0, import_saveValue.saveValue)("tempSet", parseFloat(findCodeVal(responseValue, "R02")), "number");
-        } else if (findCodeVal(response.data.object_result, "Mode") == 0) {
-          (0, import_saveValue.saveValue)("tempSet", parseFloat(findCodeVal(responseValue, "R01")), "number");
-        } else if (findCodeVal(response.data.object_result, "Mode") == 2) {
-          (0, import_saveValue.saveValue)("tempSet", parseFloat(findCodeVal(responseValue, "R03")), "number");
-        }
-        if (findCodeVal(responseValue, "Manual-mute") == "1") {
-          (0, import_saveValue.saveValue)("silent", true, "boolean");
-        } else {
-          (0, import_saveValue.saveValue)("silent", false, "boolean");
-        }
+        const mode = findCodeVal(responseValue, "Mode");
+        const modes = {
+          1: "R02",
+          // Heiz-Modus (-> R02)
+          0: "R01",
+          // Kühl-Modus (-> R01)
+          2: "R03"
+          // Auto-Modus (-> R03)
+        };
+        (0, import_saveValue.saveValue)("tempSet", parseFloat(findCodeVal(responseValue, modes[mode])), "number");
+        (0, import_saveValue.saveValue)("silent", findCodeVal(responseValue, "Manual-mute") == "1", "boolean");
         if (findCodeVal(responseValue, "Power") == "1") {
           (0, import_saveValue.saveValue)("state", true, "boolean");
           (0, import_saveValue.saveValue)("mode", findCodeVal(responseValue, "Mode"), "string");
@@ -108,9 +102,7 @@ async function updateDeviceDetails() {
         return;
       }
       store._this.log.error("Error: " + JSON.stringify(response.data));
-      (0, import_saveValue.saveValue)("info.connection", false, "boolean");
-      store.token = "";
-      store.reachable = false;
+      store.resetOnErrorHandler();
       return;
     }
     return;

@@ -39,12 +39,7 @@ async function updateDeviceErrorMsg() {
   try {
     const { token, apiLevel, cloudURL, device: deviceCode } = store;
     if (token) {
-      let sURL = "";
-      if (apiLevel < 3) {
-        sURL = cloudURL + "/app/device/getFaultDataByDeviceCode.json";
-      } else {
-        sURL = cloudURL + "/app/device/getFaultDataByDeviceCode";
-      }
+      const sURL = apiLevel < 3 ? cloudURL + "/app/device/getFaultDataByDeviceCode.json" : cloudURL + "/app/device/getFaultDataByDeviceCode";
       const response = await import_axios.default.post(
         sURL,
         {
@@ -61,16 +56,14 @@ async function updateDeviceErrorMsg() {
           (0, import_saveValue.saveValue)("errorMessage", response.data.object_result[0].description, "string");
           (0, import_saveValue.saveValue)("errorCode", response.data.object_result[0].fault_code, "string");
           (0, import_saveValue.saveValue)("errorLevel", response.data.object_result[0].error_level, "string");
-        } else {
-          (0, import_saveValue.saveValue)("errorMessage", response.data.objectResult[0].description, "string");
-          (0, import_saveValue.saveValue)("errorCode", response.data.objectResult[0].fault_code, "string");
-          (0, import_saveValue.saveValue)("errorLevel", response.data.objectResult[0].error_level, "string");
+          return;
         }
+        (0, import_saveValue.saveValue)("errorMessage", response.data.objectResult[0].description, "string");
+        (0, import_saveValue.saveValue)("errorCode", response.data.objectResult[0].fault_code, "string");
+        (0, import_saveValue.saveValue)("errorLevel", response.data.objectResult[0].error_level, "string");
         return;
       }
-      store.token = "", // , (store.device = "")
-      store.reachable = false;
-      (0, import_saveValue.saveValue)("info.connection", false, "boolean");
+      store.resetOnErrorHandler();
       return;
     }
     return;

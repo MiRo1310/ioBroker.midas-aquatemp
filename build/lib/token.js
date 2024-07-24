@@ -33,7 +33,6 @@ __export(token_exports, {
 module.exports = __toCommonJS(token_exports);
 var import_axios = __toESM(require("axios"));
 var import_endPoints = require("./endPoints");
-var import_saveValue = require("./saveValue");
 var import_store = require("./store");
 var import_updateDeviceId = require("./updateDeviceId");
 var import_updateDeviceStatus = require("./updateDeviceStatus");
@@ -52,16 +51,12 @@ async function getToken() {
         return;
       }
       if (response.status == 200) {
-        if (apiLevel < 3) {
-          store.token = (_b = (_a = response.data) == null ? void 0 : _a.object_result) == null ? void 0 : _b["x-token"];
-        } else {
-          store.token = (_d = (_c = response.data) == null ? void 0 : _c.objectResult) == null ? void 0 : _d["x-token"];
-        }
+        store.token = apiLevel < 3 ? (_b = (_a = response.data) == null ? void 0 : _a.object_result) == null ? void 0 : _b["x-token"] : store.token = (_d = (_c = response.data) == null ? void 0 : _c.objectResult) == null ? void 0 : _d["x-token"];
         _this.log.info("Login ok! Token: " + store.token);
         return;
       }
       _this.log.error("Login-error: " + response.data);
-      store.token = null;
+      store.resetOnErrorHandler();
       return;
     }
   } catch (error) {
@@ -72,16 +67,15 @@ const updateToken = async () => {
   const store = (0, import_store.initStore)();
   try {
     await getToken();
-    if (store.token) {
-      if (store.useDeviceMac) {
-        await (0, import_updateDeviceStatus.updateDeviceStatus)();
-        return;
-      }
-      await (0, import_updateDeviceId.updateDeviceID)();
+    if (!store.token) {
+      store.resetOnErrorHandler();
       return;
     }
-    store.resetOnErrorHandler();
-    (0, import_saveValue.saveValue)("info.connection", false, "boolean");
+    if (store.useDeviceMac) {
+      await (0, import_updateDeviceStatus.updateDeviceStatus)();
+      return;
+    }
+    await (0, import_updateDeviceId.updateDeviceID)();
     return;
   } catch (error) {
     store._this.log.error("Error in updateToken(): " + JSON.stringify(error));
