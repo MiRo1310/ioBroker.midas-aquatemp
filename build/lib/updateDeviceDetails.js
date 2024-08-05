@@ -28,6 +28,7 @@ var __toESM = (mod, isNodeMode, target) => (target = mod != null ? __create(__ge
 var __toCommonJS = (mod) => __copyProps(__defProp({}, "__esModule", { value: true }), mod);
 var updateDeviceDetails_exports = {};
 __export(updateDeviceDetails_exports, {
+  numberToBoolean: () => numberToBoolean,
   updateDeviceDetails: () => updateDeviceDetails
 });
 module.exports = __toCommonJS(updateDeviceDetails_exports);
@@ -64,7 +65,11 @@ const saveValues = (value, product) => {
   (0, import_saveValue.saveValue)("coilTemp", parseFloat(findCodeVal(value, isAquaTempPoolsana ? "T04" : "T4")), "number");
   (0, import_saveValue.saveValue)("ambient", parseFloat(findCodeVal(value, isAquaTempPoolsana ? "T05" : "T5")), "number");
   (0, import_saveValue.saveValue)("exhaust", parseFloat(findCodeVal(value, isAquaTempPoolsana ? "T06" : "T6")), "number");
+  (0, import_saveValue.saveValue)("flowSwitch", numberToBoolean(findCodeVal(value, isAquaTempPoolsana ? "S03" : "S3")), "boolean");
   (0, import_saveValue.saveValue)("rotor", parseInt(findCodeVal(value, "T17")), "number");
+};
+const numberToBoolean = (value) => {
+  return value === 1;
 };
 async function updateDeviceDetails() {
   const store = (0, import_store.initStore)();
@@ -117,6 +122,7 @@ function findCodeVal(result, code) {
 }
 // Annotate the CommonJS export names for ESM import in node:
 0 && (module.exports = {
+  numberToBoolean,
   updateDeviceDetails
 });
 //# sourceMappingURL=updateDeviceDetails.js.map

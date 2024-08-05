@@ -24,8 +24,10 @@ async function getToken(): Promise<void> {
 					apiLevel < 3
 						? response.data?.object_result?.["x-token"]
 						: (store.token = response.data?.objectResult?.["x-token"]);
+				if (store.token) { _this.log.info("Login ok! Token: " + store.token) }
+				else { _this.log.error("Login-error: " + JSON.stringify(response.data)) };
 
-				_this.log.info("Login ok! Token: " + store.token);
+
 				return;
 			}
 

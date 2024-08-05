@@ -52,7 +52,12 @@ async function getToken() {
       }
       if (response.status == 200) {
         store.token = apiLevel < 3 ? (_b = (_a = response.data) == null ? void 0 : _a.object_result) == null ? void 0 : _b["x-token"] : store.token = (_d = (_c = response.data) == null ? void 0 : _c.objectResult) == null ? void 0 : _d["x-token"];
-        _this.log.info("Login ok! Token: " + store.token);
+        if (store.token) {
+          _this.log.info("Login ok! Token: " + store.token);
+        } else {
+          _this.log.error("Login-error: " + JSON.stringify(response.data));
+        }
+        ;
         return;
       }
       _this.log.error("Login-error: " + response.data);

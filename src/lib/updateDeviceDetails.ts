@@ -43,9 +43,14 @@ const saveValues = (value: any, product: string): void => {
 	saveValue("ambient", parseFloat(findCodeVal(value, isAquaTempPoolsana ? "T05" : "T5")), "number");
 	// Kompressorausgang-Temperatur T06
 	saveValue("exhaust", parseFloat(findCodeVal(value, isAquaTempPoolsana ? "T06" : "T6")), "number");
+	// Strömungsschalter S03
+	saveValue("flowSwitch", numberToBoolean(findCodeVal(value, isAquaTempPoolsana ? "S03" : "S3")), "boolean");
 	// Lüfter-Drehzahl T17
 	saveValue("rotor", parseInt(findCodeVal(value, "T17")), "number");
 };
+export const numberToBoolean = (value: number): boolean => {
+	return value === 1;
+}
 
 export async function updateDeviceDetails(): Promise<void> {
 	const store = initStore();

@@ -19,6 +19,11 @@
 	Placeholder for the next version (at the beginning of the line):
 	### **WORK IN PROGRESS**
 -->
+
+### **WORK IN PROGRESS**
+
+-   FEAT: Add flowSwitch
+
 ### 1.0.0 (2024-07-24)
 
 -   FEAT: Add writeable states

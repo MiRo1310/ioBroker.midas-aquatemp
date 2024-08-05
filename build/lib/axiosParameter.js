@@ -64,7 +64,9 @@ const getProtocolCodes = (deviceCode) => {
       "T4",
       "T5",
       "T6",
-      "T7"
+      "T7",
+      "S03",
+      "S3"
     ],
     protocalCodes: [
       "Power",
@@ -102,7 +104,9 @@ const getProtocolCodes = (deviceCode) => {
       "T4",
       "T5",
       "T6",
-      "T7"
+      "T7",
+      "S03",
+      "S3"
     ]
   };
 };

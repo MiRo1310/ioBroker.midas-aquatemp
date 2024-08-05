@@ -47,6 +47,8 @@ export const getProtocolCodes = (deviceCode: string): ReturnGetProtocolCodes => 
 			"T5",
 			"T6",
 			"T7",
+			"S03",
+			"S3",
 		],
 		protocalCodes: [
 			"Power",
@@ -85,6 +87,8 @@ export const getProtocolCodes = (deviceCode: string): ReturnGetProtocolCodes => 
 			"T5",
 			"T6",
 			"T7",
+			"S03",
+			"S3",
 		],
 	};
 };

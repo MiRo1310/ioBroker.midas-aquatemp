@@ -377,7 +377,26 @@ export const createObjects = async (): Promise<void> => {
 			type: "array",
 			role: "state",
 		},
+		{
+			id: dpRoot + ".flowSwitch",
+			name: {
+				"en": "Flow switch",
+				"de": "Strömungsschalter",
+				"ru": "Переключение потока",
+				"pt": "Interruptor de fluxo",
+				"nl": "Stroomschakelaar",
+				"fr": "Interrupteur de débit",
+				"it": "Interruttore di flusso",
+				"es": "Interruptor de flujo",
+				"pl": "Przełącznik przepływu",
+				"uk": "Перемикач потоку",
+				"zh-cn": "流程切换"
+			},
+			type: "boolean",
+			role: "state",
+		},
 	];
+
 	try {
 		for (const { id, name, role, unit, type, def, write } of objects) {
 			_this.log.info("Create object: " + id);
