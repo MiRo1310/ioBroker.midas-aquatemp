@@ -57,7 +57,6 @@ async function getToken() {
         } else {
           _this.log.error("Login-error: " + JSON.stringify(response.data));
         }
-        ;
         return;
       }
       _this.log.error("Login-error: " + response.data);

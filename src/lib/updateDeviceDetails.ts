@@ -5,57 +5,40 @@ import { getSUrlUpdateDeviceId } from "./endPoints";
 import { saveValue } from "./saveValue";
 import { initStore } from "./store";
 
-const isAquaTemp_Poolsana = (product: string): boolean | null => {
-	const store = initStore();
-	if (store.useDeviceMac) {
-		return false;
-	}
-
-	if (product == store.AQUATEMP_POOLSANA) {
-		return true;
-	} else if (product == store.AQUATEMP_OTHER1) {
-		return false;
-	}
-	return null;
+export const numberToBoolean = (value: number): boolean => {
+	return value === 1;
 };
 
-const saveValues = (value: any, product: string): void => {
-	const isAquaTempPoolsana = isAquaTemp_Poolsana(product);
-
-	if (isAquaTempPoolsana == null) {
-		return;
-	}
+const saveValues = (value: any): void => {
 	// Stromverbrauch T07 x T14 in Watt
 	saveValue(
 		"consumption",
-		parseFloat(findCodeVal(value, isAquaTempPoolsana ? "T07" : "T7")) * parseFloat(findCodeVal(value, "T14")),
+		parseFloat(findCodeVal(value, ["T07", "T7"])) * parseFloat(findCodeVal(value, "T14")),
 		"number",
 	);
 	// Luftansaug-Temperatur T01
-	saveValue("suctionTemp", parseFloat(findCodeVal(value, isAquaTempPoolsana ? "T01" : "T1")), "number");
+	saveValue("suctionTemp", parseFloat(findCodeVal(value, ["T01", "T1"])), "number");
 	// Inlet-Temperatur T02
-	saveValue("tempIn", parseFloat(findCodeVal(value, isAquaTempPoolsana ? "T02" : "T2")), "number");
+	saveValue("tempIn", parseFloat(findCodeVal(value, ["T02", "T2"])), "number");
 	// outlet-Temperatur T03
-	saveValue("tempOut", parseFloat(findCodeVal(value, isAquaTempPoolsana ? "T03" : "T3")), "number");
+	saveValue("tempOut", parseFloat(findCodeVal(value, ["T03", "T3"])), "number");
 	// Coil-Temperatur T04
-	saveValue("coilTemp", parseFloat(findCodeVal(value, isAquaTempPoolsana ? "T04" : "T4")), "number");
+	saveValue("coilTemp", parseFloat(findCodeVal(value, ["T04", "T4"])), "number");
 	// Umgebungs-Temperatur T05
-	saveValue("ambient", parseFloat(findCodeVal(value, isAquaTempPoolsana ? "T05" : "T5")), "number");
+	saveValue("ambient", parseFloat(findCodeVal(value, ["T05", "T5"])), "number");
 	// Kompressorausgang-Temperatur T06
-	saveValue("exhaust", parseFloat(findCodeVal(value, isAquaTempPoolsana ? "T06" : "T6")), "number");
+	saveValue("exhaust", parseFloat(findCodeVal(value, ["T06", "T6"])), "number");
 	// Strömungsschalter S03
-	saveValue("flowSwitch", numberToBoolean(findCodeVal(value, isAquaTempPoolsana ? "S03" : "S3")), "boolean");
+	saveValue("flowSwitch", numberToBoolean(findCodeVal(value, ["S03", "S3"])), "boolean");
 	// Lüfter-Drehzahl T17
 	saveValue("rotor", parseInt(findCodeVal(value, "T17")), "number");
 };
-export const numberToBoolean = (value: number): boolean => {
-	return value === 1;
-}
+
 
 export async function updateDeviceDetails(): Promise<void> {
 	const store = initStore();
 	try {
-		const { apiLevel, token, device: deviceCode, product } = store;
+		const { apiLevel, token, device: deviceCode } = store;
 		if (token) {
 			const { sURL } = getSUrlUpdateDeviceId();
 
@@ -68,7 +51,7 @@ export async function updateDeviceDetails(): Promise<void> {
 				const responseValue = apiLevel < 3 ? response.data.object_result : response.data.objectResult;
 
 				saveValue("rawJSON", JSON.stringify(responseValue), "string");
-				saveValues(responseValue, product);
+				saveValues(responseValue);
 
 				const mode: number = findCodeVal(responseValue, "Mode");
 				const modes: Modes = {
@@ -106,6 +89,15 @@ export async function updateDeviceDetails(): Promise<void> {
 	}
 }
 
-function findCodeVal(result: { value: string; code: string }[], code: string): any {
-	return result.find((item) => item.code === code)?.value || "";
+function findCodeVal(result: { value: string; code: string }[], code: string | string[]): any {
+	if (!Array.isArray(code)) {
+		return result.find((item) => item.code === code)?.value || "";
+	}
+	for (let i = 0; i < code.length; i++) {
+		const val = result.find((item) => item.code === code[i])?.value;
+		if (val !== "0") {
+			return val;
+		}
+	}
+	return "0";
 }

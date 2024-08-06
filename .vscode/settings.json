@@ -18,5 +18,5 @@
 			"url": "https://raw.githubusercontent.com/ioBroker/adapter-react-v5/main/schemas/jsonConfig.json"
 		}
 	],
-	"cSpell.words": ["Aquatemp", "Inver", "Poolsana", "POOLSANA"]
+	"cSpell.words": ["Aquatemp", "Inver", "Kompressorausgang", "Poolsana", "POOLSANA", "Strömungs", "Strömungsschalter"]
 }

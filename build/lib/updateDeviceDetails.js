@@ -37,44 +37,28 @@ var import_axiosParameter = require("./axiosParameter");
 var import_endPoints = require("./endPoints");
 var import_saveValue = require("./saveValue");
 var import_store = require("./store");
-const isAquaTemp_Poolsana = (product) => {
-  const store = (0, import_store.initStore)();
-  if (store.useDeviceMac) {
-    return false;
-  }
-  if (product == store.AQUATEMP_POOLSANA) {
-    return true;
-  } else if (product == store.AQUATEMP_OTHER1) {
-    return false;
-  }
-  return null;
-};
-const saveValues = (value, product) => {
-  const isAquaTempPoolsana = isAquaTemp_Poolsana(product);
-  if (isAquaTempPoolsana == null) {
-    return;
-  }
-  (0, import_saveValue.saveValue)(
-    "consumption",
-    parseFloat(findCodeVal(value, isAquaTempPoolsana ? "T07" : "T7")) * parseFloat(findCodeVal(value, "T14")),
-    "number"
-  );
-  (0, import_saveValue.saveValue)("suctionTemp", parseFloat(findCodeVal(value, isAquaTempPoolsana ? "T01" : "T1")), "number");
-  (0, import_saveValue.saveValue)("tempIn", parseFloat(findCodeVal(value, isAquaTempPoolsana ? "T02" : "T2")), "number");
-  (0, import_saveValue.saveValue)("tempOut", parseFloat(findCodeVal(value, isAquaTempPoolsana ? "T03" : "T3")), "number");
-  (0, import_saveValue.saveValue)("coilTemp", parseFloat(findCodeVal(value, isAquaTempPoolsana ? "T04" : "T4")), "number");
-  (0, import_saveValue.saveValue)("ambient", parseFloat(findCodeVal(value, isAquaTempPoolsana ? "T05" : "T5")), "number");
-  (0, import_saveValue.saveValue)("exhaust", parseFloat(findCodeVal(value, isAquaTempPoolsana ? "T06" : "T6")), "number");
-  (0, import_saveValue.saveValue)("flowSwitch", numberToBoolean(findCodeVal(value, isAquaTempPoolsana ? "S03" : "S3")), "boolean");
-  (0, import_saveValue.saveValue)("rotor", parseInt(findCodeVal(value, "T17")), "number");
-};
 const numberToBoolean = (value) => {
   return value === 1;
+};
+const saveValues = (value) => {
+  (0, import_saveValue.saveValue)(
+    "consumption",
+    parseFloat(findCodeVal(value, ["T07", "T7"])) * parseFloat(findCodeVal(value, "T14")),
+    "number"
+  );
+  (0, import_saveValue.saveValue)("suctionTemp", parseFloat(findCodeVal(value, ["T01", "T1"])), "number");
+  (0, import_saveValue.saveValue)("tempIn", parseFloat(findCodeVal(value, ["T02", "T2"])), "number");
+  (0, import_saveValue.saveValue)("tempOut", parseFloat(findCodeVal(value, ["T03", "T3"])), "number");
+  (0, import_saveValue.saveValue)("coilTemp", parseFloat(findCodeVal(value, ["T04", "T4"])), "number");
+  (0, import_saveValue.saveValue)("ambient", parseFloat(findCodeVal(value, ["T05", "T5"])), "number");
+  (0, import_saveValue.saveValue)("exhaust", parseFloat(findCodeVal(value, ["T06", "T6"])), "number");
+  (0, import_saveValue.saveValue)("flowSwitch", numberToBoolean(findCodeVal(value, ["S03", "S3"])), "boolean");
+  (0, import_saveValue.saveValue)("rotor", parseInt(findCodeVal(value, "T17")), "number");
 };
 async function updateDeviceDetails() {
   const store = (0, import_store.initStore)();
   try {
-    const { apiLevel, token, device: deviceCode, product } = store;
+    const { apiLevel, token, device: deviceCode } = store;
     if (token) {
       const { sURL } = (0, import_endPoints.getSUrlUpdateDeviceId)();
       const response = await import_axios.default.post(sURL, (0, import_axiosParameter.getProtocolCodes)(deviceCode), {
@@ -84,7 +68,7 @@ async function updateDeviceDetails() {
       if (parseInt(response.data.error_code) == 0) {
         const responseValue = apiLevel < 3 ? response.data.object_result : response.data.objectResult;
         (0, import_saveValue.saveValue)("rawJSON", JSON.stringify(responseValue), "string");
-        saveValues(responseValue, product);
+        saveValues(responseValue);
         const mode = findCodeVal(responseValue, "Mode");
         const modes = {
           1: "R02",
@@ -117,8 +101,17 @@ async function updateDeviceDetails() {
   }
 }
 function findCodeVal(result, code) {
-  var _a;
-  return ((_a = result.find((item) => item.code === code)) == null ? void 0 : _a.value) || "";
+  var _a, _b;
+  if (!Array.isArray(code)) {
+    return ((_a = result.find((item) => item.code === code)) == null ? void 0 : _a.value) || "";
+  }
+  for (let i = 0; i < code.length; i++) {
+    const val = (_b = result.find((item) => item.code === code[i])) == null ? void 0 : _b.value;
+    if (val !== "0") {
+      return val;
+    }
+  }
+  return "0";
 }
 // Annotate the CommonJS export names for ESM import in node:
 0 && (module.exports = {

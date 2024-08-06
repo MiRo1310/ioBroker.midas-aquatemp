@@ -13,6 +13,18 @@
 
 ## midas-aquatemp adapter for ioBroker
 
+## Documentation
+
+-   Please create a second account only to use this with this adapter.
+-   Than add username and password in the adapter ui.
+-   Choose your api-level
+
+If this don´t work you can add the device mac, which you can find in the app and check use device mac. This skips a part of the code, but should still work, maybe with a few limitations.
+
+-   flowSwitch does not work for all devices
+
+If you have problems, contact us.
+
 ## Changelog
 
 <!--
@@ -22,7 +34,8 @@
 
 ### **WORK IN PROGRESS**
 
--   FEAT: Add flowSwitch
+-   FEAT: Remove isPoolsana check
+-   FEAT: #16 Add flowSwitch
 
 ### 1.0.0 (2024-07-24)
 
