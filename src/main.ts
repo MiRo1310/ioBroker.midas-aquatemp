@@ -57,6 +57,8 @@ export class MidasAquatemp extends utils.Adapter {
 		this.log.debug("API-Level: " + this.config.selectApi);
 
 		setupEndpoints();
+
+
 		encryptPassword(password);
 		await createObjects();
 		this.log.info("Objects created");
