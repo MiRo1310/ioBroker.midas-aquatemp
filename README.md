@@ -31,8 +31,7 @@ If you have problems, contact us.
 	Placeholder for the next version (at the beginning of the line):
 	### **WORK IN PROGRESS**
 -->
-
-### **WORK IN PROGRESS**
+### 1.1.0 (2024-08-06)
 
 -   FEAT: Remove isPoolsana check
 -   FEAT: #16 Add flowSwitch
