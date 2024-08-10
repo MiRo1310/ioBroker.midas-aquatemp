@@ -31,6 +31,11 @@ If you have problems, contact us.
 	Placeholder for the next version (at the beginning of the line):
 	### **WORK IN PROGRESS**
 -->
+
+### **WORK IN PROGRESS**
+
+-   FIX: #17 state change mode
+
 ### 1.1.0 (2024-08-06)
 
 -   FEAT: Remove isPoolsana check

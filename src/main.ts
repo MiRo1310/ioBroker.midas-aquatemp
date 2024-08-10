@@ -101,7 +101,8 @@ export class MidasAquatemp extends utils.Adapter {
 				if (id === dpRoot + ".mode" && state && !state.ack) {
 					this.log.debug("Mode: " + JSON.stringify(state));
 					if (state && state.val) {
-						updateDevicePower(store.device, state.val as number);
+						const mode = parseInt(state.val as string);
+						updateDevicePower(store.device, mode as number);
 					}
 				}
 
