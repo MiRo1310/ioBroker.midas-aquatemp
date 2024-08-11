@@ -31,8 +31,7 @@ If you have problems, contact us.
 	Placeholder for the next version (at the beginning of the line):
 	### **WORK IN PROGRESS**
 -->
-
-### **WORK IN PROGRESS**
+### 1.1.1 (2024-08-11)
 
 -   FIX: #17 state change mode
 
