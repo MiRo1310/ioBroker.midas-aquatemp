@@ -11,7 +11,7 @@ async function getToken(): Promise<void> {
 		const { token, apiLevel } = store;
 
 		if (!token) {
-			_this.log.info("Request token");
+			_this.log.debug("Request token");
 			const { sUrl, options } = getOptionsAndSUrl();
 
 			const response = await axios.post(sUrl, options);
@@ -25,7 +25,7 @@ async function getToken(): Promise<void> {
 						? response.data?.object_result?.["x-token"]
 						: (store.token = response.data?.objectResult?.["x-token"]);
 				if (store.token) {
-					_this.log.info("Login ok! Token: " + store.token);
+					_this.log.debug("Login ok! Token");
 				} else {
 					_this.log.error("Login-error: " + JSON.stringify(response.data));
 				}

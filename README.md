@@ -23,6 +23,10 @@ If this don´t work you can add the device mac, which you can find in the app an
 
 -   flowSwitch does not work for all devices
 
+### Supported devices
+
+-   Poolsana InverterPro Series (17, 21) with Wifi-Adapter for Mida Inverter-heater
+
 If you have problems, contact us.
 
 ## Changelog
@@ -31,6 +35,7 @@ If you have problems, contact us.
 	Placeholder for the next version (at the beginning of the line):
 	### **WORK IN PROGRESS**
 -->
+
 ### 1.1.1 (2024-08-11)
 
 -   FIX: #17 state change mode

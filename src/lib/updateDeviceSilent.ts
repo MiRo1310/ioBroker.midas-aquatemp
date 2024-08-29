@@ -19,7 +19,7 @@ export async function updateDeviceSilent(deviceCode: string, silent: boolean): P
 					headers: { "x-token": token },
 				},
 			);
-			store._this.log.info("DeviceStatus: " + JSON.stringify(response.data));
+			store._this.log.debug("DeviceStatus: " + JSON.stringify(response.data));
 
 			if (parseInt(response.data.error_code) == 0) {
 				saveValue("silent", silent, "boolean");

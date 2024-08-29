@@ -22,7 +22,7 @@ export async function updateDevicePower(deviceCode: string, power: number): Prom
 				},
 			);
 
-			store._this.log.info("DeviceStatus: " + JSON.stringify(response.data));
+			store._this.log.debug("DeviceStatus: " + JSON.stringify(response.data));
 			if (parseInt(response.data.error_code) == 0) {
 				saveValue("mode", power.toString(), "string");
 				if (power >= 0) updateDeviceMode(store.device, power);
@@ -50,7 +50,7 @@ async function updateDeviceMode(deviceCode: string, mode: any): Promise<void> {
 					headers: { "x-token": token },
 				},
 			);
-			store._this.log.info("DeviceStatus: " + JSON.stringify(response.data));
+			store._this.log.debug("DeviceStatus: " + JSON.stringify(response.data));
 
 			if (parseInt(response.data.error_code) == 0) {
 				saveValue("mode", mode, "string");

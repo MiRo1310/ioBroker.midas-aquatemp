@@ -92,7 +92,7 @@ export class MidasAquatemp extends utils.Adapter {
 
 		tokenRefreshTimer = this.setInterval(async function () {
 			store.token = "";
-			store._this.log.info("Token will be refreshed.");
+			store._this.log.debug("Token will be refreshed.");
 			await updateToken();
 		}, 3600000);
 

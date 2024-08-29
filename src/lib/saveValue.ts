@@ -27,7 +27,6 @@ export const saveValue = async (
 				},
 				native: {},
 			});
-			return;
 		}
 
 		_this.setState(dp, value, true);

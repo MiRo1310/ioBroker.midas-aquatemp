@@ -45,7 +45,7 @@ export async function updateDeviceDetails(): Promise<void> {
 			const response = await axios.post(sURL, getProtocolCodes(deviceCode), {
 				headers: { "x-token": token },
 			});
-			store._this.log.info("DeviceDetails: " + JSON.stringify(response.data));
+			store._this.log.debug("DeviceDetails: " + JSON.stringify(response.data));
 
 			if (parseInt(response.data.error_code) == 0) {
 				const responseValue = apiLevel < 3 ? response.data.object_result : response.data.objectResult;
