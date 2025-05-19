@@ -55,16 +55,16 @@ async function getToken() {
         if (store.token) {
           _this.log.debug("Login ok! Token");
         } else {
-          _this.log.error("Login-error: " + JSON.stringify(response.data));
+          _this.log.error(`Login-error: ${JSON.stringify(response.data)}`);
         }
         return;
       }
-      _this.log.error("Login-error: " + response.data);
+      _this.log.error(`Login-error: ${response.data}`);
       store.resetOnErrorHandler();
       return;
     }
   } catch (error) {
-    _this.log.error("Error in getToken(): " + JSON.stringify(error));
+    _this.log.error(`Error in getToken(): ${JSON.stringify(error)}`);
   }
 }
 const updateToken = async () => {
@@ -82,8 +82,8 @@ const updateToken = async () => {
     await (0, import_updateDeviceId.updateDeviceID)();
     return;
   } catch (error) {
-    store._this.log.error("Error in updateToken(): " + JSON.stringify(error));
-    store._this.log.error("Error in updateToken(): " + JSON.stringify(error.stack));
+    store._this.log.error(`Error in updateToken(): ${JSON.stringify(error)}`);
+    store._this.log.error(`Error in updateToken(): ${JSON.stringify(error.stack)}`);
   }
 };
 // Annotate the CommonJS export names for ESM import in node:

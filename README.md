@@ -39,6 +39,8 @@ If you have problems, contact us.
 
 -   FIX: #44 Cannot read properties of undefined (reading 'description')
 
+-   FEAT: Update dependencies and migrate to eslint 9
+
 ### 1.1.1 (2024-08-11)
 
 -   FIX: #17 state change mode

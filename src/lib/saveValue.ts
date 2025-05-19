@@ -1,20 +1,19 @@
-import { MidasAquatemp } from "../main";
-import { initStore } from "./store";
-
+import { MidasAquatemp } from '../main';
+import { initStore } from './store';
 let _this: MidasAquatemp;
 
 export const saveValue = async (
-	key: string,
-	value: ioBroker.StateValue,
-	stateType: ioBroker.CommonType,
+    key: string,
+    value: ioBroker.StateValue,
+    stateType: ioBroker.CommonType,
 ): Promise<void> => {
-	const store = initStore();
-	const dpRoot = store.getDpRoot();
-	try {
-		if (!_this) {
-			_this = MidasAquatemp.getInstance();
-		}
-		const dp = dpRoot + "." + key;
+    const store = initStore();
+    const dpRoot = store.getDpRoot();
+    try {
+        if (!_this) {
+            _this = MidasAquatemp.getInstance();
+        }
+        const dp = `${dpRoot}.${key}`;
 
 		if (!(await _this.objectExists(dp))) {
 			await _this.setObjectNotExists(dp, {

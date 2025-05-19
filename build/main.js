@@ -72,7 +72,7 @@ class MidasAquatemp extends utils.Adapter {
       store.device = this.config.deviceMac;
     }
     store.useDeviceMac = this.config.useDeviceMac;
-    this.log.debug("API-Level: " + this.config.selectApi);
+    this.log.debug(`API-Level: ${this.config.selectApi}`);
     (0, import_endPoints.setupEndpoints)();
     (0, import_encryptPassword.encryptPassword)(password);
     await (0, import_createState.createObjects)();
@@ -88,11 +88,11 @@ class MidasAquatemp extends utils.Adapter {
     updateIntervall = store._this.setInterval(async () => {
       try {
         await (0, import_token.updateToken)();
-        const mode = await store._this.getStateAsync(dpRoot + ".mode");
+        const mode = await store._this.getStateAsync(`${dpRoot}.mode`);
         if (mode && !mode.ack && mode.val) {
           await (0, import_updateDevicePower.updateDevicePower)(store.device, mode.val);
         }
-        const silent = await this.getStateAsync(dpRoot + ".silent");
+        const silent = await this.getStateAsync(`${dpRoot}.silent`);
         if (silent && !silent.ack && silent.val) {
           await (0, import_updateDevicePower.updateDevicePower)(store.device, silent.val);
         }
@@ -108,21 +108,21 @@ class MidasAquatemp extends utils.Adapter {
     }, 36e5);
     this.on("stateChange", async (id, state) => {
       try {
-        if (id === dpRoot + ".mode" && state && !state.ack) {
-          this.log.debug("Mode: " + JSON.stringify(state));
+        if (id === `${dpRoot}.mode` && state && !state.ack) {
+          this.log.debug(`Mode: ${JSON.stringify(state)}`);
           if (state && state.val) {
             const mode = parseInt(state.val);
             await (0, import_updateDevicePower.updateDevicePower)(store.device, mode);
           }
         }
-        if (id === dpRoot + ".silent" && state && !state.ack) {
-          this.log.debug("Silent: " + JSON.stringify(state));
+        if (id === `${dpRoot}.silent` && state && !state.ack) {
+          this.log.debug(`Silent: ${JSON.stringify(state)}`);
           if (state && state.val) {
             await (0, import_updateDeviceSilent.updateDeviceSilent)(store.device, state.val);
           }
         }
-        if (id === dpRoot + ".tempSet" && state && !state.ack) {
-          this.log.debug("TempSet: " + JSON.stringify(state));
+        if (id === `${dpRoot}.tempSet` && state && !state.ack) {
+          this.log.debug(`TempSet: ${JSON.stringify(state)}`);
           if (state && state.val) {
             await (0, import_updateDeviceSetTemp.updateDeviceSetTemp)(store.device, state.val);
           }
@@ -132,12 +132,14 @@ class MidasAquatemp extends utils.Adapter {
         store._this.log.error(JSON.stringify(error.stack));
       }
     });
-    await this.subscribeStatesAsync(dpRoot + ".mode");
-    await this.subscribeStatesAsync(dpRoot + ".silent");
-    await this.subscribeStatesAsync(dpRoot + ".tempSet");
+    await this.subscribeStatesAsync(`${dpRoot}.mode`);
+    await this.subscribeStatesAsync(`${dpRoot}.silent`);
+    await this.subscribeStatesAsync(`${dpRoot}.tempSet`);
   }
   /**
    * Is called when adapter shuts down - callback has to be called under any circumstances!
+   *
+   * @param callback Callback
    */
   onUnload(callback) {
     try {
@@ -146,6 +148,7 @@ class MidasAquatemp extends utils.Adapter {
       callback();
     } catch (e) {
       callback();
+      this.log.error(`Error: ${e.message}`);
     }
   }
 }

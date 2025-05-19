@@ -1,27 +1,27 @@
-import axios from "axios";
-import { saveValue } from "./saveValue";
-import { initStore } from "./store";
+import axios from 'axios';
+import { saveValue } from './saveValue';
+import { initStore } from './store';
 
 export async function updateDeviceErrorMsg(): Promise<void> {
-	const store = initStore();
-	try {
-		const { token, apiLevel, cloudURL, device: deviceCode } = store;
-		if (token) {
-			const sURL =
-				apiLevel < 3
-					? cloudURL + "/app/device/getFaultDataByDeviceCode.json"
-					: cloudURL + "/app/device/getFaultDataByDeviceCode";
+    const store = initStore();
+    try {
+        const { token, apiLevel, cloudURL, device: deviceCode } = store;
+        if (token) {
+            const sURL =
+                apiLevel < 3
+                    ? `${cloudURL}/app/device/getFaultDataByDeviceCode.json`
+                    : `${cloudURL}/app/device/getFaultDataByDeviceCode`;
 
-			const response = await axios.post(
-				sURL,
-				{
-					device_code: deviceCode,
-					deviceCode: deviceCode,
-				},
-				{
-					headers: { "x-token": token },
-				},
-			);
+            const response = await axios.post(
+                sURL,
+                {
+                    device_code: deviceCode,
+                    deviceCode: deviceCode,
+                },
+                {
+                    headers: { 'x-token': token },
+                },
+            );
 
 			if (parseInt(response.data.error_code) == 0) {
 				await saveValue("error", true, "boolean");

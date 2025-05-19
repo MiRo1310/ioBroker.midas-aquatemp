@@ -6,22 +6,22 @@ import { saveValue } from "./saveValue";
 import axios from "axios";
 
 export async function updateDevicePower(deviceCode: string, power: number): Promise<void> {
-	const store = initStore();
-	try {
-		const token = store.token;
-		const { powerMode, powerOpt } = getPowerMode(power);
-		if (powerOpt === null || powerMode === null) {
-			return;
-		}
-		if (token && token != "") {
-			const { sURL } = getSUrl();
-			const response = await axios.post(
-				sURL,
-				getAxiosUpdateDevicePowerParams({ deviceCode, value: powerOpt, protocolCode: "Power" }),
-				{
-					headers: { "x-token": token },
-				},
-			);
+    const store = initStore();
+    try {
+        const token = store.token;
+        const { powerMode, powerOpt } = getPowerMode(power);
+        if (powerOpt === null || powerMode === null) {
+            return;
+        }
+        if (token && token != '') {
+            const { sURL } = getSUrl();
+            const response = await axios.post(
+                sURL,
+                getAxiosUpdateDevicePowerParams({ deviceCode, value: powerOpt, protocolCode: 'Power' }),
+                {
+                    headers: { 'x-token': token },
+                },
+            );
 
 			store._this.log.debug("DeviceStatus: " + JSON.stringify(response.data));
 			if (parseInt(response.data.error_code) == 0) {
@@ -39,19 +39,19 @@ export async function updateDevicePower(deviceCode: string, power: number): Prom
 }
 
 async function updateDeviceMode(deviceCode: string, mode: any): Promise<void> {
-	const store = initStore();
-	const token = store.token;
-	try {
-		if (token && token != "") {
-			const { sURL } = getSUrl();
-			const response = await axios.post(
-				sURL,
-				getAxiosUpdateDevicePowerParams({ deviceCode: deviceCode, value: mode, protocolCode: "mode" }),
-				{
-					headers: { "x-token": token },
-				},
-			);
-			store._this.log.debug("DeviceStatus: " + JSON.stringify(response.data));
+    const store = initStore();
+    const token = store.token;
+    try {
+        if (token && token != '') {
+            const { sURL } = getSUrl();
+            const response = await axios.post(
+                sURL,
+                getAxiosUpdateDevicePowerParams({ deviceCode: deviceCode, value: mode, protocolCode: 'mode' }),
+                {
+                    headers: { 'x-token': token },
+                },
+            );
+            store._this.log.debug(`DeviceStatus: ${JSON.stringify(response.data)}`);
 
 			if (parseInt(response.data.error_code) == 0) {
 				await saveValue("mode", mode, "string");

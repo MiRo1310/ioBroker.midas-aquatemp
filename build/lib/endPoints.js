@@ -35,11 +35,11 @@ function setupEndpoints() {
 const getSUrl = () => {
   const store = (0, import_store.initStore)();
   const cloudURL = store.cloudURL;
-  return store.apiLevel < 3 ? { sURL: cloudURL + "/app/device/control.json" } : { sURL: cloudURL + "/app/device/control" };
+  return store.apiLevel < 3 ? { sURL: `${cloudURL}/app/device/control.json` } : { sURL: `${cloudURL}/app/device/control` };
 };
 const getSUrlUpdateDeviceId = () => {
   const store = (0, import_store.initStore)();
-  return store.apiLevel < 3 ? { sURL: store.cloudURL + "/app/device/getDataByCode.json" } : { sURL: store.cloudURL + "/app/device/getDataByCode" };
+  return store.apiLevel < 3 ? { sURL: `${store.cloudURL}/app/device/getDataByCode.json` } : { sURL: `${store.cloudURL}/app/device/getDataByCode` };
 };
 const getOptionsAndSUrl = () => {
   const store = (0, import_store.initStore)();
@@ -48,14 +48,14 @@ const getOptionsAndSUrl = () => {
   const encryptedPassword = store.encryptedPassword;
   const username = store.username;
   return apiLevel < 3 ? {
-    sUrl: cloudURL + "/app/user/login.json",
+    sUrl: `${cloudURL}/app/user/login.json`,
     options: {
       user_name: username,
       password: encryptedPassword,
       type: "2"
     }
   } : {
-    sUrl: cloudURL + "/app/user/login",
+    sUrl: `${cloudURL}/app/user/login`,
     options: {
       userName: username,
       password: encryptedPassword,
@@ -65,11 +65,11 @@ const getOptionsAndSUrl = () => {
 };
 const getUpdateDeviceStatusSUrl = () => {
   const store = (0, import_store.initStore)();
-  return store.apiLevel < 3 ? { sURL: store.cloudURL + "/app/device/getDeviceStatus.json" } : { sURL: store.cloudURL + "/app/device/getDeviceStatus" };
+  return store.apiLevel < 3 ? { sURL: `${store.cloudURL}/app/device/getDeviceStatus.json` } : { sURL: `${store.cloudURL}/app/device/getDeviceStatus` };
 };
 const getUpdateDeviceIdSUrl = () => {
   const store = (0, import_store.initStore)();
-  return store.apiLevel < 3 ? { sURL: store.cloudURL + "/app/device/deviceList.json" } : { sURL: store.cloudURL + "/app/device/deviceList" };
+  return store.apiLevel < 3 ? { sURL: `${store.cloudURL}/app/device/deviceList.json` } : { sURL: `${store.cloudURL}/app/device/deviceList` };
 };
 // Annotate the CommonJS export names for ESM import in node:
 0 && (module.exports = {

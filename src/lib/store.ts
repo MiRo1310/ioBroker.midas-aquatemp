@@ -1,23 +1,23 @@
-import { MidasAquatemp } from "../main";
-import { saveValue } from "./saveValue";
+import type { MidasAquatemp } from '../main';
+import { saveValue } from './saveValue';
 
 interface Store {
-	_this: MidasAquatemp;
-	token: string | null;
-	instance: number | undefined | null;
-	username: string;
-	encryptedPassword: string;
-	cloudURL: string;
-	AQUATEMP_POOLSANA: string;
-	AQUATEMP_OTHER1: string;
-	apiLevel: number;
-	interval: number;
-	device: string;
-	product: string;
-	reachable: boolean;
-	useDeviceMac: boolean;
-	getDpRoot: () => string;
-	resetOnErrorHandler: () => void;
+    _this: MidasAquatemp;
+    token: string | null;
+    instance: number | undefined | null;
+    username: string;
+    encryptedPassword: string;
+    cloudURL: string;
+    AQUATEMP_POOLSANA: string;
+    AQUATEMP_OTHER1: string;
+    apiLevel: number;
+    interval: number;
+    device: string;
+    product: string;
+    reachable: boolean;
+    useDeviceMac: boolean;
+    getDpRoot: () => string;
+    resetOnErrorHandler: () => void;
 }
 
 let store: Store;

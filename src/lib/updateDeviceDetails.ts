@@ -1,12 +1,12 @@
-import axios from "axios";
-import { Modes } from "../types";
-import { getProtocolCodes } from "./axiosParameter";
-import { getSUrlUpdateDeviceId } from "./endPoints";
-import { saveValue } from "./saveValue";
-import { initStore } from "./store";
+import axios from 'axios';
+import type { Modes } from '../types';
+import { getProtocolCodes } from './axiosParameter';
+import { getSUrlUpdateDeviceId } from './endPoints';
+import { saveValue } from './saveValue';
+import { initStore } from './store';
 
 export const numberToBoolean = (value: number): boolean => {
-	return value === 1;
+    return value === 1;
 };
 
 const saveValues = async (value: any): Promise<void> => {
@@ -35,19 +35,19 @@ const saveValues = async (value: any): Promise<void> => {
 };
 
 export async function updateDeviceDetails(): Promise<void> {
-	const store = initStore();
-	try {
-		const { apiLevel, token, device: deviceCode } = store;
-		if (token) {
-			const { sURL } = getSUrlUpdateDeviceId();
+    const store = initStore();
+    try {
+        const { apiLevel, token, device: deviceCode } = store;
+        if (token) {
+            const { sURL } = getSUrlUpdateDeviceId();
 
-			const response = await axios.post(sURL, getProtocolCodes(deviceCode), {
-				headers: { "x-token": token },
-			});
-			store._this.log.debug("DeviceDetails: " + JSON.stringify(response.data));
+            const response = await axios.post(sURL, getProtocolCodes(deviceCode), {
+                headers: { 'x-token': token },
+            });
+            store._this.log.debug(`DeviceDetails: ${JSON.stringify(response.data)}`);
 
-			if (parseInt(response.data.error_code) == 0) {
-				const responseValue = apiLevel < 3 ? response.data.object_result : response.data.objectResult;
+            if (parseInt(response.data.error_code) == 0) {
+                const responseValue = apiLevel < 3 ? response.data.object_result : response.data.objectResult;
 
 				await saveValue("rawJSON", JSON.stringify(responseValue), "string");
 				await saveValues(responseValue);
@@ -77,26 +77,26 @@ export async function updateDeviceDetails(): Promise<void> {
 				return;
 			}
 
-			store._this.log.error("Error: " + JSON.stringify(response.data));
-			store.resetOnErrorHandler();
-			return;
-		}
-		return;
-	} catch (error: any) {
-		store._this.log.error(JSON.stringify(error));
-		store._this.log.error(JSON.stringify(error.stack));
-	}
+            store._this.log.error(`Error: ${JSON.stringify(response.data)}`);
+            store.resetOnErrorHandler();
+            return;
+        }
+        return;
+    } catch (error: any) {
+        store._this.log.error(JSON.stringify(error));
+        store._this.log.error(JSON.stringify(error.stack));
+    }
 }
 
 function findCodeVal(result: { value: string; code: string }[], code: string | string[]): any {
-	if (!Array.isArray(code)) {
-		return result.find((item) => item.code === code)?.value || "";
-	}
-	for (let i = 0; i < code.length; i++) {
-		const val = result.find((item) => item.code === code[i])?.value;
-		if (val !== "0") {
-			return val;
-		}
-	}
-	return "0";
+    if (!Array.isArray(code)) {
+        return result.find(item => item.code === code)?.value || '';
+    }
+    for (let i = 0; i < code.length; i++) {
+        const val = result.find(item => item.code === code[i])?.value;
+        if (val !== '0') {
+            return val;
+        }
+    }
+    return '0';
 }
