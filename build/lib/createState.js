@@ -418,7 +418,7 @@ const createObjects = async () => {
   ];
   try {
     for (const { id, name, role, unit, type, def, write } of objects) {
-      _this.log.info("Create object: " + id);
+      _this.log.debug("Create object: " + id);
       await _this.setObjectNotExistsAsync(id, {
         type: "state",
         common: { read: true, write: write || false, type, unit, role, name, def },

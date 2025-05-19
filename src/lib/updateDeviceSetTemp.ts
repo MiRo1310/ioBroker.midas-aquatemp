@@ -24,7 +24,7 @@ export const updateDeviceSetTemp = async (deviceCode: string, temperature: numbe
 			store._this.log.debug("DeviceStatus: " + JSON.stringify(response.data));
 
 			if (parseInt(response.data.error_code) == 0) {
-				saveValue("tempSet", temperature, "number");
+				await saveValue("tempSet", temperature, "number");
 				return;
 			}
 			store._this.log.error("Error: " + JSON.stringify(response.data));

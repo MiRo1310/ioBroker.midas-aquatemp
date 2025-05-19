@@ -4,6 +4,7 @@ import { getSUrl } from "./endPoints";
 import { getAxiosUpdateDevicePowerParams } from "./axiosParameter";
 import { saveValue } from "./saveValue";
 import axios from "axios";
+
 export async function updateDevicePower(deviceCode: string, power: number): Promise<void> {
 	const store = initStore();
 	try {
@@ -24,8 +25,8 @@ export async function updateDevicePower(deviceCode: string, power: number): Prom
 
 			store._this.log.debug("DeviceStatus: " + JSON.stringify(response.data));
 			if (parseInt(response.data.error_code) == 0) {
-				saveValue("mode", power.toString(), "string");
-				if (power >= 0) updateDeviceMode(store.device, power);
+				await saveValue("mode", power.toString(), "string");
+				if (power >= 0) await updateDeviceMode(store.device, power);
 				return;
 			}
 			store._this.log.error("Error: " + JSON.stringify(response.data));
@@ -53,7 +54,7 @@ async function updateDeviceMode(deviceCode: string, mode: any): Promise<void> {
 			store._this.log.debug("DeviceStatus: " + JSON.stringify(response.data));
 
 			if (parseInt(response.data.error_code) == 0) {
-				saveValue("mode", mode, "string");
+				await saveValue("mode", mode, "string");
 				return;
 			}
 			store._this.log.error("Error: " + JSON.stringify(response.data));

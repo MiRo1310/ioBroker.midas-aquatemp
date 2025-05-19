@@ -24,17 +24,17 @@ export async function updateDeviceErrorMsg(): Promise<void> {
 			);
 
 			if (parseInt(response.data.error_code) == 0) {
-				saveValue("error", true, "boolean");
+				await saveValue("error", true, "boolean");
 
 				if (apiLevel < 3) {
-					saveValue("errorMessage", response.data.object_result[0].description, "string");
-					saveValue("errorCode", response.data.object_result[0].fault_code, "string");
-					saveValue("errorLevel", response.data.object_result[0].error_level, "string");
+					await saveValue("errorMessage", response.data.object_result[0]?.description ?? "", "string");
+					await saveValue("errorCode", response.data.object_result[0]?.fault_code, "string");
+					await saveValue("errorLevel", response.data.object_result[0]?.error_level, "string");
 					return;
 				}
-				saveValue("errorMessage", response.data.objectResult[0].description, "string");
-				saveValue("errorCode", response.data.objectResult[0].fault_code, "string");
-				saveValue("errorLevel", response.data.objectResult[0].error_level, "string");
+				await saveValue("errorMessage", response.data.objectResult[0]?.description ?? "", "string");
+				await saveValue("errorCode", response.data.objectResult[0]?.fault_code, "string");
+				await saveValue("errorLevel", response.data.objectResult[0]?.error_level, "string");
 				return;
 			}
 			// Login-Fehler

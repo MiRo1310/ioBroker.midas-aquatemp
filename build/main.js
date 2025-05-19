@@ -63,7 +63,7 @@ class MidasAquatemp extends utils.Adapter {
     store._this = this;
     store.instance = this.instance;
     const dpRoot = store.getDpRoot();
-    this.setState("info.connection", false, true);
+    await this.setState("info.connection", false, true);
     store.username = this.config.username;
     const password = this.config.password;
     store.interval = this.config.refresh;
@@ -90,11 +90,11 @@ class MidasAquatemp extends utils.Adapter {
         await (0, import_token.updateToken)();
         const mode = await store._this.getStateAsync(dpRoot + ".mode");
         if (mode && !mode.ack && mode.val) {
-          (0, import_updateDevicePower.updateDevicePower)(store.device, mode.val);
+          await (0, import_updateDevicePower.updateDevicePower)(store.device, mode.val);
         }
         const silent = await this.getStateAsync(dpRoot + ".silent");
         if (silent && !silent.ack && silent.val) {
-          (0, import_updateDevicePower.updateDevicePower)(store.device, silent.val);
+          await (0, import_updateDevicePower.updateDevicePower)(store.device, silent.val);
         }
       } catch (error) {
         store._this.log.error(JSON.stringify(error));
@@ -103,7 +103,7 @@ class MidasAquatemp extends utils.Adapter {
     }, store.interval * 1e3);
     tokenRefreshTimer = this.setInterval(async function() {
       store.token = "";
-      store._this.log.info("Token will be refreshed.");
+      store._this.log.debug("Token will be refreshed.");
       await (0, import_token.updateToken)();
     }, 36e5);
     this.on("stateChange", async (id, state) => {
@@ -112,19 +112,19 @@ class MidasAquatemp extends utils.Adapter {
           this.log.debug("Mode: " + JSON.stringify(state));
           if (state && state.val) {
             const mode = parseInt(state.val);
-            (0, import_updateDevicePower.updateDevicePower)(store.device, mode);
+            await (0, import_updateDevicePower.updateDevicePower)(store.device, mode);
           }
         }
         if (id === dpRoot + ".silent" && state && !state.ack) {
           this.log.debug("Silent: " + JSON.stringify(state));
           if (state && state.val) {
-            (0, import_updateDeviceSilent.updateDeviceSilent)(store.device, state.val);
+            await (0, import_updateDeviceSilent.updateDeviceSilent)(store.device, state.val);
           }
         }
         if (id === dpRoot + ".tempSet" && state && !state.ack) {
           this.log.debug("TempSet: " + JSON.stringify(state));
           if (state && state.val) {
-            (0, import_updateDeviceSetTemp.updateDeviceSetTemp)(store.device, state.val);
+            await (0, import_updateDeviceSetTemp.updateDeviceSetTemp)(store.device, state.val);
           }
         }
       } catch (error) {

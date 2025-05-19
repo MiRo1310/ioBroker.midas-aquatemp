@@ -43,7 +43,7 @@ export class MidasAquatemp extends utils.Adapter {
 		store.instance = this.instance;
 
 		const dpRoot = store.getDpRoot();
-		this.setState("info.connection", false, true);
+		await this.setState("info.connection", false, true);
 
 		store.username = this.config.username;
 		const password = this.config.password;
@@ -57,7 +57,6 @@ export class MidasAquatemp extends utils.Adapter {
 		this.log.debug("API-Level: " + this.config.selectApi);
 
 		setupEndpoints();
-
 
 		encryptPassword(password);
 		await createObjects();
@@ -78,11 +77,11 @@ export class MidasAquatemp extends utils.Adapter {
 				const mode = await store._this.getStateAsync(dpRoot + ".mode");
 
 				if (mode && !mode.ack && mode.val) {
-					updateDevicePower(store.device, mode.val as number);
+					await updateDevicePower(store.device, mode.val as number);
 				}
 				const silent = await this.getStateAsync(dpRoot + ".silent");
 				if (silent && !silent.ack && silent.val) {
-					updateDevicePower(store.device, silent.val as number);
+					await updateDevicePower(store.device, silent.val as number);
 				}
 			} catch (error: any) {
 				store._this.log.error(JSON.stringify(error));
@@ -102,14 +101,14 @@ export class MidasAquatemp extends utils.Adapter {
 					this.log.debug("Mode: " + JSON.stringify(state));
 					if (state && state.val) {
 						const mode = parseInt(state.val as string);
-						updateDevicePower(store.device, mode as number);
+						await updateDevicePower(store.device, mode as number);
 					}
 				}
 
 				if (id === dpRoot + ".silent" && state && !state.ack) {
 					this.log.debug("Silent: " + JSON.stringify(state));
 					if (state && state.val) {
-						updateDeviceSilent(store.device, state.val as boolean);
+						await updateDeviceSilent(store.device, state.val as boolean);
 					}
 				}
 
@@ -117,7 +116,7 @@ export class MidasAquatemp extends utils.Adapter {
 					this.log.debug("TempSet: " + JSON.stringify(state));
 
 					if (state && state.val) {
-						updateDeviceSetTemp(store.device, state.val as number);
+						await updateDeviceSetTemp(store.device, state.val as number);
 					}
 				}
 			} catch (error: any) {

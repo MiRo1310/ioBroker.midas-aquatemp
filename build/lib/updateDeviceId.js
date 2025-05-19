@@ -80,10 +80,10 @@ async function updateDeviceID() {
     _this.log.debug("Device: " + store.device);
     _this.log.debug("Product: " + store.product);
     _this.log.debug("Reachable: " + store.reachable);
-    (0, import_saveValue.saveValue)("DeviceCode", store.device, "string");
-    (0, import_saveValue.saveValue)("ProductCode", store.product, "string");
+    await (0, import_saveValue.saveValue)("DeviceCode", store.device, "string");
+    await (0, import_saveValue.saveValue)("ProductCode", store.product, "string");
     if (store.reachable && store.device) {
-      (0, import_saveValue.saveValue)("info.connection", true, "boolean");
+      await (0, import_saveValue.saveValue)("info.connection", true, "boolean");
       if (store.device != "" && store.product) {
         _this.log.debug("Update device status");
         await (0, import_updateDeviceStatus.updateDeviceStatus)();

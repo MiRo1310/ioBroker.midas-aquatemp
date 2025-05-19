@@ -51,9 +51,9 @@ const updateDeviceSetTemp = async (deviceCode, temperature) => {
       const response = await import_axios.default.post(sURL, (0, import_axiosParameter.getAxiosUpdateDeviceSetTempParams)({ deviceCode, sTemperature }), {
         headers: { "x-token": token }
       });
-      store._this.log.info("DeviceStatus: " + JSON.stringify(response.data));
+      store._this.log.debug("DeviceStatus: " + JSON.stringify(response.data));
       if (parseInt(response.data.error_code) == 0) {
-        (0, import_saveValue.saveValue)("tempSet", temperature, "number");
+        await (0, import_saveValue.saveValue)("tempSet", temperature, "number");
         return;
       }
       store._this.log.error("Error: " + JSON.stringify(response.data));

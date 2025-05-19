@@ -46,11 +46,11 @@ export function initStore(): Store {
 			getDpRoot: function () {
 				return `midas-aquatemp.${this.instance}`;
 			},
-			resetOnErrorHandler: function () {
+			resetOnErrorHandler: async function () {
 				this.token = "";
 				this.device = "";
 				this.reachable = false;
-				saveValue("info.connection", false, "boolean");
+				await saveValue("info.connection", false, "boolean");
 			},
 		};
 	}
