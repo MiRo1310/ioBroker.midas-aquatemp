@@ -1,5 +1,6 @@
 import type { CreateObjects } from '../types';
 import { initStore } from './store';
+import { errorLogger } from './logging';
 
 export const createObjects = async (): Promise<void> => {
     const store = initStore();
@@ -407,6 +408,6 @@ export const createObjects = async (): Promise<void> => {
             });
         }
     } catch (error: any) {
-        _this.log.error(`Error in createObjects: ${error.message}, stack: ${error.stack}`);
+        errorLogger('Error in createObjects', error, _this);
     }
 };

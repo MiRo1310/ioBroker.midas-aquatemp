@@ -3,6 +3,7 @@ import { getAxiosUpdateDeviceSetTempParams } from './axiosParameter';
 import { getSUrl } from './endPoints';
 import { saveValue } from './saveValue';
 import { initStore } from './store';
+import { errorLogger } from './logging';
 
 export const updateDeviceSetTemp = async (deviceCode: string, temperature: number): Promise<void> => {
     const store = initStore();
@@ -32,6 +33,6 @@ export const updateDeviceSetTemp = async (deviceCode: string, temperature: numbe
             store.resetOnErrorHandler();
         }
     } catch (error: any) {
-        store._this.log.error(JSON.stringify(error));
+        errorLogger('Error in updateDeviceSetTemp', error, store._this);
     }
 };

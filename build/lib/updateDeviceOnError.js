@@ -34,6 +34,7 @@ module.exports = __toCommonJS(updateDeviceOnError_exports);
 var import_axios = __toESM(require("axios"));
 var import_saveValue = require("./saveValue");
 var import_store = require("./store");
+var import_logging = require("./logging");
 async function updateDeviceErrorMsg() {
   var _a, _b, _c, _d, _e, _f, _g, _h;
   const store = (0, import_store.initStore)();
@@ -69,8 +70,7 @@ async function updateDeviceErrorMsg() {
     }
     return;
   } catch (error) {
-    store._this.log.error(JSON.stringify(error));
-    store._this.log.error(JSON.stringify(error.stack));
+    (0, import_logging.errorLogger)("Error in updateDeviceErrorMsg", error, store._this);
   }
 }
 // Annotate the CommonJS export names for ESM import in node:

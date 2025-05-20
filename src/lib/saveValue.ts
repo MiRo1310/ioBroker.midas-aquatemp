@@ -1,5 +1,6 @@
 import { MidasAquatemp } from '../main';
 import { initStore } from './store';
+import { errorLogger } from './logging';
 
 let _this: MidasAquatemp;
 
@@ -32,6 +33,6 @@ export const saveValue = async (
 
         await _this.setState(dp, value, true);
     } catch (err: any) {
-        _this.log.error(`Error in saveValue: ${err}`);
+        errorLogger('Error in saveValue', err, _this);
     }
 };

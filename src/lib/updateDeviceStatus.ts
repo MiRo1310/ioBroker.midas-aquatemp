@@ -5,6 +5,7 @@ import { saveValue } from './saveValue';
 import { initStore } from './store';
 import { updateDeviceDetails } from './updateDeviceDetails';
 import { updateDeviceErrorMsg } from './updateDeviceOnError';
+import { errorLogger } from './logging';
 
 let _this: MidasAquatemp;
 
@@ -58,7 +59,6 @@ export async function updateDeviceStatus(): Promise<void> {
         }
         store.resetOnErrorHandler();
     } catch (error: any) {
-        store._this.log.error(JSON.stringify(error));
-        store._this.log.error(JSON.stringify(error.stack));
+        errorLogger('Error in updateDeviceStatus', error, store._this);
     }
 }

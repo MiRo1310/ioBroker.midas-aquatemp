@@ -4,6 +4,7 @@ import { getProtocolCodes } from './axiosParameter';
 import { getSUrlUpdateDeviceId } from './endPoints';
 import { saveValue } from './saveValue';
 import { initStore } from './store';
+import { errorLogger } from './logging';
 
 export const numberToBoolean = (value: number): boolean => {
     return value === 1;
@@ -83,8 +84,7 @@ export async function updateDeviceDetails(): Promise<void> {
         }
         return;
     } catch (error: any) {
-        store._this.log.error(JSON.stringify(error));
-        store._this.log.error(JSON.stringify(error.stack));
+        errorLogger('Error updateDeviceDetails', error, store._this);
     }
 }
 

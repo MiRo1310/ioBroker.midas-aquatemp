@@ -11,6 +11,8 @@
 
 **Tests:** ![Test and Release](https://github.com/Miro1310/ioBroker.midas-aquatemp/workflows/Test%20and%20Release/badge.svg)
 
+**This adapter uses Sentry libraries to automatically report exceptions and code errors to the developers.** For more details and instructions on disabling error reporting, please refer to the [Sentry-Plugin Documentation](https://github.com/ioBroker/plugin-sentry#plugin-sentry)! Use of Sentry reporting starts with js-controller 3.0.
+
 ## midas-aquatemp adapter for ioBroker
 
 ## Documentation
@@ -37,6 +39,7 @@ If you have problems, contact us.
 -->
 ### **WORK IN PROGRESS**
 
+-   FEAT: Add sentry to the adapter
 -   FIX: #24 Silent mode cannot be disabled
 -   FIX: #44 Cannot read properties of undefined (reading 'description')
 -   FEAT: Update dependencies and migrate to eslint 9

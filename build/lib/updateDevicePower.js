@@ -37,6 +37,7 @@ var import_endPoints = require("./endPoints");
 var import_axiosParameter = require("./axiosParameter");
 var import_saveValue = require("./saveValue");
 var import_axios = __toESM(require("axios"));
+var import_logging = require("./logging");
 async function updateDevicePower(deviceCode, power) {
   const store = (0, import_store.initStore)();
   try {
@@ -92,8 +93,7 @@ async function updateDeviceMode(deviceCode, mode) {
       store.resetOnErrorHandler();
     }
   } catch (error) {
-    store._this.log.error(JSON.stringify(error));
-    store._this.log.error(JSON.stringify(error.stack));
+    (0, import_logging.errorLogger)("Error in updateDeviceMode", error, store._this);
   }
 }
 // Annotate the CommonJS export names for ESM import in node:

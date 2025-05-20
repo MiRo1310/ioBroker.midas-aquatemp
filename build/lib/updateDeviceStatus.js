@@ -38,6 +38,7 @@ var import_saveValue = require("./saveValue");
 var import_store = require("./store");
 var import_updateDeviceDetails = require("./updateDeviceDetails");
 var import_updateDeviceOnError = require("./updateDeviceOnError");
+var import_logging = require("./logging");
 let _this;
 async function updateDeviceStatus() {
   var _a, _b, _c, _d, _e, _f;
@@ -80,8 +81,7 @@ async function updateDeviceStatus() {
     }
     store.resetOnErrorHandler();
   } catch (error) {
-    store._this.log.error(JSON.stringify(error));
-    store._this.log.error(JSON.stringify(error.stack));
+    (0, import_logging.errorLogger)("Error in updateDeviceStatus", error, store._this);
   }
 }
 // Annotate the CommonJS export names for ESM import in node:

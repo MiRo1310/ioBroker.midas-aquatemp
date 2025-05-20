@@ -37,6 +37,7 @@ var import_axiosParameter = require("./axiosParameter");
 var import_endPoints = require("./endPoints");
 var import_saveValue = require("./saveValue");
 var import_store = require("./store");
+var import_logging = require("./logging");
 const numberToBoolean = (value) => {
   return value === 1;
 };
@@ -96,8 +97,7 @@ async function updateDeviceDetails() {
     }
     return;
   } catch (error) {
-    store._this.log.error(JSON.stringify(error));
-    store._this.log.error(JSON.stringify(error.stack));
+    (0, import_logging.errorLogger)("Error updateDeviceDetails", error, store._this);
   }
 }
 function findCodeVal(result, code) {
