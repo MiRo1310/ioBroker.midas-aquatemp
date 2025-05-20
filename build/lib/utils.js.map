@@ -1,7 +1,7 @@
 {
   "version": 3,
   "sources": ["../../src/lib/utils.ts"],
-  "sourcesContent": ["export const isDefined = <T>(value: T | undefined | null): value is T => value !== undefined && value !== null;\n\nexport const isStateValue = (state?: ioBroker.State): boolean => isDefined(state) && isDefined(state?.val);\n"],
+  "sourcesContent": ["export const isDefined = <T>(value: T | undefined | null): value is T => value !== undefined && value !== null;\r\n\r\nexport const isStateValue = (state?: ioBroker.State): boolean => isDefined(state) && isDefined(state?.val);\r\n"],
   "mappings": ";;;;;;;;;;;;;;;;;;AAAA;AAAA;AAAA;AAAA;AAAA;AAAA;AAAO,MAAM,YAAY,CAAI,UAA4C,UAAU,UAAa,UAAU;AAEnG,MAAM,eAAe,CAAC,UAAoC,UAAU,KAAK,KAAK,UAAU,+BAAO,GAAG;",
   "names": []
 }
