@@ -42,6 +42,7 @@ var import_token = require("./lib/token");
 var import_updateDevicePower = require("./lib/updateDevicePower");
 var import_updateDeviceSetTemp = require("./lib/updateDeviceSetTemp");
 var import_updateDeviceSilent = require("./lib/updateDeviceSilent");
+var import_utils = require("./lib/utils");
 let updateIntervall;
 let tokenRefreshTimer;
 class MidasAquatemp extends utils.Adapter {
@@ -108,24 +109,30 @@ class MidasAquatemp extends utils.Adapter {
     }, 36e5);
     this.on("stateChange", async (id, state) => {
       try {
-        if (id === `${dpRoot}.mode` && state && !state.ack) {
+        if (!state || state.ack) {
+          return;
+        }
+        if (id === `${dpRoot}.mode`) {
           this.log.debug(`Mode: ${JSON.stringify(state)}`);
-          if (state && state.val) {
+          if ((0, import_utils.isStateValue)(state)) {
             const mode = parseInt(state.val);
             await (0, import_updateDevicePower.updateDevicePower)(store.device, mode);
           }
+          await this.setState(id, { ack: true });
         }
-        if (id === `${dpRoot}.silent` && state && !state.ack) {
+        if (id === `${dpRoot}.silent`) {
           this.log.debug(`Silent: ${JSON.stringify(state)}`);
-          if (state && state.val) {
+          if ((0, import_utils.isStateValue)(state)) {
             await (0, import_updateDeviceSilent.updateDeviceSilent)(store.device, state.val);
           }
+          await this.setState(id, { ack: true });
         }
-        if (id === `${dpRoot}.tempSet` && state && !state.ack) {
+        if (id === `${dpRoot}.tempSet`) {
           this.log.debug(`TempSet: ${JSON.stringify(state)}`);
-          if (state && state.val) {
+          if ((0, import_utils.isStateValue)(state)) {
             await (0, import_updateDeviceSetTemp.updateDeviceSetTemp)(store.device, state.val);
           }
+          await this.setState(id, { ack: true });
         }
       } catch (error) {
         store._this.log.error(JSON.stringify(error));

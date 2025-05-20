@@ -37,6 +37,7 @@ If you have problems, contact us.
 -->
 ### **WORK IN PROGRESS**
 
+-   FIX: #24 Silent mode cannot be disabled
 -   FIX: #44 Cannot read properties of undefined (reading 'description')
 -   FEAT: Update dependencies and migrate to eslint 9
 
