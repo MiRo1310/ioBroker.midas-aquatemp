@@ -36,6 +36,7 @@ var import_axiosParameter = require("./axiosParameter");
 var import_endPoints = require("./endPoints");
 var import_saveValue = require("./saveValue");
 var import_store = require("./store");
+var import_logging = require("./logging");
 async function updateDeviceSilent(deviceCode, silent) {
   const store = (0, import_store.initStore)();
   try {
@@ -59,8 +60,7 @@ async function updateDeviceSilent(deviceCode, silent) {
       store.resetOnErrorHandler();
     }
   } catch (error) {
-    store._this.log.error(JSON.stringify(error));
-    store._this.log.error(JSON.stringify(error.stack));
+    (0, import_logging.errorLogger)("Error in updateDeviceSilent", error, store._this);
   }
 }
 // Annotate the CommonJS export names for ESM import in node:

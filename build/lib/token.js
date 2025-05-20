@@ -36,6 +36,7 @@ var import_endPoints = require("./endPoints");
 var import_store = require("./store");
 var import_updateDeviceId = require("./updateDeviceId");
 var import_updateDeviceStatus = require("./updateDeviceStatus");
+var import_logging = require("./logging");
 async function getToken() {
   var _a, _b, _c, _d;
   const store = (0, import_store.initStore)();
@@ -64,7 +65,7 @@ async function getToken() {
       return;
     }
   } catch (error) {
-    _this.log.error(`Error in getToken(): ${JSON.stringify(error)}`);
+    (0, import_logging.errorLogger)("Error in getToken", error, store._this);
   }
 }
 const updateToken = async () => {
@@ -82,8 +83,7 @@ const updateToken = async () => {
     await (0, import_updateDeviceId.updateDeviceID)();
     return;
   } catch (error) {
-    store._this.log.error(`Error in updateToken(): ${JSON.stringify(error)}`);
-    store._this.log.error(`Error in updateToken(): ${JSON.stringify(error.stack)}`);
+    (0, import_logging.errorLogger)("Error in updateToken", error, store._this);
   }
 };
 // Annotate the CommonJS export names for ESM import in node:

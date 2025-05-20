@@ -1,6 +1,7 @@
 import axios from 'axios';
 import { saveValue } from './saveValue';
 import { initStore } from './store';
+import { errorLogger } from './logging';
 
 export async function updateDeviceErrorMsg(): Promise<void> {
     const store = initStore();
@@ -43,7 +44,6 @@ export async function updateDeviceErrorMsg(): Promise<void> {
         }
         return;
     } catch (error: any) {
-        store._this.log.error(JSON.stringify(error));
-        store._this.log.error(JSON.stringify(error.stack));
+        errorLogger('Error in updateDeviceErrorMsg', error, store._this);
     }
 }

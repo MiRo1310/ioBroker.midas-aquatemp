@@ -1,0 +1,7 @@
+{
+  "version": 3,
+  "sources": ["../../src/lib/logging.ts"],
+  "sourcesContent": ["import type { MidasAquatemp } from '../main';\r\n\r\nexport const errorLogger = (title: string, e: any, adapter: MidasAquatemp): void => {\r\n    if (adapter.supportsFeature && adapter.supportsFeature('PLUGINS')) {\r\n        const sentryInstance = adapter.getPluginInstance('sentry');\r\n        if (sentryInstance) {\r\n            sentryInstance.getSentryObject().captureException(e);\r\n        }\r\n    }\r\n    adapter.log.error(title);\r\n\r\n    adapter.log.error(`Error message: ${e.message}`);\r\n    adapter.log.error(`Error stack: ${e.stack}`);\r\n    if (e?.response) {\r\n        adapter.log.error(`Server response: ${e?.response?.status}`);\r\n    }\r\n    if (e?.response) {\r\n        adapter.log.error(`Server status: ${e?.response?.statusText}`);\r\n    }\r\n};\r\n"],
+  "mappings": ";;;;;;;;;;;;;;;;;;AAAA;AAAA;AAAA;AAAA;AAAA;AAEO,MAAM,cAAc,CAAC,OAAe,GAAQ,YAAiC;AAFpF;AAGI,MAAI,QAAQ,mBAAmB,QAAQ,gBAAgB,SAAS,GAAG;AAC/D,UAAM,iBAAiB,QAAQ,kBAAkB,QAAQ;AACzD,QAAI,gBAAgB;AAChB,qBAAe,gBAAgB,EAAE,iBAAiB,CAAC;AAAA,IACvD;AAAA,EACJ;AACA,UAAQ,IAAI,MAAM,KAAK;AAEvB,UAAQ,IAAI,MAAM,kBAAkB,EAAE,OAAO,EAAE;AAC/C,UAAQ,IAAI,MAAM,gBAAgB,EAAE,KAAK,EAAE;AAC3C,MAAI,uBAAG,UAAU;AACb,YAAQ,IAAI,MAAM,qBAAoB,4BAAG,aAAH,mBAAa,MAAM,EAAE;AAAA,EAC/D;AACA,MAAI,uBAAG,UAAU;AACb,YAAQ,IAAI,MAAM,mBAAkB,4BAAG,aAAH,mBAAa,UAAU,EAAE;AAAA,EACjE;AACJ;",
+  "names": []
+}

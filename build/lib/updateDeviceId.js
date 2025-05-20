@@ -38,6 +38,7 @@ var import_endPoints = require("./endPoints");
 var import_saveValue = require("./saveValue");
 var import_store = require("./store");
 var import_updateDeviceStatus = require("./updateDeviceStatus");
+var import_logging = require("./logging");
 let _this;
 async function updateDeviceID() {
   var _a, _b, _c, _d, _e, _f, _g, _h, _i, _j, _k, _l;
@@ -93,8 +94,7 @@ async function updateDeviceID() {
     _this.log.debug("Device not reachable");
     store.resetOnErrorHandler();
   } catch (error) {
-    _this.log.error(`Error in updateDeviceID(): ${JSON.stringify(error)}`);
-    _this.log.error(`Error in updateDeviceID(): ${JSON.stringify(error.stack)}`);
+    (0, import_logging.errorLogger)("Error in updateDeviceID", error, _this);
     store.token = "", store.device = "", store.reachable = false;
   }
 }

@@ -5,6 +5,7 @@ import { getUpdateDeviceIdSUrl } from './endPoints';
 import { saveValue } from './saveValue';
 import { initStore } from './store';
 import { updateDeviceStatus } from './updateDeviceStatus';
+import { errorLogger } from './logging';
 
 let _this: MidasAquatemp;
 
@@ -69,8 +70,8 @@ export async function updateDeviceID(): Promise<void> {
         _this.log.debug('Device not reachable');
         store.resetOnErrorHandler();
     } catch (error: any) {
-        _this.log.error(`Error in updateDeviceID(): ${JSON.stringify(error)}`);
-        _this.log.error(`Error in updateDeviceID(): ${JSON.stringify(error.stack)}`);
+        errorLogger('Error in updateDeviceID', error, _this);
+
         (store.token = ''), (store.device = ''), (store.reachable = false);
     }
 }

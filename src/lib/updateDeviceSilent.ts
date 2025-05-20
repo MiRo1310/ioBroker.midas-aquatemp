@@ -3,6 +3,7 @@ import { getAxiosUpdateDevicePowerParams } from './axiosParameter';
 import { getSUrl } from './endPoints';
 import { saveValue } from './saveValue';
 import { initStore } from './store';
+import { errorLogger } from './logging';
 
 export async function updateDeviceSilent(deviceCode: string, silent: boolean): Promise<void> {
     const store = initStore();
@@ -29,7 +30,6 @@ export async function updateDeviceSilent(deviceCode: string, silent: boolean): P
             store.resetOnErrorHandler();
         }
     } catch (error: any) {
-        store._this.log.error(JSON.stringify(error));
-        store._this.log.error(JSON.stringify(error.stack));
+        errorLogger('Error in updateDeviceSilent', error, store._this);
     }
 }

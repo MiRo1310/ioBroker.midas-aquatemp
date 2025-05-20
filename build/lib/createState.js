@@ -22,6 +22,7 @@ __export(createState_exports, {
 });
 module.exports = __toCommonJS(createState_exports);
 var import_store = require("./store");
+var import_logging = require("./logging");
 const createObjects = async () => {
   const store = (0, import_store.initStore)();
   const _this = store._this;
@@ -426,7 +427,7 @@ const createObjects = async () => {
       });
     }
   } catch (error) {
-    _this.log.error(`Error in createObjects: ${error.message}, stack: ${error.stack}`);
+    (0, import_logging.errorLogger)("Error in createObjects", error, _this);
   }
 };
 // Annotate the CommonJS export names for ESM import in node:

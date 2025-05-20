@@ -4,6 +4,7 @@ import { getSUrl } from './endPoints';
 import { getAxiosUpdateDevicePowerParams } from './axiosParameter';
 import { saveValue } from './saveValue';
 import axios from 'axios';
+import { errorLogger } from './logging';
 
 export async function updateDevicePower(deviceCode: string, power: number): Promise<void> {
     const store = initStore();
@@ -63,7 +64,6 @@ async function updateDeviceMode(deviceCode: string, mode: any): Promise<void> {
             store.resetOnErrorHandler();
         }
     } catch (error: any) {
-        store._this.log.error(JSON.stringify(error));
-        store._this.log.error(JSON.stringify(error.stack));
+        errorLogger('Error in updateDeviceMode', error, store._this);
     }
 }

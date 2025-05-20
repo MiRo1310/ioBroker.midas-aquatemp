@@ -3,6 +3,7 @@ import { getOptionsAndSUrl } from './endPoints';
 import { initStore as useStore } from './store';
 import { updateDeviceID } from './updateDeviceId';
 import { updateDeviceStatus } from './updateDeviceStatus';
+import { errorLogger } from './logging';
 
 async function getToken(): Promise<void> {
     const store = useStore();
@@ -38,7 +39,7 @@ async function getToken(): Promise<void> {
             return;
         }
     } catch (error) {
-        _this.log.error(`Error in getToken(): ${JSON.stringify(error)}`);
+        errorLogger('Error in getToken', error, store._this);
     }
 }
 
@@ -58,7 +59,6 @@ export const updateToken = async (): Promise<void> => {
         await updateDeviceID();
         return;
     } catch (error: any) {
-        store._this.log.error(`Error in updateToken(): ${JSON.stringify(error)}`);
-        store._this.log.error(`Error in updateToken(): ${JSON.stringify(error.stack)}`);
+        errorLogger('Error in updateToken', error, store._this);
     }
 };

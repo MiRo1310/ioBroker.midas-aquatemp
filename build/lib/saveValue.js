@@ -23,6 +23,7 @@ __export(saveValue_exports, {
 module.exports = __toCommonJS(saveValue_exports);
 var import_main = require("../main");
 var import_store = require("./store");
+var import_logging = require("./logging");
 let _this;
 const saveValue = async (key, value, stateType) => {
   const store = (0, import_store.initStore)();
@@ -47,7 +48,7 @@ const saveValue = async (key, value, stateType) => {
     }
     await _this.setState(dp, value, true);
   } catch (err) {
-    _this.log.error(`Error in saveValue: ${err}`);
+    (0, import_logging.errorLogger)("Error in saveValue", err, _this);
   }
 };
 // Annotate the CommonJS export names for ESM import in node:
