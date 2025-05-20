@@ -55,11 +55,11 @@ export async function updateDeviceID(): Promise<void> {
 		_this.log.debug("Product: " + store.product);
 		_this.log.debug("Reachable: " + store.reachable);
 
-		saveValue("DeviceCode", store.device, "string");
-		saveValue("ProductCode", store.product, "string");
+		await saveValue("DeviceCode", store.device, "string");
+		await saveValue("ProductCode", store.product, "string");
 
 		if (store.reachable && store.device) {
-			saveValue("info.connection", true, "boolean");
+			await saveValue("info.connection", true, "boolean");
 			if (store.device != "" && store.product) {
 				_this.log.debug("Update device status");
 				await updateDeviceStatus();

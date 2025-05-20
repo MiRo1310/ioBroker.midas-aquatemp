@@ -35,6 +35,7 @@ var import_axios = __toESM(require("axios"));
 var import_saveValue = require("./saveValue");
 var import_store = require("./store");
 async function updateDeviceErrorMsg() {
+  var _a, _b, _c, _d, _e, _f, _g, _h;
   const store = (0, import_store.initStore)();
   try {
     const { token, apiLevel, cloudURL, device: deviceCode } = store;
@@ -51,16 +52,16 @@ async function updateDeviceErrorMsg() {
         }
       );
       if (parseInt(response.data.error_code) == 0) {
-        (0, import_saveValue.saveValue)("error", true, "boolean");
+        await (0, import_saveValue.saveValue)("error", true, "boolean");
         if (apiLevel < 3) {
-          (0, import_saveValue.saveValue)("errorMessage", response.data.object_result[0].description, "string");
-          (0, import_saveValue.saveValue)("errorCode", response.data.object_result[0].fault_code, "string");
-          (0, import_saveValue.saveValue)("errorLevel", response.data.object_result[0].error_level, "string");
+          await (0, import_saveValue.saveValue)("errorMessage", (_b = (_a = response.data.object_result[0]) == null ? void 0 : _a.description) != null ? _b : "", "string");
+          await (0, import_saveValue.saveValue)("errorCode", (_c = response.data.object_result[0]) == null ? void 0 : _c.fault_code, "string");
+          await (0, import_saveValue.saveValue)("errorLevel", (_d = response.data.object_result[0]) == null ? void 0 : _d.error_level, "string");
           return;
         }
-        (0, import_saveValue.saveValue)("errorMessage", response.data.objectResult[0].description, "string");
-        (0, import_saveValue.saveValue)("errorCode", response.data.objectResult[0].fault_code, "string");
-        (0, import_saveValue.saveValue)("errorLevel", response.data.objectResult[0].error_level, "string");
+        await (0, import_saveValue.saveValue)("errorMessage", (_f = (_e = response.data.objectResult[0]) == null ? void 0 : _e.description) != null ? _f : "", "string");
+        await (0, import_saveValue.saveValue)("errorCode", (_g = response.data.objectResult[0]) == null ? void 0 : _g.fault_code, "string");
+        await (0, import_saveValue.saveValue)("errorLevel", (_h = response.data.objectResult[0]) == null ? void 0 : _h.error_level, "string");
         return;
       }
       store.resetOnErrorHandler();

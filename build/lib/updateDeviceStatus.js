@@ -63,16 +63,16 @@ async function updateDeviceStatus() {
       if (parseInt(response.data.error_code) == 0) {
         if (((_d = (_c = response.data) == null ? void 0 : _c.object_result) == null ? void 0 : _d["is_fault"]) || ((_f = (_e = response.data) == null ? void 0 : _e.objectResult) == null ? void 0 : _f["isFault"])) {
           store._this.log.error("Error in updateDeviceStatus(): " + JSON.stringify(response.data));
-          (0, import_saveValue.saveValue)("error", true, "boolean");
-          (0, import_updateDeviceDetails.updateDeviceDetails)();
-          (0, import_updateDeviceOnError.updateDeviceErrorMsg)();
+          await (0, import_saveValue.saveValue)("error", true, "boolean");
+          await (0, import_updateDeviceDetails.updateDeviceDetails)();
+          await (0, import_updateDeviceOnError.updateDeviceErrorMsg)();
           return;
         }
-        (0, import_saveValue.saveValue)("error", false, "boolean");
-        (0, import_saveValue.saveValue)("errorMessage", "", "string");
-        (0, import_saveValue.saveValue)("errorCode", "", "string");
-        (0, import_saveValue.saveValue)("errorLevel", 0, "number");
-        (0, import_updateDeviceDetails.updateDeviceDetails)();
+        await (0, import_saveValue.saveValue)("error", false, "boolean");
+        await (0, import_saveValue.saveValue)("errorMessage", "", "string");
+        await (0, import_saveValue.saveValue)("errorCode", "", "string");
+        await (0, import_saveValue.saveValue)("errorLevel", 0, "number");
+        await (0, import_updateDeviceDetails.updateDeviceDetails)();
         return;
       }
       store.resetOnErrorHandler();

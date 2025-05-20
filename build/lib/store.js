@@ -48,11 +48,11 @@ function initStore() {
       getDpRoot: function() {
         return `midas-aquatemp.${this.instance}`;
       },
-      resetOnErrorHandler: function() {
+      resetOnErrorHandler: async function() {
         this.token = "";
         this.device = "";
         this.reachable = false;
-        (0, import_saveValue.saveValue)("info.connection", false, "boolean");
+        await (0, import_saveValue.saveValue)("info.connection", false, "boolean");
       }
     };
   }

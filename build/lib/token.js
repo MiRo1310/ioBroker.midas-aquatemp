@@ -43,7 +43,7 @@ async function getToken() {
   try {
     const { token, apiLevel } = store;
     if (!token) {
-      _this.log.info("Request token");
+      _this.log.debug("Request token");
       const { sUrl, options } = (0, import_endPoints.getOptionsAndSUrl)();
       const response = await import_axios.default.post(sUrl, options);
       if (!response) {
@@ -53,7 +53,7 @@ async function getToken() {
       if (response.status == 200) {
         store.token = apiLevel < 3 ? (_b = (_a = response.data) == null ? void 0 : _a.object_result) == null ? void 0 : _b["x-token"] : store.token = (_d = (_c = response.data) == null ? void 0 : _c.objectResult) == null ? void 0 : _d["x-token"];
         if (store.token) {
-          _this.log.info("Login ok! Token: " + store.token);
+          _this.log.debug("Login ok! Token");
         } else {
           _this.log.error("Login-error: " + JSON.stringify(response.data));
         }

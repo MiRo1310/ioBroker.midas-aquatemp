@@ -1,5 +1,6 @@
 import { MidasAquatemp } from "../main";
 import { initStore } from "./store";
+
 let _this: MidasAquatemp;
 
 export const saveValue = async (
@@ -15,7 +16,7 @@ export const saveValue = async (
 		}
 		const dp = dpRoot + "." + key;
 
-		if (!_this.objectExists(dp)) {
+		if (!(await _this.objectExists(dp))) {
 			await _this.setObjectNotExists(dp, {
 				type: "state",
 				common: {
@@ -29,7 +30,7 @@ export const saveValue = async (
 			});
 		}
 
-		_this.setState(dp, value, true);
+		await _this.setState(dp, value, true);
 	} catch (err) {
 		_this.log.error("Error in saveValue: " + err);
 	}

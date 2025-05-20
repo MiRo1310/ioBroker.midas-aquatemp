@@ -32,7 +32,7 @@ const saveValue = async (key, value, stateType) => {
       _this = import_main.MidasAquatemp.getInstance();
     }
     const dp = dpRoot + "." + key;
-    if (!_this.objectExists(dp)) {
+    if (!await _this.objectExists(dp)) {
       await _this.setObjectNotExists(dp, {
         type: "state",
         common: {
@@ -44,9 +44,8 @@ const saveValue = async (key, value, stateType) => {
         },
         native: {}
       });
-      return;
     }
-    _this.setState(dp, value, true);
+    await _this.setState(dp, value, true);
   } catch (err) {
     _this.log.error("Error in saveValue: " + err);
   }

@@ -54,11 +54,11 @@ async function updateDevicePower(deviceCode, power) {
           headers: { "x-token": token }
         }
       );
-      store._this.log.info("DeviceStatus: " + JSON.stringify(response.data));
+      store._this.log.debug("DeviceStatus: " + JSON.stringify(response.data));
       if (parseInt(response.data.error_code) == 0) {
-        (0, import_saveValue.saveValue)("mode", power.toString(), "string");
+        await (0, import_saveValue.saveValue)("mode", power.toString(), "string");
         if (power >= 0)
-          updateDeviceMode(store.device, power);
+          await updateDeviceMode(store.device, power);
         return;
       }
       store._this.log.error("Error: " + JSON.stringify(response.data));
@@ -82,9 +82,9 @@ async function updateDeviceMode(deviceCode, mode) {
           headers: { "x-token": token }
         }
       );
-      store._this.log.info("DeviceStatus: " + JSON.stringify(response.data));
+      store._this.log.debug("DeviceStatus: " + JSON.stringify(response.data));
       if (parseInt(response.data.error_code) == 0) {
-        (0, import_saveValue.saveValue)("mode", mode, "string");
+        await (0, import_saveValue.saveValue)("mode", mode, "string");
         return;
       }
       store._this.log.error("Error: " + JSON.stringify(response.data));

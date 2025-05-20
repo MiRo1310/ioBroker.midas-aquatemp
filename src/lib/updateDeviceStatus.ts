@@ -5,6 +5,7 @@ import { saveValue } from "./saveValue";
 import { initStore } from "./store";
 import { updateDeviceDetails } from "./updateDeviceDetails";
 import { updateDeviceErrorMsg } from "./updateDeviceOnError";
+
 let _this: MidasAquatemp;
 
 export async function updateDeviceStatus(): Promise<void> {
@@ -38,17 +39,17 @@ export async function updateDeviceStatus(): Promise<void> {
 					store._this.log.error("Error in updateDeviceStatus(): " + JSON.stringify(response.data));
 					// TODO: Fehlerbeschreibung abrufen
 					//clearValues();
-					saveValue("error", true, "boolean");
-					updateDeviceDetails();
-					updateDeviceErrorMsg();
+					await saveValue("error", true, "boolean");
+					await updateDeviceDetails();
+					await updateDeviceErrorMsg();
 					return;
 				}
 				// kein Fehler
-				saveValue("error", false, "boolean");
-				saveValue("errorMessage", "", "string");
-				saveValue("errorCode", "", "string");
-				saveValue("errorLevel", 0, "number");
-				updateDeviceDetails();
+				await saveValue("error", false, "boolean");
+				await saveValue("errorMessage", "", "string");
+				await saveValue("errorCode", "", "string");
+				await saveValue("errorLevel", 0, "number");
+				await updateDeviceDetails();
 
 				return;
 			}

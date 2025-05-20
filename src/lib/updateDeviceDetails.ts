@@ -9,31 +9,30 @@ export const numberToBoolean = (value: number): boolean => {
 	return value === 1;
 };
 
-const saveValues = (value: any): void => {
+const saveValues = async (value: any): Promise<void> => {
 	// Stromverbrauch T07 x T14 in Watt
-	saveValue(
+	await saveValue(
 		"consumption",
 		parseFloat(findCodeVal(value, ["T07", "T7"])) * parseFloat(findCodeVal(value, "T14")),
 		"number",
 	);
 	// Luftansaug-Temperatur T01
-	saveValue("suctionTemp", parseFloat(findCodeVal(value, ["T01", "T1"])), "number");
+	await saveValue("suctionTemp", parseFloat(findCodeVal(value, ["T01", "T1"])), "number");
 	// Inlet-Temperatur T02
-	saveValue("tempIn", parseFloat(findCodeVal(value, ["T02", "T2"])), "number");
+	await saveValue("tempIn", parseFloat(findCodeVal(value, ["T02", "T2"])), "number");
 	// outlet-Temperatur T03
-	saveValue("tempOut", parseFloat(findCodeVal(value, ["T03", "T3"])), "number");
+	await saveValue("tempOut", parseFloat(findCodeVal(value, ["T03", "T3"])), "number");
 	// Coil-Temperatur T04
-	saveValue("coilTemp", parseFloat(findCodeVal(value, ["T04", "T4"])), "number");
+	await saveValue("coilTemp", parseFloat(findCodeVal(value, ["T04", "T4"])), "number");
 	// Umgebungs-Temperatur T05
-	saveValue("ambient", parseFloat(findCodeVal(value, ["T05", "T5"])), "number");
+	await saveValue("ambient", parseFloat(findCodeVal(value, ["T05", "T5"])), "number");
 	// Kompressorausgang-Temperatur T06
-	saveValue("exhaust", parseFloat(findCodeVal(value, ["T06", "T6"])), "number");
+	await saveValue("exhaust", parseFloat(findCodeVal(value, ["T06", "T6"])), "number");
 	// Strömungsschalter S03
-	saveValue("flowSwitch", numberToBoolean(findCodeVal(value, ["S03", "S3"])), "boolean");
+	await saveValue("flowSwitch", numberToBoolean(findCodeVal(value, ["S03", "S3"])), "boolean");
 	// Lüfter-Drehzahl T17
-	saveValue("rotor", parseInt(findCodeVal(value, "T17")), "number");
+	await saveValue("rotor", parseInt(findCodeVal(value, "T17")), "number");
 };
-
 
 export async function updateDeviceDetails(): Promise<void> {
 	const store = initStore();
@@ -50,8 +49,8 @@ export async function updateDeviceDetails(): Promise<void> {
 			if (parseInt(response.data.error_code) == 0) {
 				const responseValue = apiLevel < 3 ? response.data.object_result : response.data.objectResult;
 
-				saveValue("rawJSON", JSON.stringify(responseValue), "string");
-				saveValues(responseValue);
+				await saveValue("rawJSON", JSON.stringify(responseValue), "string");
+				await saveValues(responseValue);
 
 				const mode: number = findCodeVal(responseValue, "Mode");
 				const modes: Modes = {
@@ -60,21 +59,21 @@ export async function updateDeviceDetails(): Promise<void> {
 					2: "R03", // Auto-Modus (-> R03)
 				};
 				// Ziel-Temperatur anhand Modus
-				saveValue("tempSet", parseFloat(findCodeVal(responseValue, modes[mode])), "number");
+				await saveValue("tempSet", parseFloat(findCodeVal(responseValue, modes[mode])), "number");
 
 				// Flüstermodus Manual-mute
-				saveValue("silent", findCodeVal(responseValue, "Manual-mute") == "1", "boolean");
+				await saveValue("silent", findCodeVal(responseValue, "Manual-mute") == "1", "boolean");
 
 				// Zustand Power
 				if (findCodeVal(responseValue, "Power") == "1") {
-					saveValue("state", true, "boolean");
-					saveValue("mode", findCodeVal(responseValue, "Mode"), "string");
+					await saveValue("state", true, "boolean");
+					await saveValue("mode", findCodeVal(responseValue, "Mode"), "string");
 				} else {
-					saveValue("state", false, "boolean");
-					saveValue("mode", "-1", "string");
+					await saveValue("state", false, "boolean");
+					await saveValue("mode", "-1", "string");
 				}
 
-				saveValue("info.connection", true, "boolean");
+				await saveValue("info.connection", true, "boolean");
 				return;
 			}
 
