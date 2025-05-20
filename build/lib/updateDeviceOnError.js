@@ -40,7 +40,7 @@ async function updateDeviceErrorMsg() {
   try {
     const { token, apiLevel, cloudURL, device: deviceCode } = store;
     if (token) {
-      const sURL = apiLevel < 3 ? cloudURL + "/app/device/getFaultDataByDeviceCode.json" : cloudURL + "/app/device/getFaultDataByDeviceCode";
+      const sURL = apiLevel < 3 ? `${cloudURL}/app/device/getFaultDataByDeviceCode.json` : `${cloudURL}/app/device/getFaultDataByDeviceCode`;
       const response = await import_axios.default.post(
         sURL,
         {
