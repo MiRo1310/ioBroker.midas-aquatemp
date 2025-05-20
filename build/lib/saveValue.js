@@ -31,7 +31,7 @@ const saveValue = async (key, value, stateType) => {
     if (!_this) {
       _this = import_main.MidasAquatemp.getInstance();
     }
-    const dp = dpRoot + "." + key;
+    const dp = `${dpRoot}.${key}`;
     if (!await _this.objectExists(dp)) {
       await _this.setObjectNotExists(dp, {
         type: "state",
@@ -47,7 +47,7 @@ const saveValue = async (key, value, stateType) => {
     }
     await _this.setState(dp, value, true);
   } catch (err) {
-    _this.log.error("Error in saveValue: " + err);
+    _this.log.error(`Error in saveValue: ${err}`);
   }
 };
 // Annotate the CommonJS export names for ESM import in node:

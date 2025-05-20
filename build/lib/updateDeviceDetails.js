@@ -64,7 +64,7 @@ async function updateDeviceDetails() {
       const response = await import_axios.default.post(sURL, (0, import_axiosParameter.getProtocolCodes)(deviceCode), {
         headers: { "x-token": token }
       });
-      store._this.log.debug("DeviceDetails: " + JSON.stringify(response.data));
+      store._this.log.debug(`DeviceDetails: ${JSON.stringify(response.data)}`);
       if (parseInt(response.data.error_code) == 0) {
         const responseValue = apiLevel < 3 ? response.data.object_result : response.data.objectResult;
         await (0, import_saveValue.saveValue)("rawJSON", JSON.stringify(responseValue), "string");
@@ -90,7 +90,7 @@ async function updateDeviceDetails() {
         await (0, import_saveValue.saveValue)("info.connection", true, "boolean");
         return;
       }
-      store._this.log.error("Error: " + JSON.stringify(response.data));
+      store._this.log.error(`Error: ${JSON.stringify(response.data)}`);
       store.resetOnErrorHandler();
       return;
     }

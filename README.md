@@ -38,7 +38,6 @@ If you have problems, contact us.
 ### **WORK IN PROGRESS**
 
 -   FIX: #44 Cannot read properties of undefined (reading 'description')
-
 -   FEAT: Update dependencies and migrate to eslint 9
 
 ### 1.1.1 (2024-08-11)

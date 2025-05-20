@@ -21,15 +21,15 @@ export async function updateDeviceSilent(deviceCode: string, silent: boolean): P
             );
             store._this.log.debug(`DeviceStatus: ${JSON.stringify(response.data)}`);
 
-			if (parseInt(response.data.error_code) == 0) {
-				await saveValue("silent", silent, "boolean");
-				return;
-			}
-			store._this.log.error("Error: " + JSON.stringify(response.data));
-			store.resetOnErrorHandler();
-		}
-	} catch (error: any) {
-		store._this.log.error(JSON.stringify(error));
-		store._this.log.error(JSON.stringify(error.stack));
-	}
+            if (parseInt(response.data.error_code) == 0) {
+                await saveValue('silent', silent, 'boolean');
+                return;
+            }
+            store._this.log.error(`Error: ${JSON.stringify(response.data)}`);
+            store.resetOnErrorHandler();
+        }
+    } catch (error: any) {
+        store._this.log.error(JSON.stringify(error));
+        store._this.log.error(JSON.stringify(error.stack));
+    }
 }

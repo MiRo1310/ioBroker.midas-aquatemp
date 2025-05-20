@@ -28,7 +28,7 @@ const createObjects = async () => {
   const dpRoot = store.getDpRoot();
   const objects = [
     {
-      id: dpRoot + ".ambient",
+      id: `${dpRoot}.ambient`,
       name: {
         en: "Ambient temperature",
         de: "Umgebungstemperatur",
@@ -47,7 +47,7 @@ const createObjects = async () => {
       unit: "\xB0C"
     },
     {
-      id: dpRoot + ".info.connection",
+      id: `${dpRoot}.info.connection`,
       name: {
         en: "Connection",
         de: "Verbindung",
@@ -66,7 +66,7 @@ const createObjects = async () => {
       def: false
     },
     {
-      id: dpRoot + ".consumption",
+      id: `${dpRoot}.consumption`,
       name: {
         en: "Power consumption",
         de: "Stromverbrauch",
@@ -86,7 +86,7 @@ const createObjects = async () => {
       def: 0
     },
     {
-      id: dpRoot + ".error",
+      id: `${dpRoot}.error`,
       name: {
         en: "Error",
         de: "Fehler",
@@ -105,7 +105,7 @@ const createObjects = async () => {
       def: false
     },
     {
-      id: dpRoot + ".errorCode",
+      id: `${dpRoot}.errorCode`,
       name: {
         en: "Error code",
         de: "Fehlercode",
@@ -124,7 +124,7 @@ const createObjects = async () => {
       role: "state"
     },
     {
-      id: dpRoot + ".errorLevel",
+      id: `${dpRoot}.errorLevel`,
       name: {
         en: "Error level",
         de: "Fehlerlevel",
@@ -142,7 +142,7 @@ const createObjects = async () => {
       role: "state"
     },
     {
-      id: dpRoot + ".errorMessage",
+      id: `${dpRoot}.errorMessage`,
       name: {
         en: "Errormessage",
         de: "Fehlermeldung",
@@ -161,7 +161,7 @@ const createObjects = async () => {
       role: "state"
     },
     {
-      id: dpRoot + ".mode",
+      id: `${dpRoot}.mode`,
       name: "Modus",
       type: "string",
       states: "-1:off;0:cool;1:heat;2:auto",
@@ -170,7 +170,7 @@ const createObjects = async () => {
       role: "state"
     },
     {
-      id: dpRoot + ".rotor",
+      id: `${dpRoot}.rotor`,
       name: {
         en: "Fan speed",
         de: "L\xFCfterdrehzahl",
@@ -190,7 +190,7 @@ const createObjects = async () => {
       role: "state"
     },
     {
-      id: dpRoot + ".silent",
+      id: `${dpRoot}.silent`,
       name: {
         en: "Silent",
         de: "Silent",
@@ -210,7 +210,7 @@ const createObjects = async () => {
       write: true
     },
     {
-      id: dpRoot + ".state",
+      id: `${dpRoot}.state`,
       name: {
         en: "Status",
         de: "Status",
@@ -229,7 +229,7 @@ const createObjects = async () => {
       def: false
     },
     {
-      id: dpRoot + ".tempIn",
+      id: `${dpRoot}.tempIn`,
       name: {
         en: "Input temperature",
         de: "Eingangstemperatur",
@@ -248,7 +248,7 @@ const createObjects = async () => {
       role: "value.temperature"
     },
     {
-      id: dpRoot + ".tempOut",
+      id: `${dpRoot}.tempOut`,
       name: {
         en: "Output temperature",
         de: "Ausgangstemperatur",
@@ -267,7 +267,7 @@ const createObjects = async () => {
       role: "value.temperature"
     },
     {
-      id: dpRoot + ".tempSet",
+      id: `${dpRoot}.tempSet`,
       name: {
         en: "Should temperature",
         de: "Solltemperatur",
@@ -287,7 +287,7 @@ const createObjects = async () => {
       role: "value.temperature"
     },
     {
-      id: dpRoot + ".suctionTemp",
+      id: `${dpRoot}.suctionTemp`,
       name: {
         en: "Air intake temperature",
         de: "Lufteintrittstemperatur",
@@ -306,7 +306,7 @@ const createObjects = async () => {
       role: "value.temperature"
     },
     {
-      id: dpRoot + ".coilTemp",
+      id: `${dpRoot}.coilTemp`,
       name: {
         en: "Compressor temperature",
         de: "Kompressortemperatur",
@@ -325,7 +325,7 @@ const createObjects = async () => {
       role: "value.temperature"
     },
     {
-      id: dpRoot + ".exhaust",
+      id: `${dpRoot}.exhaust`,
       name: {
         en: "Compressor output",
         de: "Kompressorausgang",
@@ -344,7 +344,7 @@ const createObjects = async () => {
       role: "value.temperature"
     },
     {
-      id: dpRoot + ".ProductCode",
+      id: `${dpRoot}.ProductCode`,
       name: {
         en: "Productcode",
         de: "Produktcode",
@@ -362,7 +362,7 @@ const createObjects = async () => {
       role: "state"
     },
     {
-      id: dpRoot + ".DeviceCode",
+      id: `${dpRoot}.DeviceCode`,
       name: {
         en: "Device ID",
         de: "Ger\xE4te ID",
@@ -380,7 +380,7 @@ const createObjects = async () => {
       role: "state"
     },
     {
-      id: dpRoot + ".rawJSON",
+      id: `${dpRoot}.rawJSON`,
       name: {
         en: "JSON",
         de: "JSON",
@@ -398,7 +398,7 @@ const createObjects = async () => {
       role: "state"
     },
     {
-      id: dpRoot + ".flowSwitch",
+      id: `${dpRoot}.flowSwitch`,
       name: {
         en: "Flow switch",
         de: "Str\xF6mungsschalter",
@@ -418,7 +418,7 @@ const createObjects = async () => {
   ];
   try {
     for (const { id, name, role, unit, type, def, write } of objects) {
-      _this.log.debug("Create object: " + id);
+      _this.log.debug(`Create object: ${id}`);
       await _this.setObjectNotExistsAsync(id, {
         type: "state",
         common: { read: true, write: write || false, type, unit, role, name, def },

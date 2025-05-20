@@ -55,22 +55,22 @@ export async function updateDeviceID(): Promise<void> {
         _this.log.debug(`Product: ${store.product}`);
         _this.log.debug(`Reachable: ${store.reachable}`);
 
-		await saveValue("DeviceCode", store.device, "string");
-		await saveValue("ProductCode", store.product, "string");
+        await saveValue('DeviceCode', store.device, 'string');
+        await saveValue('ProductCode', store.product, 'string');
 
-		if (store.reachable && store.device) {
-			await saveValue("info.connection", true, "boolean");
-			if (store.device != "" && store.product) {
-				_this.log.debug("Update device status");
-				await updateDeviceStatus();
-			}
-			return;
-		}
-		_this.log.debug("Device not reachable");
-		store.resetOnErrorHandler();
-	} catch (error: any) {
-		_this.log.error("Error in updateDeviceID(): " + JSON.stringify(error));
-		_this.log.error("Error in updateDeviceID(): " + JSON.stringify(error.stack));
-		(store.token = ""), (store.device = ""), (store.reachable = false);
-	}
+        if (store.reachable && store.device) {
+            await saveValue('info.connection', true, 'boolean');
+            if (store.device != '' && store.product) {
+                _this.log.debug('Update device status');
+                await updateDeviceStatus();
+            }
+            return;
+        }
+        _this.log.debug('Device not reachable');
+        store.resetOnErrorHandler();
+    } catch (error: any) {
+        _this.log.error(`Error in updateDeviceID(): ${JSON.stringify(error)}`);
+        _this.log.error(`Error in updateDeviceID(): ${JSON.stringify(error.stack)}`);
+        (store.token = ''), (store.device = ''), (store.reachable = false);
+    }
 }

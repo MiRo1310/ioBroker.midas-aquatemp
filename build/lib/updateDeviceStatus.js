@@ -61,8 +61,8 @@ async function updateDeviceStatus() {
       );
       store.reachable = apiLevel < 3 ? ((_a = response.data.object_result[0]) == null ? void 0 : _a.device_status) == "ONLINE" : ((_b = response.data.objectResult[0]) == null ? void 0 : _b.deviceStatus) == "ONLINE";
       if (parseInt(response.data.error_code) == 0) {
-        if (((_d = (_c = response.data) == null ? void 0 : _c.object_result) == null ? void 0 : _d["is_fault"]) || ((_f = (_e = response.data) == null ? void 0 : _e.objectResult) == null ? void 0 : _f["isFault"])) {
-          store._this.log.error("Error in updateDeviceStatus(): " + JSON.stringify(response.data));
+        if (((_d = (_c = response.data) == null ? void 0 : _c.object_result) == null ? void 0 : _d.is_fault) || ((_f = (_e = response.data) == null ? void 0 : _e.objectResult) == null ? void 0 : _f.isFault)) {
+          store._this.log.error(`Error in updateDeviceStatus(): ${JSON.stringify(response.data)}`);
           await (0, import_saveValue.saveValue)("error", true, "boolean");
           await (0, import_updateDeviceDetails.updateDeviceDetails)();
           await (0, import_updateDeviceOnError.updateDeviceErrorMsg)();

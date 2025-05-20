@@ -77,13 +77,13 @@ class MidasAquatemp extends utils.Adapter {
     (0, import_encryptPassword.encryptPassword)(password);
     await (0, import_createState.createObjects)();
     this.log.info("Objects created");
-    clearValues();
+    await clearValues();
     await (0, import_token.updateToken)();
-    function clearValues() {
-      (0, import_saveValue.saveValue)("error", true, "boolean");
-      (0, import_saveValue.saveValue)("consumption", 0, "number");
-      (0, import_saveValue.saveValue)("state", false, "boolean");
-      (0, import_saveValue.saveValue)("rawJSON", null, "string");
+    async function clearValues() {
+      await (0, import_saveValue.saveValue)("error", true, "boolean");
+      await (0, import_saveValue.saveValue)("consumption", 0, "number");
+      await (0, import_saveValue.saveValue)("state", false, "boolean");
+      await (0, import_saveValue.saveValue)("rawJSON", null, "string");
     }
     updateIntervall = store._this.setInterval(async () => {
       try {

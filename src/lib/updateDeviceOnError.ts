@@ -23,27 +23,27 @@ export async function updateDeviceErrorMsg(): Promise<void> {
                 },
             );
 
-			if (parseInt(response.data.error_code) == 0) {
-				await saveValue("error", true, "boolean");
+            if (parseInt(response.data.error_code) == 0) {
+                await saveValue('error', true, 'boolean');
 
-				if (apiLevel < 3) {
-					await saveValue("errorMessage", response.data.object_result[0]?.description ?? "", "string");
-					await saveValue("errorCode", response.data.object_result[0]?.fault_code, "string");
-					await saveValue("errorLevel", response.data.object_result[0]?.error_level, "string");
-					return;
-				}
-				await saveValue("errorMessage", response.data.objectResult[0]?.description ?? "", "string");
-				await saveValue("errorCode", response.data.objectResult[0]?.fault_code, "string");
-				await saveValue("errorLevel", response.data.objectResult[0]?.error_level, "string");
-				return;
-			}
-			// Login-Fehler
-			store.resetOnErrorHandler();
-			return;
-		}
-		return;
-	} catch (error: any) {
-		store._this.log.error(JSON.stringify(error));
-		store._this.log.error(JSON.stringify(error.stack));
-	}
+                if (apiLevel < 3) {
+                    await saveValue('errorMessage', response.data.object_result[0]?.description ?? '', 'string');
+                    await saveValue('errorCode', response.data.object_result[0]?.fault_code, 'string');
+                    await saveValue('errorLevel', response.data.object_result[0]?.error_level, 'string');
+                    return;
+                }
+                await saveValue('errorMessage', response.data.objectResult[0]?.description ?? '', 'string');
+                await saveValue('errorCode', response.data.objectResult[0]?.fault_code, 'string');
+                await saveValue('errorLevel', response.data.objectResult[0]?.error_level, 'string');
+                return;
+            }
+            // Login-Fehler
+            store.resetOnErrorHandler();
+            return;
+        }
+        return;
+    } catch (error: any) {
+        store._this.log.error(JSON.stringify(error));
+        store._this.log.error(JSON.stringify(error.stack));
+    }
 }
