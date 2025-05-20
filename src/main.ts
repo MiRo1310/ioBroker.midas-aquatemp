@@ -17,6 +17,7 @@ import { updateToken } from './lib/token';
 import { updateDevicePower } from './lib/updateDevicePower';
 import { updateDeviceSetTemp } from './lib/updateDeviceSetTemp';
 import { updateDeviceSilent } from './lib/updateDeviceSilent';
+import { isStateValue } from './lib/utils';
 
 let updateIntervall: ioBroker.Interval | undefined;
 let tokenRefreshTimer: ioBroker.Interval | undefined;
@@ -97,27 +98,33 @@ export class MidasAquatemp extends utils.Adapter {
 
         this.on('stateChange', async (id, state) => {
             try {
-                if (id === `${dpRoot}.mode` && state && !state.ack) {
+                if (!state || state.ack) {
+                    return;
+                }
+                if (id === `${dpRoot}.mode`) {
                     this.log.debug(`Mode: ${JSON.stringify(state)}`);
-                    if (state && state.val) {
+                    if (isStateValue(state)) {
                         const mode = parseInt(state.val as string);
                         await updateDevicePower(store.device, mode);
                     }
+                    await this.setState(id, { ack: true });
                 }
 
-                if (id === `${dpRoot}.silent` && state && !state.ack) {
+                if (id === `${dpRoot}.silent`) {
                     this.log.debug(`Silent: ${JSON.stringify(state)}`);
-                    if (state && state.val) {
+                    if (isStateValue(state)) {
                         await updateDeviceSilent(store.device, state.val as boolean);
                     }
+                    await this.setState(id, { ack: true });
                 }
 
-                if (id === `${dpRoot}.tempSet` && state && !state.ack) {
+                if (id === `${dpRoot}.tempSet`) {
                     this.log.debug(`TempSet: ${JSON.stringify(state)}`);
 
-                    if (state && state.val) {
+                    if (isStateValue(state)) {
                         await updateDeviceSetTemp(store.device, state.val as number);
                     }
+                    await this.setState(id, { ack: true });
                 }
             } catch (error: any) {
                 store._this.log.error(JSON.stringify(error));
