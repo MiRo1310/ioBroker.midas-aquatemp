@@ -4,7 +4,7 @@ export const errorLogger = (title: string, e: any, adapter: MidasAquatemp): void
     if (adapter.supportsFeature && adapter.supportsFeature('PLUGINS')) {
         const sentryInstance = adapter.getPluginInstance('sentry');
         if (sentryInstance) {
-            sentryInstance.getSentryObject().captureException(e);
+            sentryInstance.getSentryObject()?.captureException(e);
         }
     }
     adapter.log.error(title);

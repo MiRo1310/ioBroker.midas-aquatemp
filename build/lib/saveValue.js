@@ -21,20 +21,15 @@ __export(saveValue_exports, {
   saveValue: () => saveValue
 });
 module.exports = __toCommonJS(saveValue_exports);
-var import_main = require("../main");
 var import_store = require("./store");
 var import_logging = require("./logging");
-let _this;
-const saveValue = async (key, value, stateType) => {
+const saveValue = async (key, value, stateType, adapter) => {
   const store = (0, import_store.initStore)();
   const dpRoot = store.getDpRoot();
   try {
-    if (!_this) {
-      _this = import_main.MidasAquatemp.getInstance();
-    }
     const dp = `${dpRoot}.${key}`;
-    if (!await _this.objectExists(dp)) {
-      await _this.setObjectNotExists(dp, {
+    if (!await adapter.objectExists(dp)) {
+      await adapter.setObjectNotExists(dp, {
         type: "state",
         common: {
           name: key,
@@ -46,9 +41,11 @@ const saveValue = async (key, value, stateType) => {
         native: {}
       });
     }
-    await _this.setState(dp, value, true);
+    if (value) {
+      await adapter.setState(dp, value, true);
+    }
   } catch (err) {
-    (0, import_logging.errorLogger)("Error in saveValue", err, _this);
+    (0, import_logging.errorLogger)("Error in saveValue", err, adapter);
   }
 };
 // Annotate the CommonJS export names for ESM import in node:

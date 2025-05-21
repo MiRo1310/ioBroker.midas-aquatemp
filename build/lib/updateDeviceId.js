@@ -32,41 +32,36 @@ __export(updateDeviceId_exports, {
 });
 module.exports = __toCommonJS(updateDeviceId_exports);
 var import_axios = __toESM(require("axios"));
-var import_main = require("../main");
 var import_axiosParameter = require("./axiosParameter");
 var import_endPoints = require("./endPoints");
 var import_saveValue = require("./saveValue");
 var import_store = require("./store");
 var import_updateDeviceStatus = require("./updateDeviceStatus");
 var import_logging = require("./logging");
-let _this;
-async function updateDeviceID() {
+async function updateDeviceID(adapter) {
   var _a, _b, _c, _d, _e, _f, _g, _h, _i, _j, _k, _l;
   const store = (0, import_store.initStore)();
   try {
-    if (!_this) {
-      _this = import_main.MidasAquatemp.getInstance();
-    }
     const { token, apiLevel } = store;
     if (!token) {
       return;
     }
     const { sURL } = (0, import_endPoints.getUpdateDeviceIdSUrl)();
     const options = (0, import_axiosParameter.getAxiosUpdateDeviceIdParams)();
-    _this.log.debug(`UpdateDeviceID URL: ${sURL}`);
-    _this.log.debug(`UpdateDeviceID options: ${JSON.stringify(options)}`);
+    adapter.log.debug(`UpdateDeviceID URL: ${sURL}`);
+    adapter.log.debug(`UpdateDeviceID options: ${JSON.stringify(options)}`);
     const response = await import_axios.default.post(sURL, options, {
       headers: { "x-token": token }
     });
-    _this.log.debug(`UpdateDeviceID response: ${JSON.stringify(response.data)}`);
-    _this.log.debug(`UpdateDeviceID response status: ${JSON.stringify(response.status)}`);
+    adapter.log.debug(`UpdateDeviceID response: ${JSON.stringify(response.data)}`);
+    adapter.log.debug(`UpdateDeviceID response status: ${JSON.stringify(response.status)}`);
     if (!response || response.status !== 200 || response.data.error_code !== "0") {
       store.resetOnErrorHandler();
       return;
     }
     if (!((_c = (_b = (_a = response.data) == null ? void 0 : _a.object_result) == null ? void 0 : _b[0]) == null ? void 0 : _c.device_code) && !((_f = (_e = (_d = response.data) == null ? void 0 : _d.objectResult) == null ? void 0 : _e[0]) == null ? void 0 : _f.deviceCode)) {
-      _this.log.error("Error in updateDeviceID(): No device code found");
-      _this.log.error(`Response: ${JSON.stringify(response.data)}`);
+      adapter.log.error("Error in updateDeviceID(): No device code found");
+      adapter.log.error(`Response: ${JSON.stringify(response.data)}`);
       return;
     }
     if (apiLevel < 3) {
@@ -78,23 +73,23 @@ async function updateDeviceID() {
       store.product = (_k = response.data.objectResult[0]) == null ? void 0 : _k.productId;
       store.reachable = ((_l = response.data.objectResult[0]) == null ? void 0 : _l.deviceStatus) == "ONLINE";
     }
-    _this.log.debug(`Device: ${store.device}`);
-    _this.log.debug(`Product: ${store.product}`);
-    _this.log.debug(`Reachable: ${store.reachable}`);
-    await (0, import_saveValue.saveValue)("DeviceCode", store.device, "string");
-    await (0, import_saveValue.saveValue)("ProductCode", store.product, "string");
+    adapter.log.debug(`Device: ${store.device}`);
+    adapter.log.debug(`Product: ${store.product}`);
+    adapter.log.debug(`Reachable: ${store.reachable}`);
+    await (0, import_saveValue.saveValue)("DeviceCode", store.device, "string", adapter);
+    await (0, import_saveValue.saveValue)("ProductCode", store.product, "string", adapter);
     if (store.reachable && store.device) {
-      await (0, import_saveValue.saveValue)("info.connection", true, "boolean");
+      await (0, import_saveValue.saveValue)("info.connection", true, "boolean", adapter);
       if (store.device != "" && store.product) {
-        _this.log.debug("Update device status");
-        await (0, import_updateDeviceStatus.updateDeviceStatus)();
+        adapter.log.debug("Update device status");
+        await (0, import_updateDeviceStatus.updateDeviceStatus)(adapter);
       }
       return;
     }
-    _this.log.debug("Device not reachable");
+    adapter.log.debug("Device not reachable");
     store.resetOnErrorHandler();
   } catch (error) {
-    (0, import_logging.errorLogger)("Error in updateDeviceID", error, _this);
+    (0, import_logging.errorLogger)("Error in updateDeviceID", error, adapter);
     store.token = "", store.device = "", store.reachable = false;
   }
 }

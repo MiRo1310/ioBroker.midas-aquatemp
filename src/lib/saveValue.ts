@@ -1,24 +1,20 @@
-import { MidasAquatemp } from '../main';
+import type { MidasAquatemp } from '../main';
 import { initStore } from './store';
 import { errorLogger } from './logging';
-
-let _this: MidasAquatemp;
 
 export const saveValue = async (
     key: string,
     value: ioBroker.StateValue,
     stateType: ioBroker.CommonType,
+    adapter: MidasAquatemp,
 ): Promise<void> => {
     const store = initStore();
     const dpRoot = store.getDpRoot();
     try {
-        if (!_this) {
-            _this = MidasAquatemp.getInstance();
-        }
         const dp = `${dpRoot}.${key}`;
 
-        if (!(await _this.objectExists(dp))) {
-            await _this.setObjectNotExists(dp, {
+        if (!(await adapter.objectExists(dp))) {
+            await adapter.setObjectNotExists(dp, {
                 type: 'state',
                 common: {
                     name: key,
@@ -30,9 +26,10 @@ export const saveValue = async (
                 native: {},
             });
         }
-
-        await _this.setState(dp, value, true);
+        if (value) {
+            await adapter.setState(dp, value, true);
+        }
     } catch (err: any) {
-        errorLogger('Error in saveValue', err, _this);
+        errorLogger('Error in saveValue', err, adapter);
     }
 };

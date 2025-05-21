@@ -50,7 +50,7 @@ export function initStore(): Store {
                 this.token = '';
                 this.device = '';
                 this.reachable = false;
-                await saveValue('info.connection', false, 'boolean');
+                await saveValue('info.connection', false, 'boolean', this._this);
             },
         };
     }

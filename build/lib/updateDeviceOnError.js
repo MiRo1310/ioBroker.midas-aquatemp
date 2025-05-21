@@ -35,7 +35,7 @@ var import_axios = __toESM(require("axios"));
 var import_saveValue = require("./saveValue");
 var import_store = require("./store");
 var import_logging = require("./logging");
-async function updateDeviceErrorMsg() {
+async function updateDeviceErrorMsg(adapter) {
   var _a, _b, _c, _d, _e, _f, _g, _h;
   const store = (0, import_store.initStore)();
   try {
@@ -53,16 +53,21 @@ async function updateDeviceErrorMsg() {
         }
       );
       if (parseInt(response.data.error_code) == 0) {
-        await (0, import_saveValue.saveValue)("error", true, "boolean");
+        await (0, import_saveValue.saveValue)("error", true, "boolean", adapter);
         if (apiLevel < 3) {
-          await (0, import_saveValue.saveValue)("errorMessage", (_b = (_a = response.data.object_result[0]) == null ? void 0 : _a.description) != null ? _b : "", "string");
-          await (0, import_saveValue.saveValue)("errorCode", (_c = response.data.object_result[0]) == null ? void 0 : _c.fault_code, "string");
-          await (0, import_saveValue.saveValue)("errorLevel", (_d = response.data.object_result[0]) == null ? void 0 : _d.error_level, "string");
+          await (0, import_saveValue.saveValue)(
+            "errorMessage",
+            (_b = (_a = response.data.object_result[0]) == null ? void 0 : _a.description) != null ? _b : "",
+            "string",
+            adapter
+          );
+          await (0, import_saveValue.saveValue)("errorCode", (_c = response.data.object_result[0]) == null ? void 0 : _c.fault_code, "string", adapter);
+          await (0, import_saveValue.saveValue)("errorLevel", (_d = response.data.object_result[0]) == null ? void 0 : _d.error_level, "string", adapter);
           return;
         }
-        await (0, import_saveValue.saveValue)("errorMessage", (_f = (_e = response.data.objectResult[0]) == null ? void 0 : _e.description) != null ? _f : "", "string");
-        await (0, import_saveValue.saveValue)("errorCode", (_g = response.data.objectResult[0]) == null ? void 0 : _g.fault_code, "string");
-        await (0, import_saveValue.saveValue)("errorLevel", (_h = response.data.objectResult[0]) == null ? void 0 : _h.error_level, "string");
+        await (0, import_saveValue.saveValue)("errorMessage", (_f = (_e = response.data.objectResult[0]) == null ? void 0 : _e.description) != null ? _f : "", "string", adapter);
+        await (0, import_saveValue.saveValue)("errorCode", (_g = response.data.objectResult[0]) == null ? void 0 : _g.fault_code, "string", adapter);
+        await (0, import_saveValue.saveValue)("errorLevel", (_h = response.data.objectResult[0]) == null ? void 0 : _h.error_level, "string", adapter);
         return;
       }
       store.resetOnErrorHandler();
@@ -70,7 +75,7 @@ async function updateDeviceErrorMsg() {
     }
     return;
   } catch (error) {
-    (0, import_logging.errorLogger)("Error in updateDeviceErrorMsg", error, store._this);
+    (0, import_logging.errorLogger)("Error in updateDeviceErrorMsg", error, adapter);
   }
 }
 // Annotate the CommonJS export names for ESM import in node:

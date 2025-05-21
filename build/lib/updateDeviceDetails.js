@@ -41,22 +41,23 @@ var import_logging = require("./logging");
 const numberToBoolean = (value) => {
   return value === 1;
 };
-const saveValues = async (value) => {
+const saveValues = async (adapter, value) => {
   await (0, import_saveValue.saveValue)(
     "consumption",
     parseFloat(findCodeVal(value, ["T07", "T7"])) * parseFloat(findCodeVal(value, "T14")),
-    "number"
+    "number",
+    adapter
   );
-  await (0, import_saveValue.saveValue)("suctionTemp", parseFloat(findCodeVal(value, ["T01", "T1"])), "number");
-  await (0, import_saveValue.saveValue)("tempIn", parseFloat(findCodeVal(value, ["T02", "T2"])), "number");
-  await (0, import_saveValue.saveValue)("tempOut", parseFloat(findCodeVal(value, ["T03", "T3"])), "number");
-  await (0, import_saveValue.saveValue)("coilTemp", parseFloat(findCodeVal(value, ["T04", "T4"])), "number");
-  await (0, import_saveValue.saveValue)("ambient", parseFloat(findCodeVal(value, ["T05", "T5"])), "number");
-  await (0, import_saveValue.saveValue)("exhaust", parseFloat(findCodeVal(value, ["T06", "T6"])), "number");
-  await (0, import_saveValue.saveValue)("flowSwitch", numberToBoolean(findCodeVal(value, ["S03", "S3"])), "boolean");
-  await (0, import_saveValue.saveValue)("rotor", parseInt(findCodeVal(value, "T17")), "number");
+  await (0, import_saveValue.saveValue)("suctionTemp", parseFloat(findCodeVal(value, ["T01", "T1"])), "number", adapter);
+  await (0, import_saveValue.saveValue)("tempIn", parseFloat(findCodeVal(value, ["T02", "T2"])), "number", adapter);
+  await (0, import_saveValue.saveValue)("tempOut", parseFloat(findCodeVal(value, ["T03", "T3"])), "number", adapter);
+  await (0, import_saveValue.saveValue)("coilTemp", parseFloat(findCodeVal(value, ["T04", "T4"])), "number", adapter);
+  await (0, import_saveValue.saveValue)("ambient", parseFloat(findCodeVal(value, ["T05", "T5"])), "number", adapter);
+  await (0, import_saveValue.saveValue)("exhaust", parseFloat(findCodeVal(value, ["T06", "T6"])), "number", adapter);
+  await (0, import_saveValue.saveValue)("flowSwitch", numberToBoolean(findCodeVal(value, ["S03", "S3"])), "boolean", adapter);
+  await (0, import_saveValue.saveValue)("rotor", parseInt(findCodeVal(value, "T17")), "number", adapter);
 };
-async function updateDeviceDetails() {
+async function updateDeviceDetails(adapter) {
   const store = (0, import_store.initStore)();
   try {
     const { apiLevel, token, device: deviceCode } = store;
@@ -68,8 +69,8 @@ async function updateDeviceDetails() {
       store._this.log.debug(`DeviceDetails: ${JSON.stringify(response.data)}`);
       if (parseInt(response.data.error_code) == 0) {
         const responseValue = apiLevel < 3 ? response.data.object_result : response.data.objectResult;
-        await (0, import_saveValue.saveValue)("rawJSON", JSON.stringify(responseValue), "string");
-        await saveValues(responseValue);
+        await (0, import_saveValue.saveValue)("rawJSON", JSON.stringify(responseValue), "string", adapter);
+        await saveValues(adapter, responseValue);
         const mode = findCodeVal(responseValue, "Mode");
         const modes = {
           1: "R02",
@@ -79,25 +80,25 @@ async function updateDeviceDetails() {
           2: "R03"
           // Auto-Modus (-> R03)
         };
-        await (0, import_saveValue.saveValue)("tempSet", parseFloat(findCodeVal(responseValue, modes[mode])), "number");
-        await (0, import_saveValue.saveValue)("silent", findCodeVal(responseValue, "Manual-mute") == "1", "boolean");
+        await (0, import_saveValue.saveValue)("tempSet", parseFloat(findCodeVal(responseValue, modes[mode])), "number", adapter);
+        await (0, import_saveValue.saveValue)("silent", findCodeVal(responseValue, "Manual-mute") == "1", "boolean", adapter);
         if (findCodeVal(responseValue, "Power") == "1") {
-          await (0, import_saveValue.saveValue)("state", true, "boolean");
-          await (0, import_saveValue.saveValue)("mode", findCodeVal(responseValue, "Mode"), "string");
+          await (0, import_saveValue.saveValue)("state", true, "boolean", adapter);
+          await (0, import_saveValue.saveValue)("mode", findCodeVal(responseValue, "Mode"), "string", adapter);
         } else {
-          await (0, import_saveValue.saveValue)("state", false, "boolean");
-          await (0, import_saveValue.saveValue)("mode", "-1", "string");
+          await (0, import_saveValue.saveValue)("state", false, "boolean", adapter);
+          await (0, import_saveValue.saveValue)("mode", "-1", "string", adapter);
         }
-        await (0, import_saveValue.saveValue)("info.connection", true, "boolean");
+        await (0, import_saveValue.saveValue)("info.connection", true, "boolean", adapter);
         return;
       }
-      store._this.log.error(`Error: ${JSON.stringify(response.data)}`);
+      adapter.log.error(`Error: ${JSON.stringify(response.data)}`);
       store.resetOnErrorHandler();
       return;
     }
     return;
   } catch (error) {
-    (0, import_logging.errorLogger)("Error updateDeviceDetails", error, store._this);
+    (0, import_logging.errorLogger)("Error updateDeviceDetails", error, adapter);
   }
 }
 function findCodeVal(result, code) {

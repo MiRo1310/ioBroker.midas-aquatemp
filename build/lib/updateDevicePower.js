@@ -38,7 +38,7 @@ var import_axiosParameter = require("./axiosParameter");
 var import_saveValue = require("./saveValue");
 var import_axios = __toESM(require("axios"));
 var import_logging = require("./logging");
-async function updateDevicePower(deviceCode, power) {
+async function updateDevicePower(adapter, deviceCode, power) {
   const store = (0, import_store.initStore)();
   try {
     const token = store.token;
@@ -55,23 +55,22 @@ async function updateDevicePower(deviceCode, power) {
           headers: { "x-token": token }
         }
       );
-      store._this.log.debug(`DeviceStatus: ${JSON.stringify(response.data)}`);
+      adapter.log.debug(`DeviceStatus: ${JSON.stringify(response.data)}`);
       if (parseInt(response.data.error_code) == 0) {
-        await (0, import_saveValue.saveValue)("mode", power.toString(), "string");
+        await (0, import_saveValue.saveValue)("mode", power.toString(), "string", adapter);
         if (power >= 0) {
-          await updateDeviceMode(store.device, power);
+          await updateDeviceMode(adapter, store.device, power);
         }
         return;
       }
-      store._this.log.error(`Error: ${JSON.stringify(response.data)}`);
+      adapter.log.error(`Error: ${JSON.stringify(response.data)}`);
       store.resetOnErrorHandler();
     }
   } catch (error) {
-    store._this.log.error(JSON.stringify(error));
-    store._this.log.error(JSON.stringify(error.stack));
+    (0, import_logging.errorLogger)("Error in updateDevicePower", error, adapter);
   }
 }
-async function updateDeviceMode(deviceCode, mode) {
+async function updateDeviceMode(adapter, deviceCode, mode) {
   const store = (0, import_store.initStore)();
   const token = store.token;
   try {
@@ -84,16 +83,16 @@ async function updateDeviceMode(deviceCode, mode) {
           headers: { "x-token": token }
         }
       );
-      store._this.log.debug(`DeviceStatus: ${JSON.stringify(response.data)}`);
+      adapter.log.debug(`DeviceStatus: ${JSON.stringify(response.data)}`);
       if (parseInt(response.data.error_code) == 0) {
-        await (0, import_saveValue.saveValue)("mode", mode, "string");
+        await (0, import_saveValue.saveValue)("mode", mode, "string", adapter);
         return;
       }
-      store._this.log.error(`Error: ${JSON.stringify(response.data)}`);
+      adapter.log.error(`Error: ${JSON.stringify(response.data)}`);
       store.resetOnErrorHandler();
     }
   } catch (error) {
-    (0, import_logging.errorLogger)("Error in updateDeviceMode", error, store._this);
+    (0, import_logging.errorLogger)("Error in updateDeviceMode", error, adapter);
   }
 }
 // Annotate the CommonJS export names for ESM import in node:

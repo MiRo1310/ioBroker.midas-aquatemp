@@ -37,53 +37,52 @@ var import_store = require("./store");
 var import_updateDeviceId = require("./updateDeviceId");
 var import_updateDeviceStatus = require("./updateDeviceStatus");
 var import_logging = require("./logging");
-async function getToken() {
+async function getToken(adapter) {
   var _a, _b, _c, _d;
   const store = (0, import_store.initStore)();
-  const _this = store._this;
   try {
     const { token, apiLevel } = store;
     if (!token) {
-      _this.log.debug("Request token");
+      adapter.log.debug("Request token");
       const { sUrl, options } = (0, import_endPoints.getOptionsAndSUrl)();
       const response = await import_axios.default.post(sUrl, options);
       if (!response) {
-        _this.log.error("No response from server");
+        adapter.log.error("No response from server");
         return;
       }
       if (response.status == 200) {
         store.token = apiLevel < 3 ? (_b = (_a = response.data) == null ? void 0 : _a.object_result) == null ? void 0 : _b["x-token"] : store.token = (_d = (_c = response.data) == null ? void 0 : _c.objectResult) == null ? void 0 : _d["x-token"];
         if (store.token) {
-          _this.log.debug("Login ok! Token");
+          adapter.log.debug("Login ok! Token");
         } else {
-          _this.log.error(`Login-error: ${JSON.stringify(response.data)}`);
+          adapter.log.error(`Login-error: ${JSON.stringify(response.data)}`);
         }
         return;
       }
-      _this.log.error(`Login-error: ${response.data}`);
+      adapter.log.error(`Login-error: ${response.data}`);
       store.resetOnErrorHandler();
       return;
     }
   } catch (error) {
-    (0, import_logging.errorLogger)("Error in getToken", error, store._this);
+    (0, import_logging.errorLogger)("Error in getToken", error, adapter);
   }
 }
-const updateToken = async () => {
+const updateToken = async (adapter) => {
   const store = (0, import_store.initStore)();
   try {
-    await getToken();
+    await getToken(adapter);
     if (!store.token) {
       store.resetOnErrorHandler();
       return;
     }
     if (store.useDeviceMac) {
-      await (0, import_updateDeviceStatus.updateDeviceStatus)();
+      await (0, import_updateDeviceStatus.updateDeviceStatus)(adapter);
       return;
     }
-    await (0, import_updateDeviceId.updateDeviceID)();
+    await (0, import_updateDeviceId.updateDeviceID)(adapter);
     return;
   } catch (error) {
-    (0, import_logging.errorLogger)("Error in updateToken", error, store._this);
+    (0, import_logging.errorLogger)("Error in updateToken", error, adapter);
   }
 };
 // Annotate the CommonJS export names for ESM import in node:

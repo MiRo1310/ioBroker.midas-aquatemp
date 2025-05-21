@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { MidasAquatemp } from '../main';
+import type { MidasAquatemp } from '../main';
 import { getAxiosUpdateDeviceIdParams } from './axiosParameter';
 import { getUpdateDeviceIdSUrl } from './endPoints';
 import { saveValue } from './saveValue';
@@ -7,29 +7,24 @@ import { initStore } from './store';
 import { updateDeviceStatus } from './updateDeviceStatus';
 import { errorLogger } from './logging';
 
-let _this: MidasAquatemp;
-
-export async function updateDeviceID(): Promise<void> {
+export async function updateDeviceID(adapter: MidasAquatemp): Promise<void> {
     const store = initStore();
     try {
-        if (!_this) {
-            _this = MidasAquatemp.getInstance();
-        }
         const { token, apiLevel } = store;
         if (!token) {
             return;
         }
         const { sURL } = getUpdateDeviceIdSUrl();
         const options = getAxiosUpdateDeviceIdParams();
-        _this.log.debug(`UpdateDeviceID URL: ${sURL}`);
-        _this.log.debug(`UpdateDeviceID options: ${JSON.stringify(options)}`);
+        adapter.log.debug(`UpdateDeviceID URL: ${sURL}`);
+        adapter.log.debug(`UpdateDeviceID options: ${JSON.stringify(options)}`);
 
         const response = await axios.post(sURL, options, {
             headers: { 'x-token': token },
         });
 
-        _this.log.debug(`UpdateDeviceID response: ${JSON.stringify(response.data)}`);
-        _this.log.debug(`UpdateDeviceID response status: ${JSON.stringify(response.status)}`);
+        adapter.log.debug(`UpdateDeviceID response: ${JSON.stringify(response.data)}`);
+        adapter.log.debug(`UpdateDeviceID response status: ${JSON.stringify(response.status)}`);
 
         if (!response || response.status !== 200 || response.data.error_code !== '0') {
             // Login-Fehler
@@ -38,8 +33,8 @@ export async function updateDeviceID(): Promise<void> {
         }
 
         if (!response.data?.object_result?.[0]?.device_code && !response.data?.objectResult?.[0]?.deviceCode) {
-            _this.log.error('Error in updateDeviceID(): No device code found');
-            _this.log.error(`Response: ${JSON.stringify(response.data)}`);
+            adapter.log.error('Error in updateDeviceID(): No device code found');
+            adapter.log.error(`Response: ${JSON.stringify(response.data)}`);
             return;
         }
 
@@ -52,25 +47,25 @@ export async function updateDeviceID(): Promise<void> {
             store.product = response.data.objectResult[0]?.productId;
             store.reachable = response.data.objectResult[0]?.deviceStatus == 'ONLINE';
         }
-        _this.log.debug(`Device: ${store.device}`);
-        _this.log.debug(`Product: ${store.product}`);
-        _this.log.debug(`Reachable: ${store.reachable}`);
+        adapter.log.debug(`Device: ${store.device}`);
+        adapter.log.debug(`Product: ${store.product}`);
+        adapter.log.debug(`Reachable: ${store.reachable}`);
 
-        await saveValue('DeviceCode', store.device, 'string');
-        await saveValue('ProductCode', store.product, 'string');
+        await saveValue('DeviceCode', store.device, 'string', adapter);
+        await saveValue('ProductCode', store.product, 'string', adapter);
 
         if (store.reachable && store.device) {
-            await saveValue('info.connection', true, 'boolean');
+            await saveValue('info.connection', true, 'boolean', adapter);
             if (store.device != '' && store.product) {
-                _this.log.debug('Update device status');
-                await updateDeviceStatus();
+                adapter.log.debug('Update device status');
+                await updateDeviceStatus(adapter);
             }
             return;
         }
-        _this.log.debug('Device not reachable');
+        adapter.log.debug('Device not reachable');
         store.resetOnErrorHandler();
     } catch (error: any) {
-        errorLogger('Error in updateDeviceID', error, _this);
+        errorLogger('Error in updateDeviceID', error, adapter);
 
         (store.token = ''), (store.device = ''), (store.reachable = false);
     }

@@ -52,7 +52,7 @@ function initStore() {
         this.token = "";
         this.device = "";
         this.reachable = false;
-        await (0, import_saveValue.saveValue)("info.connection", false, "boolean");
+        await (0, import_saveValue.saveValue)("info.connection", false, "boolean", this._this);
       }
     };
   }

@@ -2,8 +2,9 @@ import axios from 'axios';
 import { saveValue } from './saveValue';
 import { initStore } from './store';
 import { errorLogger } from './logging';
+import type { MidasAquatemp } from '../main';
 
-export async function updateDeviceErrorMsg(): Promise<void> {
+export async function updateDeviceErrorMsg(adapter: MidasAquatemp): Promise<void> {
     const store = initStore();
     try {
         const { token, apiLevel, cloudURL, device: deviceCode } = store;
@@ -25,17 +26,22 @@ export async function updateDeviceErrorMsg(): Promise<void> {
             );
 
             if (parseInt(response.data.error_code) == 0) {
-                await saveValue('error', true, 'boolean');
+                await saveValue('error', true, 'boolean', adapter);
 
                 if (apiLevel < 3) {
-                    await saveValue('errorMessage', response.data.object_result[0]?.description ?? '', 'string');
-                    await saveValue('errorCode', response.data.object_result[0]?.fault_code, 'string');
-                    await saveValue('errorLevel', response.data.object_result[0]?.error_level, 'string');
+                    await saveValue(
+                        'errorMessage',
+                        response.data.object_result[0]?.description ?? '',
+                        'string',
+                        adapter,
+                    );
+                    await saveValue('errorCode', response.data.object_result[0]?.fault_code, 'string', adapter);
+                    await saveValue('errorLevel', response.data.object_result[0]?.error_level, 'string', adapter);
                     return;
                 }
-                await saveValue('errorMessage', response.data.objectResult[0]?.description ?? '', 'string');
-                await saveValue('errorCode', response.data.objectResult[0]?.fault_code, 'string');
-                await saveValue('errorLevel', response.data.objectResult[0]?.error_level, 'string');
+                await saveValue('errorMessage', response.data.objectResult[0]?.description ?? '', 'string', adapter);
+                await saveValue('errorCode', response.data.objectResult[0]?.fault_code, 'string', adapter);
+                await saveValue('errorLevel', response.data.objectResult[0]?.error_level, 'string', adapter);
                 return;
             }
             // Login-Fehler
@@ -44,6 +50,6 @@ export async function updateDeviceErrorMsg(): Promise<void> {
         }
         return;
     } catch (error: any) {
-        errorLogger('Error in updateDeviceErrorMsg', error, store._this);
+        errorLogger('Error in updateDeviceErrorMsg', error, adapter);
     }
 }
