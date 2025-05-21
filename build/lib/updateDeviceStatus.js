@@ -40,8 +40,8 @@ var import_updateDeviceDetails = require("./updateDeviceDetails");
 var import_updateDeviceOnError = require("./updateDeviceOnError");
 var import_logging = require("./logging");
 let _this;
-async function updateDeviceStatus() {
-  var _a, _b, _c, _d, _e, _f;
+async function updateDeviceStatus(adapter) {
+  var _a, _b, _c, _d, _e, _f, _g, _h;
   const store = (0, import_store.initStore)();
   try {
     if (!_this) {
@@ -60,20 +60,20 @@ async function updateDeviceStatus() {
           headers: { "x-token": token }
         }
       );
-      store.reachable = apiLevel < 3 ? ((_a = response.data.object_result[0]) == null ? void 0 : _a.device_status) == "ONLINE" : ((_b = response.data.objectResult[0]) == null ? void 0 : _b.deviceStatus) == "ONLINE";
+      store.reachable = apiLevel < 3 ? ((_b = (_a = response.data.object_result) == null ? void 0 : _a[0]) == null ? void 0 : _b.device_status) == "ONLINE" : ((_d = (_c = response.data.objectResult) == null ? void 0 : _c[0]) == null ? void 0 : _d.deviceStatus) == "ONLINE";
       if (parseInt(response.data.error_code) == 0) {
-        if (((_d = (_c = response.data) == null ? void 0 : _c.object_result) == null ? void 0 : _d.is_fault) || ((_f = (_e = response.data) == null ? void 0 : _e.objectResult) == null ? void 0 : _f.isFault)) {
+        if (((_f = (_e = response.data) == null ? void 0 : _e.object_result) == null ? void 0 : _f.is_fault) || ((_h = (_g = response.data) == null ? void 0 : _g.objectResult) == null ? void 0 : _h.isFault)) {
           store._this.log.error(`Error in updateDeviceStatus(): ${JSON.stringify(response.data)}`);
-          await (0, import_saveValue.saveValue)("error", true, "boolean");
-          await (0, import_updateDeviceDetails.updateDeviceDetails)();
-          await (0, import_updateDeviceOnError.updateDeviceErrorMsg)();
+          await (0, import_saveValue.saveValue)("error", true, "boolean", adapter);
+          await (0, import_updateDeviceDetails.updateDeviceDetails)(adapter);
+          await (0, import_updateDeviceOnError.updateDeviceErrorMsg)(adapter);
           return;
         }
-        await (0, import_saveValue.saveValue)("error", false, "boolean");
-        await (0, import_saveValue.saveValue)("errorMessage", "", "string");
-        await (0, import_saveValue.saveValue)("errorCode", "", "string");
-        await (0, import_saveValue.saveValue)("errorLevel", 0, "number");
-        await (0, import_updateDeviceDetails.updateDeviceDetails)();
+        await (0, import_saveValue.saveValue)("error", false, "boolean", adapter);
+        await (0, import_saveValue.saveValue)("errorMessage", "", "string", adapter);
+        await (0, import_saveValue.saveValue)("errorCode", "", "string", adapter);
+        await (0, import_saveValue.saveValue)("errorLevel", 0, "number", adapter);
+        await (0, import_updateDeviceDetails.updateDeviceDetails)(adapter);
         return;
       }
       store.resetOnErrorHandler();

@@ -37,7 +37,7 @@ var import_endPoints = require("./endPoints");
 var import_saveValue = require("./saveValue");
 var import_store = require("./store");
 var import_logging = require("./logging");
-async function updateDeviceSilent(deviceCode, silent) {
+async function updateDeviceSilent(adapter, deviceCode, silent) {
   const store = (0, import_store.initStore)();
   try {
     const token = store.token;
@@ -51,16 +51,16 @@ async function updateDeviceSilent(deviceCode, silent) {
           headers: { "x-token": token }
         }
       );
-      store._this.log.debug(`DeviceStatus: ${JSON.stringify(response.data)}`);
+      adapter.log.debug(`DeviceStatus: ${JSON.stringify(response.data)}`);
       if (parseInt(response.data.error_code) == 0) {
-        await (0, import_saveValue.saveValue)("silent", silent, "boolean");
+        await (0, import_saveValue.saveValue)("silent", silent, "boolean", adapter);
         return;
       }
-      store._this.log.error(`Error: ${JSON.stringify(response.data)}`);
+      adapter.log.error(`Error: ${JSON.stringify(response.data)}`);
       store.resetOnErrorHandler();
     }
   } catch (error) {
-    (0, import_logging.errorLogger)("Error in updateDeviceSilent", error, store._this);
+    (0, import_logging.errorLogger)("Error in updateDeviceSilent", error, adapter);
   }
 }
 // Annotate the CommonJS export names for ESM import in node:

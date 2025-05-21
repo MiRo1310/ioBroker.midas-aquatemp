@@ -1,10 +1,10 @@
 import type { CreateObjects } from '../types';
 import { initStore } from './store';
 import { errorLogger } from './logging';
+import type { MidasAquatemp } from '../main';
 
-export const createObjects = async (): Promise<void> => {
+export const createObjects = async (adapter: MidasAquatemp): Promise<void> => {
     const store = initStore();
-    const _this = store._this;
     const dpRoot = store.getDpRoot();
 
     const objects: CreateObjects[] = [
@@ -400,14 +400,14 @@ export const createObjects = async (): Promise<void> => {
 
     try {
         for (const { id, name, role, unit, type, def, write } of objects) {
-            _this.log.debug(`Create object: ${id}`);
-            await _this.setObjectNotExistsAsync(id, {
+            adapter.log.debug(`Create object: ${id}`);
+            await adapter.setObjectNotExistsAsync(id, {
                 type: 'state',
                 common: { read: true, write: write || false, type: type, unit, role, name, def },
                 native: {},
             });
         }
     } catch (error: any) {
-        errorLogger('Error in createObjects', error, _this);
+        errorLogger('Error in createObjects', error, adapter);
     }
 };

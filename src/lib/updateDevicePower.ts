@@ -5,8 +5,9 @@ import { getAxiosUpdateDevicePowerParams } from './axiosParameter';
 import { saveValue } from './saveValue';
 import axios from 'axios';
 import { errorLogger } from './logging';
+import type { MidasAquatemp } from '../main';
 
-export async function updateDevicePower(deviceCode: string, power: number): Promise<void> {
+export async function updateDevicePower(adapter: MidasAquatemp, deviceCode: string, power: number): Promise<void> {
     const store = initStore();
     try {
         const token = store.token;
@@ -24,24 +25,23 @@ export async function updateDevicePower(deviceCode: string, power: number): Prom
                 },
             );
 
-            store._this.log.debug(`DeviceStatus: ${JSON.stringify(response.data)}`);
+            adapter.log.debug(`DeviceStatus: ${JSON.stringify(response.data)}`);
             if (parseInt(response.data.error_code) == 0) {
-                await saveValue('mode', power.toString(), 'string');
+                await saveValue('mode', power.toString(), 'string', adapter);
                 if (power >= 0) {
-                    await updateDeviceMode(store.device, power);
+                    await updateDeviceMode(adapter, store.device, power);
                 }
                 return;
             }
-            store._this.log.error(`Error: ${JSON.stringify(response.data)}`);
+            adapter.log.error(`Error: ${JSON.stringify(response.data)}`);
             store.resetOnErrorHandler();
         }
     } catch (error: any) {
-        store._this.log.error(JSON.stringify(error));
-        store._this.log.error(JSON.stringify(error.stack));
+        errorLogger('Error in updateDevicePower', error, adapter);
     }
 }
 
-async function updateDeviceMode(deviceCode: string, mode: any): Promise<void> {
+async function updateDeviceMode(adapter: MidasAquatemp, deviceCode: string, mode: any): Promise<void> {
     const store = initStore();
     const token = store.token;
     try {
@@ -54,16 +54,16 @@ async function updateDeviceMode(deviceCode: string, mode: any): Promise<void> {
                     headers: { 'x-token': token },
                 },
             );
-            store._this.log.debug(`DeviceStatus: ${JSON.stringify(response.data)}`);
+            adapter.log.debug(`DeviceStatus: ${JSON.stringify(response.data)}`);
 
             if (parseInt(response.data.error_code) == 0) {
-                await saveValue('mode', mode, 'string');
+                await saveValue('mode', mode, 'string', adapter);
                 return;
             }
-            store._this.log.error(`Error: ${JSON.stringify(response.data)}`);
+            adapter.log.error(`Error: ${JSON.stringify(response.data)}`);
             store.resetOnErrorHandler();
         }
     } catch (error: any) {
-        errorLogger('Error in updateDeviceMode', error, store._this);
+        errorLogger('Error in updateDeviceMode', error, adapter);
     }
 }

@@ -61,6 +61,7 @@ class MidasAquatemp extends utils.Adapter {
   }
   async onReady() {
     const store = (0, import_store.initStore)();
+    const adapter2 = this;
     store._this = this;
     store.instance = this.instance;
     const dpRoot = store.getDpRoot();
@@ -76,26 +77,26 @@ class MidasAquatemp extends utils.Adapter {
     this.log.debug(`API-Level: ${this.config.selectApi}`);
     (0, import_endPoints.setupEndpoints)();
     (0, import_encryptPassword.encryptPassword)(password);
-    await (0, import_createState.createObjects)();
+    await (0, import_createState.createObjects)(adapter2);
     this.log.info("Objects created");
     await clearValues();
-    await (0, import_token.updateToken)();
+    await (0, import_token.updateToken)(adapter2);
     async function clearValues() {
-      await (0, import_saveValue.saveValue)("error", true, "boolean");
-      await (0, import_saveValue.saveValue)("consumption", 0, "number");
-      await (0, import_saveValue.saveValue)("state", false, "boolean");
-      await (0, import_saveValue.saveValue)("rawJSON", null, "string");
+      await (0, import_saveValue.saveValue)("error", true, "boolean", adapter2);
+      await (0, import_saveValue.saveValue)("consumption", 0, "number", adapter2);
+      await (0, import_saveValue.saveValue)("state", false, "boolean", adapter2);
+      await (0, import_saveValue.saveValue)("rawJSON", null, "string", adapter2);
     }
     updateIntervall = store._this.setInterval(async () => {
       try {
-        await (0, import_token.updateToken)();
+        await (0, import_token.updateToken)(adapter2);
         const mode = await store._this.getStateAsync(`${dpRoot}.mode`);
         if (mode && !mode.ack && mode.val) {
-          await (0, import_updateDevicePower.updateDevicePower)(store.device, mode.val);
+          await (0, import_updateDevicePower.updateDevicePower)(adapter2, store.device, mode.val);
         }
         const silent = await this.getStateAsync(`${dpRoot}.silent`);
         if (silent && !silent.ack && silent.val) {
-          await (0, import_updateDevicePower.updateDevicePower)(store.device, silent.val);
+          await (0, import_updateDevicePower.updateDevicePower)(adapter2, store.device, silent.val);
         }
       } catch (error) {
         store._this.log.error(JSON.stringify(error));
@@ -105,7 +106,7 @@ class MidasAquatemp extends utils.Adapter {
     tokenRefreshTimer = this.setInterval(async function() {
       store.token = "";
       store._this.log.debug("Token will be refreshed.");
-      await (0, import_token.updateToken)();
+      await (0, import_token.updateToken)(adapter2);
     }, 36e5);
     this.on("stateChange", async (id, state) => {
       try {
@@ -116,21 +117,21 @@ class MidasAquatemp extends utils.Adapter {
           this.log.debug(`Mode: ${JSON.stringify(state)}`);
           if ((0, import_utils.isStateValue)(state)) {
             const mode = parseInt(state.val);
-            await (0, import_updateDevicePower.updateDevicePower)(store.device, mode);
+            await (0, import_updateDevicePower.updateDevicePower)(adapter2, store.device, mode);
           }
           await this.setState(id, { ack: true });
         }
         if (id === `${dpRoot}.silent`) {
           this.log.debug(`Silent: ${JSON.stringify(state)}`);
           if ((0, import_utils.isStateValue)(state)) {
-            await (0, import_updateDeviceSilent.updateDeviceSilent)(store.device, state.val);
+            await (0, import_updateDeviceSilent.updateDeviceSilent)(adapter2, store.device, state.val);
           }
           await this.setState(id, { ack: true });
         }
         if (id === `${dpRoot}.tempSet`) {
           this.log.debug(`TempSet: ${JSON.stringify(state)}`);
           if ((0, import_utils.isStateValue)(state)) {
-            await (0, import_updateDeviceSetTemp.updateDeviceSetTemp)(store.device, state.val);
+            await (0, import_updateDeviceSetTemp.updateDeviceSetTemp)(adapter2, store.device, state.val);
           }
           await this.setState(id, { ack: true });
         }
