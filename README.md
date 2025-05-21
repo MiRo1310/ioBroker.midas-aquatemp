@@ -37,7 +37,7 @@ If you have problems, contact us.
 	Placeholder for the next version (at the beginning of the line):
 	### **WORK IN PROGRESS**
 -->
-### **WORK IN PROGRESS**
+### 1.2.0 (2025-05-21)
 
 -   FEAT: Add sentry to the adapter
 -   FIX: #24 Silent mode cannot be disabled

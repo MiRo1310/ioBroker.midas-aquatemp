@@ -1,8 +1,21 @@
 {
   "common": {
     "name": "midas-aquatemp",
-    "version": "1.1.1",
+    "version": "1.2.0",
     "news": {
+      "1.2.0": {
+        "en": "FEAT: Add sentry to the adapter\nFIX: #24 Silent mode cannot be disabled\nFIX: #44 Cannot read properties of undefined (reading 'description')\nFEAT: Update dependencies and migrate to eslint 9",
+        "de": "FEAT: Senden an den Adapter hinzufügen\nFIX: #24 Ruhemodus kann nicht deaktiviert werden\nFIX: #44 Kann keine Eigenschaften von undefiniert lesen (lesen 'description')\nFEAT: Aktualisieren Sie Abhängigkeiten und migrieren Sie zu Eslint 9",
+        "ru": "FEAT: Добавьте часовой к адаптеру\nFIX: #24 Безмолвный режим нельзя отключить\nFIX: #44 Невозможно прочитать свойства неопределенного (чтение описания)\nОбновление зависимостей и миграция в eslint 9",
+        "pt": "FEAT: Adicionar sentinela ao adaptador\nFIX: #24 O modo silencioso não pode ser desativado\nFIX: #44 Não é possível ler propriedades indefinidas (ler 'descrição')\nFEAT: Atualizar dependências e migrar para eslint 9",
+        "nl": "FEAT: voeg wacht aan de adapter\nFIX: #24 Stille modus kan niet worden uitgeschakeld\nFIX: #44 Kan eigenschappen van ongedefinieerde niet lezen (lees 'beschrijving')\nFEAT: Update afhankelijkheden en migreren naar eslint 9",
+        "fr": "VIANDE: Ajouter une sentinelle à l'adaptateur\nFIX: #24 Le mode silencieux ne peut pas être désactivé\nFIXE: #44 Impossible de lire les propriétés non définies (lecture de 'description')\nFeat: Mettre à jour les dépendances et migrer vers eslint 9",
+        "it": "FEAT: Aggiungere la sentinella all'adattatore\nFIX: #24 La modalità silenziosa non può essere disabilitata\nFIX: #44 Non è possibile leggere le proprietà di undefined (leggendo 'descrizione')\nFEAT: Aggiornare le dipendenze e migrare a eslint 9",
+        "es": "FEAT: Añadir el centinela al adaptador\nFIX: #24 El modo silencioso no puede ser deshabilitado\nFIX: #44 No se pueden leer propiedades indefinidas (leer 'descripción')\nFEAT: Actualizar las dependencias y migrar a eslint 9",
+        "pl": "FEAT: Dodaj wartownik do adaptera\nFIX: # 24 Tryb cichy nie może być wyłączony\nFIX: # 44 Nie można odczytać właściwości nieokreślonych (odczyt 'opis')\nFEAT: Aktualizacja zależności i migracja do eslint 9",
+        "uk": "FEAT: Додати відправку до адаптера\nFIX: #24 Безшумний режим\nFIX: #44 Не прочитайте властивості невизначеного (редагування 'description')\nFEAT: Оновити залежності і мігрувати до eslint 9",
+        "zh-cn": "FEAT: 在适配器上添加哨兵\nFIX: #24 沉默模式无法禁用\nFIX: # 44 无法读取未定义的属性( 正在读取“ 描述 ” )\nFEAT: 更新依赖性并迁移到埃斯林9"
+      },
       "1.1.1": {
         "en": "FIX: #17 state change mode",
         "de": "FIX: #17 Zustandswechselmodus",
