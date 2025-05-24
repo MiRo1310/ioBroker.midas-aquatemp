@@ -61,6 +61,7 @@ async function updateDeviceStatus(adapter) {
         }
       );
       store.reachable = apiLevel < 3 ? ((_b = (_a = response.data.object_result) == null ? void 0 : _a[0]) == null ? void 0 : _b.device_status) == "ONLINE" : ((_d = (_c = response.data.objectResult) == null ? void 0 : _c[0]) == null ? void 0 : _d.deviceStatus) == "ONLINE";
+      adapter.log.debug(`DeviceStatus: ${JSON.stringify(response.data)}`);
       if (parseInt(response.data.error_code) == 0) {
         if (((_f = (_e = response.data) == null ? void 0 : _e.object_result) == null ? void 0 : _f.is_fault) || ((_h = (_g = response.data) == null ? void 0 : _g.objectResult) == null ? void 0 : _h.isFault)) {
           store._this.log.error(`Error in updateDeviceStatus(): ${JSON.stringify(response.data)}`);
