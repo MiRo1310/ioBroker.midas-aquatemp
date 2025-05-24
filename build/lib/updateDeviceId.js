@@ -60,7 +60,7 @@ async function updateDeviceID(adapter) {
       return;
     }
     if (!((_c = (_b = (_a = response.data) == null ? void 0 : _a.object_result) == null ? void 0 : _b[0]) == null ? void 0 : _c.device_code) && !((_f = (_e = (_d = response.data) == null ? void 0 : _d.objectResult) == null ? void 0 : _e[0]) == null ? void 0 : _f.deviceCode)) {
-      adapter.log.error("Error in updateDeviceID(): No device code found");
+      adapter.log.error("Error in updateDeviceID: No device code found");
       adapter.log.error(`Response: ${JSON.stringify(response.data)}`);
       return;
     }
@@ -90,7 +90,9 @@ async function updateDeviceID(adapter) {
     store.resetOnErrorHandler();
   } catch (error) {
     (0, import_logging.errorLogger)("Error in updateDeviceID", error, adapter);
-    store.token = "", store.device = "", store.reachable = false;
+    store.token = "";
+    store.device = "";
+    store.reachable = false;
   }
 }
 // Annotate the CommonJS export names for ESM import in node:

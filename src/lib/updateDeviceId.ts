@@ -33,7 +33,7 @@ export async function updateDeviceID(adapter: MidasAquatemp): Promise<void> {
         }
 
         if (!response.data?.object_result?.[0]?.device_code && !response.data?.objectResult?.[0]?.deviceCode) {
-            adapter.log.error('Error in updateDeviceID(): No device code found');
+            adapter.log.error('Error in updateDeviceID: No device code found');
             adapter.log.error(`Response: ${JSON.stringify(response.data)}`);
             return;
         }
@@ -67,6 +67,8 @@ export async function updateDeviceID(adapter: MidasAquatemp): Promise<void> {
     } catch (error: any) {
         errorLogger('Error in updateDeviceID', error, adapter);
 
-        (store.token = ''), (store.device = ''), (store.reachable = false);
+        store.token = '';
+        store.device = '';
+        store.reachable = false;
     }
 }

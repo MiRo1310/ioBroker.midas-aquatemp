@@ -35,6 +35,8 @@ export async function updateDeviceStatus(adapter: MidasAquatemp): Promise<void> 
                     ? response.data.object_result?.[0]?.device_status == 'ONLINE'
                     : response.data.objectResult?.[0]?.deviceStatus == 'ONLINE';
 
+            adapter.log.debug(`DeviceStatus: ${JSON.stringify(response.data)}`);
+
             if (parseInt(response.data.error_code) == 0) {
                 if (response.data?.object_result?.is_fault || response.data?.objectResult?.isFault) {
                     store._this.log.error(`Error in updateDeviceStatus(): ${JSON.stringify(response.data)}`);
