@@ -1,8 +1,21 @@
 {
   "common": {
     "name": "midas-aquatemp",
-    "version": "1.2.0",
+    "version": "1.2.1",
     "news": {
+      "1.2.1": {
+        "en": "FIX: #50 Cannot read properties of undefined",
+        "de": "FIX: #50 Kann nicht lesen Eigenschaften von undefiniert",
+        "ru": "FIX: #50 Невозможно прочитать свойства неопределенного",
+        "pt": "FIX: #50 Não é possível ler propriedades indefinidas",
+        "nl": "FIX: #50 Kan eigenschappen van ongedefinieerde niet lezen",
+        "fr": "FIX: #50 Impossible de lire les propriétés non définies",
+        "it": "FIX: #50 Le proprietà di lettura non definite",
+        "es": "FIX: #50 No se pueden leer propiedades de indefinidos",
+        "pl": "FIX: # 50 Nie można odczytać właściwości nieokreślonych",
+        "uk": "FIX: #50 Не можна прочитати властивості невизначеного",
+        "zh-cn": "FIX: #50 无法读取未定义的属性"
+      },
       "1.2.0": {
         "en": "FEAT: Add sentry to the adapter\nFIX: #24 Silent mode cannot be disabled\nFIX: #44 Cannot read properties of undefined (reading 'description')\nFEAT: Update dependencies and migrate to eslint 9",
         "de": "FEAT: Senden an den Adapter hinzufügen\nFIX: #24 Ruhemodus kann nicht deaktiviert werden\nFIX: #44 Kann keine Eigenschaften von undefiniert lesen (lesen 'description')\nFEAT: Aktualisieren Sie Abhängigkeiten und migrieren Sie zu Eslint 9",
