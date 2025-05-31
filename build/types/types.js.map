@@ -1,0 +1,7 @@
+{
+  "version": 3,
+  "sources": ["../../src/types/types.ts"],
+  "sourcesContent": ["export type ObjectResultResponse = ObjectResult[];\n\nexport interface ObjectResult {\n    value: string;\n    code: string;\n}\n\nexport interface MidasData {\n    object_result?: {\n        device_status: 'ONLINE' | 'OFFLINE';\n        is_fault: boolean;\n        fault_code: string;\n        error_level: number;\n        description: string;\n    }[];\n    objectResult?: {\n        deviceStatus: 'ONLINE' | 'OFFLINE';\n        isFault: boolean;\n        faultCode: string;\n        errorLevel: number;\n        description: string;\n    }[];\n    error_code: string;\n}\n"],
+  "mappings": ";;;;;;;;;;;;;;AAAA;AAAA;",
+  "names": []
+}

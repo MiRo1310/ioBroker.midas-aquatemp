@@ -6,7 +6,7 @@ import { initStore } from './store';
 import { errorLogger } from './logging';
 import type { MidasAquatemp } from '../main';
 import { request } from './axios';
-import type { ObjectResultResponse } from '../types/types';
+import type { MidasData, ObjectResultResponse } from '../types/types';
 
 export const numberToBoolean = (value: number): boolean => {
     return value === 1;
@@ -81,14 +81,14 @@ const saveValues = async (adapter: MidasAquatemp, value: any): Promise<void> => 
 export async function updateDeviceDetails(adapter: MidasAquatemp): Promise<void> {
     const store = initStore();
     try {
-        const { apiLevel, token, device: deviceCode } = store;
+        const { token, device: deviceCode } = store;
         if (!token || !deviceCode) {
             return;
         }
 
         const { sURL } = getSUrlUpdateDeviceId();
 
-        const { data } = await request(adapter, sURL, getProtocolCodes(deviceCode), getHeaders(token));
+        const { data } = await request<MidasData>(adapter, sURL, getProtocolCodes(deviceCode), getHeaders(token));
 
         if (!data) {
             return;

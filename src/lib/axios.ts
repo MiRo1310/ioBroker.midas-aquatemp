@@ -1,14 +1,13 @@
 import axios from 'axios';
 import { errorLogger } from './logging';
 import type { MidasAquatemp } from '../main';
-import type { MidasData } from '../types/types';
 
-export const request = async (
+export const request = async <T>(
     adapter: MidasAquatemp,
     url: string,
     options = {},
     header = { headers: {} },
-): Promise<{ status?: number; data?: MidasData }> => {
+): Promise<{ status?: number; data: T | undefined }> => {
     try {
         const result = await axios.post(url, options, header);
         if (result.status === 200) {
