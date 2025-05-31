@@ -37,6 +37,10 @@ If you have problems, contact us.
 	Placeholder for the next version (at the beginning of the line):
 	### **WORK IN PROGRESS**
 -->
+### **WORK IN PROGRESS**
+
+-   FIX: Reported errors by sentry
+
 ### 1.2.1 (2025-05-24)
 
 -   FIX: #50 Cannot read properties of undefined
