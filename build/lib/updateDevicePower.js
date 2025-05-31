@@ -44,18 +44,15 @@ async function updateDevicePower(adapter, deviceCode, power) {
       (0, import_axiosParameter.getAxiosUpdateDevicePowerParams)({ deviceCode, value: powerOpt, protocolCode: "Power" }),
       (0, import_axiosParameter.getHeaders)(token)
     );
-    if (!data) {
+    if (!data || !(0, import_utils.noError)(data.error_code)) {
+      store.resetOnErrorHandler();
       return;
     }
     adapter.log.debug(`DeviceStatus: ${JSON.stringify(data)}`);
-    if ((0, import_utils.noError)(data.error_code)) {
-      await (0, import_saveValue.saveValue)({ key: "mode", value: power.toString(), stateType: "string", adapter });
-      if (power >= 0) {
-        await updateDeviceMode(adapter, store.device, power);
-      }
-      return;
+    await (0, import_saveValue.saveValue)({ key: "mode", value: power.toString(), stateType: "string", adapter });
+    if (power >= 0) {
+      await updateDeviceMode(adapter, store.device, power);
     }
-    store.resetOnErrorHandler();
   } catch (error) {
     (0, import_logging.errorLogger)("Error in updateDevicePower", error, adapter);
   }
@@ -74,15 +71,12 @@ async function updateDeviceMode(adapter, deviceCode, mode) {
           headers: { "x-token": token }
         }
       );
-      if (!data) {
+      if (!data || !(0, import_utils.noError)(data.error_code)) {
+        store.resetOnErrorHandler();
         return;
       }
       adapter.log.debug(`DeviceStatus: ${JSON.stringify(data)}`);
-      if (data.error_code === "0") {
-        await (0, import_saveValue.saveValue)({ key: "mode", value: mode, stateType: "string", adapter });
-        return;
-      }
-      store.resetOnErrorHandler();
+      await (0, import_saveValue.saveValue)({ key: "mode", value: mode, stateType: "string", adapter });
     }
   } catch (error) {
     (0, import_logging.errorLogger)("Error in updateDeviceMode", error, adapter);

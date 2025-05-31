@@ -26,32 +26,27 @@ export async function updateDeviceStatus(adapter: MidasAquatemp): Promise<void> 
                 },
                 getHeaders(token),
             );
-            if (!data) {
+            if (!data || !noError(data.error_code)) {
+                store.resetOnErrorHandler();
                 return;
             }
-            {
-                store.reachable = (data.object_result?.[0]?.status ?? data.objectResult?.[0]?.status) == 'ONLINE';
-            }
 
-            if (noError(data.error_code)) {
-                adapter.log.debug(`DeviceStatus: ${JSON.stringify(data)}`);
+            store.reachable = (data.object_result?.[0]?.status ?? data.objectResult?.[0]?.status) == 'ONLINE';
 
-                if (data?.object_result?.[0]?.is_fault || data?.objectResult?.[0]?.isFault) {
-                    await saveValue({ key: 'error', value: true, stateType: 'boolean', adapter: adapter });
-                    await updateDeviceDetails(adapter);
-                    await updateDeviceErrorMsg(adapter);
-                    return;
-                }
-                // kein Fehler
-                await saveValue({ key: 'error', value: false, stateType: 'boolean', adapter: adapter });
-                await saveValue({ key: 'errorMessage', value: '', stateType: 'string', adapter: adapter });
-                await saveValue({ key: 'errorCode', value: '', stateType: 'string', adapter: adapter });
-                await saveValue({ key: 'errorLevel', value: 0, stateType: 'number', adapter: adapter });
+            adapter.log.debug(`DeviceStatus: ${JSON.stringify(data)}`);
+
+            if (data?.object_result?.[0]?.is_fault || data?.objectResult?.[0]?.isFault) {
+                await saveValue({ key: 'error', value: true, stateType: 'boolean', adapter: adapter });
                 await updateDeviceDetails(adapter);
-
+                await updateDeviceErrorMsg(adapter);
                 return;
             }
-            store.resetOnErrorHandler();
+            // kein Fehler
+            await saveValue({ key: 'error', value: false, stateType: 'boolean', adapter: adapter });
+            await saveValue({ key: 'errorMessage', value: '', stateType: 'string', adapter: adapter });
+            await saveValue({ key: 'errorCode', value: '', stateType: 'string', adapter: adapter });
+            await saveValue({ key: 'errorLevel', value: 0, stateType: 'number', adapter: adapter });
+            await updateDeviceDetails(adapter);
             return;
         }
         store.resetOnErrorHandler();

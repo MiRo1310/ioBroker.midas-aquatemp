@@ -46,28 +46,23 @@ async function updateDeviceStatus(adapter) {
         },
         (0, import_axiosParameter.getHeaders)(token)
       );
-      if (!data) {
+      if (!data || !(0, import_utils.noError)(data.error_code)) {
+        store.resetOnErrorHandler();
         return;
       }
-      {
-        store.reachable = ((_e = (_b = (_a = data.object_result) == null ? void 0 : _a[0]) == null ? void 0 : _b.status) != null ? _e : (_d = (_c = data.objectResult) == null ? void 0 : _c[0]) == null ? void 0 : _d.status) == "ONLINE";
-      }
-      if ((0, import_utils.noError)(data.error_code)) {
-        adapter.log.debug(`DeviceStatus: ${JSON.stringify(data)}`);
-        if (((_g = (_f = data == null ? void 0 : data.object_result) == null ? void 0 : _f[0]) == null ? void 0 : _g.is_fault) || ((_i = (_h = data == null ? void 0 : data.objectResult) == null ? void 0 : _h[0]) == null ? void 0 : _i.isFault)) {
-          await (0, import_saveValue.saveValue)({ key: "error", value: true, stateType: "boolean", adapter });
-          await (0, import_updateDeviceDetails.updateDeviceDetails)(adapter);
-          await (0, import_updateDeviceOnError.updateDeviceErrorMsg)(adapter);
-          return;
-        }
-        await (0, import_saveValue.saveValue)({ key: "error", value: false, stateType: "boolean", adapter });
-        await (0, import_saveValue.saveValue)({ key: "errorMessage", value: "", stateType: "string", adapter });
-        await (0, import_saveValue.saveValue)({ key: "errorCode", value: "", stateType: "string", adapter });
-        await (0, import_saveValue.saveValue)({ key: "errorLevel", value: 0, stateType: "number", adapter });
+      store.reachable = ((_e = (_b = (_a = data.object_result) == null ? void 0 : _a[0]) == null ? void 0 : _b.status) != null ? _e : (_d = (_c = data.objectResult) == null ? void 0 : _c[0]) == null ? void 0 : _d.status) == "ONLINE";
+      adapter.log.debug(`DeviceStatus: ${JSON.stringify(data)}`);
+      if (((_g = (_f = data == null ? void 0 : data.object_result) == null ? void 0 : _f[0]) == null ? void 0 : _g.is_fault) || ((_i = (_h = data == null ? void 0 : data.objectResult) == null ? void 0 : _h[0]) == null ? void 0 : _i.isFault)) {
+        await (0, import_saveValue.saveValue)({ key: "error", value: true, stateType: "boolean", adapter });
         await (0, import_updateDeviceDetails.updateDeviceDetails)(adapter);
+        await (0, import_updateDeviceOnError.updateDeviceErrorMsg)(adapter);
         return;
       }
-      store.resetOnErrorHandler();
+      await (0, import_saveValue.saveValue)({ key: "error", value: false, stateType: "boolean", adapter });
+      await (0, import_saveValue.saveValue)({ key: "errorMessage", value: "", stateType: "string", adapter });
+      await (0, import_saveValue.saveValue)({ key: "errorCode", value: "", stateType: "string", adapter });
+      await (0, import_saveValue.saveValue)({ key: "errorLevel", value: 0, stateType: "number", adapter });
+      await (0, import_updateDeviceDetails.updateDeviceDetails)(adapter);
       return;
     }
     store.resetOnErrorHandler();

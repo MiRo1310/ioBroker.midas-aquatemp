@@ -91,61 +91,57 @@ export async function updateDeviceDetails(adapter: MidasAquatemp): Promise<void>
 
         const { data } = await request<DeviceDetails>(adapter, sURL, getProtocolCodes(deviceCode), getHeaders(token));
 
-        if (!data) {
+        if (!data || !noError(data.error_code)) {
+            store.resetOnErrorHandler();
             return;
         }
+
         adapter.log.debug(`DeviceDetails: ${JSON.stringify(data)}`);
 
-        if (noError(data.error_code)) {
-            const responseValue = data.object_result ?? data.objectResult;
-            if (!responseValue || responseValue.length === 0) {
-                return;
-            }
-            await saveValue({
-                key: 'rawJSON',
-                value: JSON.stringify(responseValue),
-                stateType: 'string',
-                adapter: adapter,
-            });
-            await saveValues(adapter, responseValue);
-
-            const mode: number = findCodeVal(responseValue, 'Mode');
-            const modes: Modes = {
-                1: 'R02', // Heiz-Modus (-> R02)
-                0: 'R01', // Kühl-Modus (-> R01)
-                2: 'R03', // Auto-Modus (-> R03)
-            };
-
-            await saveValue({
-                key: 'tempSet',
-                value: parseFloat(findCodeVal(responseValue, modes[mode])),
-                stateType: 'number',
-                adapter: adapter,
-            });
-
-            await saveValue({
-                key: 'silent',
-                value: findCodeVal(responseValue, 'Manual-mute') == '1',
-                stateType: 'boolean',
-                adapter: adapter,
-            });
-
-            const powerOpt = findCodeVal(responseValue, 'Power') === '1';
-
-            await saveValue({ key: 'state', value: powerOpt, stateType: 'boolean', adapter: adapter });
-            await saveValue({
-                key: 'mode',
-                value: powerOpt ? findCodeVal(responseValue, 'Mode') : '-1',
-                stateType: 'string',
-                adapter: adapter,
-            });
-
-            await saveValue({ key: 'info.connection', value: true, stateType: 'boolean', adapter: adapter });
+        const responseValue = data.object_result ?? data.objectResult;
+        if (!responseValue || responseValue.length === 0) {
             return;
         }
+        await saveValue({
+            key: 'rawJSON',
+            value: JSON.stringify(responseValue),
+            stateType: 'string',
+            adapter: adapter,
+        });
+        await saveValues(adapter, responseValue);
 
-        store.resetOnErrorHandler();
-        return;
+        const mode: number = findCodeVal(responseValue, 'Mode');
+        const modes: Modes = {
+            1: 'R02', // Heiz-Modus (-> R02)
+            0: 'R01', // Kühl-Modus (-> R01)
+            2: 'R03', // Auto-Modus (-> R03)
+        };
+
+        await saveValue({
+            key: 'tempSet',
+            value: parseFloat(findCodeVal(responseValue, modes[mode])),
+            stateType: 'number',
+            adapter: adapter,
+        });
+
+        await saveValue({
+            key: 'silent',
+            value: findCodeVal(responseValue, 'Manual-mute') == '1',
+            stateType: 'boolean',
+            adapter: adapter,
+        });
+
+        const powerOpt = findCodeVal(responseValue, 'Power') === '1';
+
+        await saveValue({ key: 'state', value: powerOpt, stateType: 'boolean', adapter: adapter });
+        await saveValue({
+            key: 'mode',
+            value: powerOpt ? findCodeVal(responseValue, 'Mode') : '-1',
+            stateType: 'string',
+            adapter: adapter,
+        });
+
+        await saveValue({ key: 'info.connection', value: true, stateType: 'boolean', adapter: adapter });
     } catch (error: any) {
         errorLogger('Error updateDeviceDetails', error, adapter);
     }

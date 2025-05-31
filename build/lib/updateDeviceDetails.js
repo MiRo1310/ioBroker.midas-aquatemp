@@ -98,56 +98,52 @@ async function updateDeviceDetails(adapter) {
     }
     const { sURL } = (0, import_endPoints.getSUrlUpdateDeviceId)();
     const { data } = await (0, import_axios.request)(adapter, sURL, (0, import_axiosParameter.getProtocolCodes)(deviceCode), (0, import_axiosParameter.getHeaders)(token));
-    if (!data) {
+    if (!data || !(0, import_utils.noError)(data.error_code)) {
+      store.resetOnErrorHandler();
       return;
     }
     adapter.log.debug(`DeviceDetails: ${JSON.stringify(data)}`);
-    if ((0, import_utils.noError)(data.error_code)) {
-      const responseValue = (_a = data.object_result) != null ? _a : data.objectResult;
-      if (!responseValue || responseValue.length === 0) {
-        return;
-      }
-      await (0, import_saveValue.saveValue)({
-        key: "rawJSON",
-        value: JSON.stringify(responseValue),
-        stateType: "string",
-        adapter
-      });
-      await saveValues(adapter, responseValue);
-      const mode = findCodeVal(responseValue, "Mode");
-      const modes = {
-        1: "R02",
-        // Heiz-Modus (-> R02)
-        0: "R01",
-        // Kühl-Modus (-> R01)
-        2: "R03"
-        // Auto-Modus (-> R03)
-      };
-      await (0, import_saveValue.saveValue)({
-        key: "tempSet",
-        value: parseFloat(findCodeVal(responseValue, modes[mode])),
-        stateType: "number",
-        adapter
-      });
-      await (0, import_saveValue.saveValue)({
-        key: "silent",
-        value: findCodeVal(responseValue, "Manual-mute") == "1",
-        stateType: "boolean",
-        adapter
-      });
-      const powerOpt = findCodeVal(responseValue, "Power") === "1";
-      await (0, import_saveValue.saveValue)({ key: "state", value: powerOpt, stateType: "boolean", adapter });
-      await (0, import_saveValue.saveValue)({
-        key: "mode",
-        value: powerOpt ? findCodeVal(responseValue, "Mode") : "-1",
-        stateType: "string",
-        adapter
-      });
-      await (0, import_saveValue.saveValue)({ key: "info.connection", value: true, stateType: "boolean", adapter });
+    const responseValue = (_a = data.object_result) != null ? _a : data.objectResult;
+    if (!responseValue || responseValue.length === 0) {
       return;
     }
-    store.resetOnErrorHandler();
-    return;
+    await (0, import_saveValue.saveValue)({
+      key: "rawJSON",
+      value: JSON.stringify(responseValue),
+      stateType: "string",
+      adapter
+    });
+    await saveValues(adapter, responseValue);
+    const mode = findCodeVal(responseValue, "Mode");
+    const modes = {
+      1: "R02",
+      // Heiz-Modus (-> R02)
+      0: "R01",
+      // Kühl-Modus (-> R01)
+      2: "R03"
+      // Auto-Modus (-> R03)
+    };
+    await (0, import_saveValue.saveValue)({
+      key: "tempSet",
+      value: parseFloat(findCodeVal(responseValue, modes[mode])),
+      stateType: "number",
+      adapter
+    });
+    await (0, import_saveValue.saveValue)({
+      key: "silent",
+      value: findCodeVal(responseValue, "Manual-mute") == "1",
+      stateType: "boolean",
+      adapter
+    });
+    const powerOpt = findCodeVal(responseValue, "Power") === "1";
+    await (0, import_saveValue.saveValue)({ key: "state", value: powerOpt, stateType: "boolean", adapter });
+    await (0, import_saveValue.saveValue)({
+      key: "mode",
+      value: powerOpt ? findCodeVal(responseValue, "Mode") : "-1",
+      stateType: "string",
+      adapter
+    });
+    await (0, import_saveValue.saveValue)({ key: "info.connection", value: true, stateType: "boolean", adapter });
   } catch (error) {
     (0, import_logging.errorLogger)("Error updateDeviceDetails", error, adapter);
   }

@@ -23,9 +23,7 @@ export async function updateDeviceID(adapter: MidasAquatemp): Promise<void> {
             getAxiosUpdateDeviceIdParams(),
             getHeaders(token),
         );
-        if (!data) {
-            return;
-        }
+
         adapter.log.debug(`UpdateDeviceID response: ${JSON.stringify(data)}, status: ${status}`);
 
         if (!data || status !== 200 || !noError(data.error_code)) {

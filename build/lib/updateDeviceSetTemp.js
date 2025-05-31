@@ -47,11 +47,11 @@ const updateDeviceSetTemp = async (adapter, deviceCode, temperature) => {
         (0, import_axiosParameter.getHeaders)(token)
       );
       adapter.log.debug(`DeviceStatus: ${JSON.stringify(data)}`);
-      if ((0, import_utils.noError)(data == null ? void 0 : data.error_code)) {
-        await (0, import_saveValue.saveValue)({ key: "tempSet", value: temperature, stateType: "number", adapter });
+      if (!(0, import_utils.noError)(data == null ? void 0 : data.error_code)) {
+        store.resetOnErrorHandler();
         return;
       }
-      store.resetOnErrorHandler();
+      await (0, import_saveValue.saveValue)({ key: "tempSet", value: temperature, stateType: "number", adapter });
     }
   } catch (error) {
     (0, import_logging.errorLogger)("Error in updateDeviceSetTemp", error, adapter);

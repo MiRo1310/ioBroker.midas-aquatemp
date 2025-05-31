@@ -5,14 +5,7 @@ export interface ObjectResult {
     code: string;
 }
 
-export interface MidasData {
-    sessionid: null | string;
-    error_code: string; // "0"
-    error_msg: 'Success';
-    error_msg_code: string;
-    totalSize: number | null;
-    totalPage: number | null;
-    nextPage: number | null;
+export interface MidasData extends DefaultParams {
     object_result?: {
         device_status: 'ONLINE' | 'OFFLINE';
         is_fault: boolean;
@@ -33,7 +26,7 @@ export interface MidasData {
     }[];
 }
 
-export interface DeviceStatus {
+interface DefaultParams {
     sessionid: null | string;
     error_code: string; // "0"
     error_msg: 'Success';
@@ -42,6 +35,9 @@ export interface DeviceStatus {
     totalPage: number | null;
     nextPage: number | null;
     isReusltSuc: boolean;
+}
+
+export interface DeviceStatus extends DefaultParams {
     object_result?: {
         // TODO : Not validated Type
         is_fault: boolean;
@@ -55,15 +51,7 @@ export interface DeviceStatus {
     }[];
 }
 
-export interface UpdateDeviceId {
-    sessionid: null | string;
-    error_code: string; // "0"
-    error_msg: 'Success';
-    error_msg_code: string;
-    totalSize: number | null;
-    totalPage: number | null;
-    nextPage: number | null;
-    isReusltSuc: boolean;
+export interface UpdateDeviceId extends DefaultParams {
     object_result?: {
         houseId: string; // TODO : Not validated Type
         dtuSoftwareCode: null | string;
@@ -128,15 +116,7 @@ export interface UpdateDeviceId {
     }[];
 }
 
-export interface DeviceDetails {
-    sessionid: null | string;
-    error_code: string;
-    error_msg: string;
-    error_msg_code: string;
-    totalSize: number | null;
-    totalPage: number | null;
-    nextPage: number | null;
-    isReusltSuc: boolean;
+export interface DeviceDetails extends DefaultParams {
     object_result?: ObjectResultResponse;
     objectResult?: ObjectResultResponse;
 }

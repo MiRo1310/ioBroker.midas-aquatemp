@@ -32,26 +32,22 @@ async function getToken(adapter) {
   const store = (0, import_store.initStore)();
   try {
     const { token } = store;
-    if (!token) {
-      adapter.log.debug("Request token");
-      const { sUrl, options } = (0, import_endPoints.getOptionsAndSUrl)();
-      const { data, status } = await (0, import_axios.request)(adapter, sUrl, options);
-      if (!data) {
-        adapter.log.error("No response from server");
-        return;
-      }
-      if (status === 200) {
-        store.token = (_d = (_c = (_a = data == null ? void 0 : data.object_result) == null ? void 0 : _a["x-token"]) != null ? _c : (_b = data == null ? void 0 : data.objectResult) == null ? void 0 : _b["x-token"]) != null ? _d : null;
-        if (store.token) {
-          adapter.log.debug("Login ok! Token");
-        } else {
-          adapter.log.error(`Login-error: ${JSON.stringify(data)}`);
-        }
-        return;
-      }
+    if (token) {
+      return;
+    }
+    adapter.log.debug("Request token");
+    const { sUrl, options } = (0, import_endPoints.getOptionsAndSUrl)();
+    const { data, status } = await (0, import_axios.request)(adapter, sUrl, options);
+    if (status !== 200 || !data) {
       adapter.log.error(`Login-error: ${JSON.stringify(data)}`);
       store.resetOnErrorHandler();
       return;
+    }
+    store.token = (_d = (_c = (_a = data == null ? void 0 : data.object_result) == null ? void 0 : _a["x-token"]) != null ? _c : (_b = data == null ? void 0 : data.objectResult) == null ? void 0 : _b["x-token"]) != null ? _d : null;
+    if (store.token) {
+      adapter.log.debug("Login ok! Token");
+    } else {
+      adapter.log.error(`Login-error: ${JSON.stringify(data)}`);
     }
   } catch (error) {
     (0, import_logging.errorLogger)("Error in getToken", error, adapter);

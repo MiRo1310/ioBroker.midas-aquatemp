@@ -11,74 +11,48 @@ export async function updateDeviceErrorMsg(adapter: MidasAquatemp): Promise<void
     const store = initStore();
     try {
         const { token, apiLevel, cloudURL, device: deviceCode } = store;
-        if (token) {
-            const sURL =
-                apiLevel < 3
-                    ? `${cloudURL}/app/device/getFaultDataByDeviceCode.json`
-                    : `${cloudURL}/app/device/getFaultDataByDeviceCode`;
+        if (!token) {
+            return;
+        }
+        const sURL =
+            apiLevel < 3
+                ? `${cloudURL}/app/device/getFaultDataByDeviceCode.json`
+                : `${cloudURL}/app/device/getFaultDataByDeviceCode`;
 
-            const { data } = await request<MidasData>(
-                adapter,
-                sURL,
-                {
-                    device_code: deviceCode,
-                    deviceCode: deviceCode,
-                },
-                getHeaders(token),
-            );
-            if (!data) {
-                return;
-            }
+        const { data } = await request<MidasData>(
+            adapter,
+            sURL,
+            {
+                device_code: deviceCode,
+                deviceCode: deviceCode,
+            },
+            getHeaders(token),
+        );
 
-            if (noError(data.error_code)) {
-                await saveValue({ key: 'error', value: true, stateType: 'boolean', adapter: adapter });
-
-                if (apiLevel < 3) {
-                    await saveValue({
-                        key: 'errorMessage',
-                        value: data.object_result?.[0]?.description ?? '',
-                        stateType: 'string',
-                        adapter: adapter,
-                    });
-                    await saveValue({
-                        key: 'errorCode',
-                        value: data.object_result?.[0]?.fault_code,
-                        stateType: 'string',
-                        adapter: adapter,
-                    });
-                    await saveValue({
-                        key: 'errorLevel',
-                        value: data.object_result?.[0]?.error_level,
-                        stateType: 'string',
-                        adapter: adapter,
-                    });
-                    return;
-                }
-                await saveValue({
-                    key: 'errorMessage',
-                    value: data.objectResult?.[0]?.description ?? '',
-                    stateType: 'string',
-                    adapter: adapter,
-                });
-                await saveValue({
-                    key: 'errorCode',
-                    value: data.objectResult?.[0]?.faultCode,
-                    stateType: 'string',
-                    adapter: adapter,
-                });
-                await saveValue({
-                    key: 'errorLevel',
-                    value: data.objectResult?.[0]?.errorLevel,
-                    stateType: 'string',
-                    adapter: adapter,
-                });
-                return;
-            }
-            // Login-Fehler
+        if (!data || !noError(data.error_code)) {
             store.resetOnErrorHandler();
             return;
         }
-        return;
+
+        await saveValue({ key: 'error', value: true, stateType: 'boolean', adapter: adapter });
+        await saveValue({
+            key: 'errorMessage',
+            value: data.objectResult?.[0]?.description ?? data.object_result?.[0]?.description ?? '',
+            stateType: 'string',
+            adapter: adapter,
+        });
+        await saveValue({
+            key: 'errorCode',
+            value: data.objectResult?.[0]?.faultCode ?? data.object_result?.[0]?.fault_code,
+            stateType: 'string',
+            adapter: adapter,
+        });
+        await saveValue({
+            key: 'errorLevel',
+            value: data.objectResult?.[0]?.errorLevel ?? data.object_result?.[0]?.error_level,
+            stateType: 'string',
+            adapter: adapter,
+        });
     } catch (error: any) {
         errorLogger('Error in updateDeviceErrorMsg', error, adapter);
     }

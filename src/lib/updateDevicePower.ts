@@ -26,19 +26,16 @@ export async function updateDevicePower(adapter: MidasAquatemp, deviceCode: stri
             getAxiosUpdateDevicePowerParams({ deviceCode, value: powerOpt, protocolCode: 'Power' }),
             getHeaders(token),
         );
-        if (!data) {
+        if (!data || !noError(data.error_code)) {
+            store.resetOnErrorHandler();
             return;
         }
         adapter.log.debug(`DeviceStatus: ${JSON.stringify(data)}`);
-        if (noError(data.error_code)) {
-            await saveValue({ key: 'mode', value: power.toString(), stateType: 'string', adapter: adapter });
-            if (power >= 0) {
-                await updateDeviceMode(adapter, store.device, power);
-            }
-            return;
-        }
 
-        store.resetOnErrorHandler();
+        await saveValue({ key: 'mode', value: power.toString(), stateType: 'string', adapter: adapter });
+        if (power >= 0) {
+            await updateDeviceMode(adapter, store.device, power);
+        }
     } catch (error: any) {
         errorLogger('Error in updateDevicePower', error, adapter);
     }
@@ -58,17 +55,13 @@ async function updateDeviceMode(adapter: MidasAquatemp, deviceCode: string, mode
                     headers: { 'x-token': token },
                 },
             );
-            if (!data) {
+            if (!data || !noError(data.error_code)) {
+                store.resetOnErrorHandler();
                 return;
             }
             adapter.log.debug(`DeviceStatus: ${JSON.stringify(data)}`);
 
-            if (data.error_code === '0') {
-                await saveValue({ key: 'mode', value: mode, stateType: 'string', adapter: adapter });
-                return;
-            }
-
-            store.resetOnErrorHandler();
+            await saveValue({ key: 'mode', value: mode, stateType: 'string', adapter: adapter });
         }
     } catch (error: any) {
         errorLogger('Error in updateDeviceMode', error, adapter);

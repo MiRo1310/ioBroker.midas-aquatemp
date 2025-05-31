@@ -13,30 +13,26 @@ async function getToken(adapter: MidasAquatemp): Promise<void> {
     try {
         const { token } = store;
 
-        if (!token) {
-            adapter.log.debug('Request token');
-            const { sUrl, options } = getOptionsAndSUrl();
+        if (token) {
+            return;
+        }
 
-            const { data, status } = await request<RequestToken>(adapter, sUrl, options);
-            if (!data) {
-                adapter.log.error('No response from server');
-                return;
-            }
-            if (status === 200) {
-                store.token = data?.object_result?.['x-token'] ?? data?.objectResult?.['x-token'] ?? null;
+        adapter.log.debug('Request token');
+        const { sUrl, options } = getOptionsAndSUrl();
 
-                if (store.token) {
-                    adapter.log.debug('Login ok! Token');
-                } else {
-                    adapter.log.error(`Login-error: ${JSON.stringify(data)}`);
-                }
+        const { data, status } = await request<RequestToken>(adapter, sUrl, options);
 
-                return;
-            }
-
+        if (status !== 200 || !data) {
             adapter.log.error(`Login-error: ${JSON.stringify(data)}`);
             store.resetOnErrorHandler();
             return;
+        }
+        store.token = data?.object_result?.['x-token'] ?? data?.objectResult?.['x-token'] ?? null;
+
+        if (store.token) {
+            adapter.log.debug('Login ok! Token');
+        } else {
+            adapter.log.error(`Login-error: ${JSON.stringify(data)}`);
         }
     } catch (error) {
         errorLogger('Error in getToken', error, adapter);

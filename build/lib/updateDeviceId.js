@@ -43,9 +43,6 @@ async function updateDeviceID(adapter) {
       (0, import_axiosParameter.getAxiosUpdateDeviceIdParams)(),
       (0, import_axiosParameter.getHeaders)(token)
     );
-    if (!data) {
-      return;
-    }
     adapter.log.debug(`UpdateDeviceID response: ${JSON.stringify(data)}, status: ${status}`);
     if (!data || status !== 200 || !(0, import_utils.noError)(data.error_code)) {
       store.resetOnErrorHandler();
