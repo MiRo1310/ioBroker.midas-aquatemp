@@ -23,7 +23,13 @@ __export(saveValue_exports, {
 module.exports = __toCommonJS(saveValue_exports);
 var import_store = require("./store");
 var import_logging = require("./logging");
-const saveValue = async (key, value, stateType, adapter) => {
+var import_utils = require("./utils");
+const saveValue = async ({
+  key,
+  value,
+  stateType,
+  adapter
+}) => {
   const store = (0, import_store.initStore)();
   const dpRoot = store.getDpRoot();
   try {
@@ -41,7 +47,7 @@ const saveValue = async (key, value, stateType, adapter) => {
         native: {}
       });
     }
-    if (value) {
+    if ((0, import_utils.isDefined)(value)) {
       await adapter.setState(dp, value, true);
     }
   } catch (err) {

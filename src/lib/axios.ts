@@ -9,7 +9,7 @@ export const request = async (
     url: string,
     options = {},
     header = { headers: {} },
-): Promise<AxiosResponse | null> => {
+): Promise<AxiosResponse | undefined> => {
     try {
         const result = await axios.post(url, options, header);
         if (result.status === 200) {

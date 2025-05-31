@@ -25,6 +25,9 @@ export async function updateDeviceErrorMsg(adapter: MidasAquatemp): Promise<void
                     headers: { 'x-token': token },
                 },
             );
+            if (!response?.data) {
+                return;
+            }
 
             if (parseInt(response.data.error_code) == 0) {
                 await saveValue({ key: 'error', value: true, stateType: 'boolean', adapter: adapter });

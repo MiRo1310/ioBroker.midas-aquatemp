@@ -1,9 +1,7 @@
 "use strict";
-var __create = Object.create;
 var __defProp = Object.defineProperty;
 var __getOwnPropDesc = Object.getOwnPropertyDescriptor;
 var __getOwnPropNames = Object.getOwnPropertyNames;
-var __getProtoOf = Object.getPrototypeOf;
 var __hasOwnProp = Object.prototype.hasOwnProperty;
 var __export = (target, all) => {
   for (var name in all)
@@ -17,24 +15,16 @@ var __copyProps = (to, from, except, desc) => {
   }
   return to;
 };
-var __toESM = (mod, isNodeMode, target) => (target = mod != null ? __create(__getProtoOf(mod)) : {}, __copyProps(
-  // If the importer is in node compatibility mode or this is not an ESM
-  // file that has been converted to a CommonJS file using a Babel-
-  // compatible transform (i.e. "__esModule" has not been set), then set
-  // "default" to the CommonJS "module.exports" for node compatibility.
-  isNodeMode || !mod || !mod.__esModule ? __defProp(target, "default", { value: mod, enumerable: true }) : target,
-  mod
-));
 var __toCommonJS = (mod) => __copyProps(__defProp({}, "__esModule", { value: true }), mod);
 var updateDeviceOnError_exports = {};
 __export(updateDeviceOnError_exports, {
   updateDeviceErrorMsg: () => updateDeviceErrorMsg
 });
 module.exports = __toCommonJS(updateDeviceOnError_exports);
-var import_axios = __toESM(require("axios"));
 var import_saveValue = require("./saveValue");
 var import_store = require("./store");
 var import_logging = require("./logging");
+var import_axios = require("./axios");
 async function updateDeviceErrorMsg(adapter) {
   var _a, _b, _c, _d, _e, _f, _g, _h;
   const store = (0, import_store.initStore)();
@@ -42,7 +32,8 @@ async function updateDeviceErrorMsg(adapter) {
     const { token, apiLevel, cloudURL, device: deviceCode } = store;
     if (token) {
       const sURL = apiLevel < 3 ? `${cloudURL}/app/device/getFaultDataByDeviceCode.json` : `${cloudURL}/app/device/getFaultDataByDeviceCode`;
-      const response = await import_axios.default.post(
+      const response = await (0, import_axios.request)(
+        adapter,
         sURL,
         {
           device_code: deviceCode,
@@ -52,22 +43,50 @@ async function updateDeviceErrorMsg(adapter) {
           headers: { "x-token": token }
         }
       );
+      if (!(response == null ? void 0 : response.data)) {
+        return;
+      }
       if (parseInt(response.data.error_code) == 0) {
-        await (0, import_saveValue.saveValue)("error", true, "boolean", adapter);
+        await (0, import_saveValue.saveValue)({ key: "error", value: true, stateType: "boolean", adapter });
         if (apiLevel < 3) {
-          await (0, import_saveValue.saveValue)(
-            "errorMessage",
-            (_b = (_a = response.data.object_result[0]) == null ? void 0 : _a.description) != null ? _b : "",
-            "string",
+          await (0, import_saveValue.saveValue)({
+            key: "errorMessage",
+            value: (_b = (_a = response.data.object_result[0]) == null ? void 0 : _a.description) != null ? _b : "",
+            stateType: "string",
             adapter
-          );
-          await (0, import_saveValue.saveValue)("errorCode", (_c = response.data.object_result[0]) == null ? void 0 : _c.fault_code, "string", adapter);
-          await (0, import_saveValue.saveValue)("errorLevel", (_d = response.data.object_result[0]) == null ? void 0 : _d.error_level, "string", adapter);
+          });
+          await (0, import_saveValue.saveValue)({
+            key: "errorCode",
+            value: (_c = response.data.object_result[0]) == null ? void 0 : _c.fault_code,
+            stateType: "string",
+            adapter
+          });
+          await (0, import_saveValue.saveValue)({
+            key: "errorLevel",
+            value: (_d = response.data.object_result[0]) == null ? void 0 : _d.error_level,
+            stateType: "string",
+            adapter
+          });
           return;
         }
-        await (0, import_saveValue.saveValue)("errorMessage", (_f = (_e = response.data.objectResult[0]) == null ? void 0 : _e.description) != null ? _f : "", "string", adapter);
-        await (0, import_saveValue.saveValue)("errorCode", (_g = response.data.objectResult[0]) == null ? void 0 : _g.fault_code, "string", adapter);
-        await (0, import_saveValue.saveValue)("errorLevel", (_h = response.data.objectResult[0]) == null ? void 0 : _h.error_level, "string", adapter);
+        await (0, import_saveValue.saveValue)({
+          key: "errorMessage",
+          value: (_f = (_e = response.data.objectResult[0]) == null ? void 0 : _e.description) != null ? _f : "",
+          stateType: "string",
+          adapter
+        });
+        await (0, import_saveValue.saveValue)({
+          key: "errorCode",
+          value: (_g = response.data.objectResult[0]) == null ? void 0 : _g.fault_code,
+          stateType: "string",
+          adapter
+        });
+        await (0, import_saveValue.saveValue)({
+          key: "errorLevel",
+          value: (_h = response.data.objectResult[0]) == null ? void 0 : _h.error_level,
+          stateType: "string",
+          adapter
+        });
         return;
       }
       store.resetOnErrorHandler();

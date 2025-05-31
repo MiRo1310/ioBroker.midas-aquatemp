@@ -1,4 +1,4 @@
-import { MidasAquatemp } from '../main';
+import type { MidasAquatemp } from '../main';
 import { getUpdateDeviceStatusSUrl } from './endPoints';
 import { saveValue } from './saveValue';
 import { initStore } from './store';
@@ -7,14 +7,9 @@ import { updateDeviceErrorMsg } from './updateDeviceOnError';
 import { errorLogger } from './logging';
 import { request } from './axios';
 
-let _this: MidasAquatemp;
-
 export async function updateDeviceStatus(adapter: MidasAquatemp): Promise<void> {
     const store = initStore();
     try {
-        if (!_this) {
-            _this = MidasAquatemp.getInstance();
-        }
         const { token, device: deviceCode, apiLevel } = store;
         if (token) {
             const { sURL } = getUpdateDeviceStatusSUrl();
@@ -30,17 +25,21 @@ export async function updateDeviceStatus(adapter: MidasAquatemp): Promise<void> 
                     headers: { 'x-token': token },
                 },
             );
-
-            store.reachable =
-                apiLevel < 3
-                    ? response.data.object_result?.[0]?.device_status == 'ONLINE'
-                    : response.data.objectResult?.[0]?.deviceStatus == 'ONLINE';
-
-            adapter.log.debug(`DeviceStatus: ${JSON.stringify(response.data)}`);
+            if (!response?.data) {
+                return;
+            }
+            {
+                store.reachable =
+                    apiLevel < 3
+                        ? response.data.object_result?.[0]?.device_status == 'ONLINE'
+                        : response.data.objectResult?.[0]?.deviceStatus == 'ONLINE';
+            }
 
             if (parseInt(response.data.error_code) == 0) {
-                if (response.data?.object_result?.is_fault || response.data?.objectResult?.isFault) {
-                    store._this.log.error(`Error in updateDeviceStatus(): ${JSON.stringify(response.data)}`);
+                adapter.log.debug(`DeviceStatus: ${JSON.stringify(response.data)}`);
+
+                if (response.data?.object_result?.is_fault || response?.data?.objectResult?.isFault) {
+                    adapter.log.error(`Error in updateDeviceStatus(): ${JSON.stringify(response.data)}`);
                     // TODO: Fehlerbeschreibung abrufen
                     //clearValues();
                     await saveValue({ key: 'error', value: true, stateType: 'boolean', adapter: adapter });
@@ -62,6 +61,6 @@ export async function updateDeviceStatus(adapter: MidasAquatemp): Promise<void> 
         }
         store.resetOnErrorHandler();
     } catch (error: any) {
-        errorLogger('Error in updateDeviceStatus', error, store._this);
+        errorLogger('Error in updateDeviceStatus', error, adapter);
     }
 }

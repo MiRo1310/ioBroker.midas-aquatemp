@@ -5,6 +5,7 @@ import { saveValue } from './saveValue';
 import { initStore } from './store';
 import { updateDeviceStatus } from './updateDeviceStatus';
 import { errorLogger } from './logging';
+import { request } from './axios';
 
 export async function updateDeviceID(adapter: MidasAquatemp): Promise<void> {
     const store = initStore();
@@ -21,7 +22,9 @@ export async function updateDeviceID(adapter: MidasAquatemp): Promise<void> {
         const response = await request(adapter, sURL, options, {
             headers: { 'x-token': token },
         });
-
+        if (!response?.data) {
+            return;
+        }
         adapter.log.debug(`UpdateDeviceID response: ${JSON.stringify(response.data)}`);
         adapter.log.debug(`UpdateDeviceID response status: ${JSON.stringify(response.status)}`);
 

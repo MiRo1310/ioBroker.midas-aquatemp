@@ -2,7 +2,7 @@ import type { MidasAquatemp } from '../main';
 import { saveValue } from './saveValue';
 
 interface Store {
-    _this: MidasAquatemp;
+    adapter: MidasAquatemp;
     token: string | null;
     instance: number | undefined | null;
     username: string;
@@ -24,7 +24,7 @@ let store: Store;
 export function initStore(): Store {
     if (!store) {
         store = {
-            _this: '' as unknown as MidasAquatemp,
+            adapter: '' as unknown as MidasAquatemp,
             token: '',
             instance: null,
             username: '',
@@ -50,7 +50,7 @@ export function initStore(): Store {
                 this.token = '';
                 this.device = '';
                 this.reachable = false;
-                await saveValue({ key: 'info.connection', value: false, stateType: 'boolean', adapter: this._this });
+                await saveValue({ key: 'info.connection', value: false, stateType: 'boolean', adapter: this.adapter });
             },
         };
     }

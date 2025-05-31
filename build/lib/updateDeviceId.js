@@ -1,9 +1,7 @@
 "use strict";
-var __create = Object.create;
 var __defProp = Object.defineProperty;
 var __getOwnPropDesc = Object.getOwnPropertyDescriptor;
 var __getOwnPropNames = Object.getOwnPropertyNames;
-var __getProtoOf = Object.getPrototypeOf;
 var __hasOwnProp = Object.prototype.hasOwnProperty;
 var __export = (target, all) => {
   for (var name in all)
@@ -17,27 +15,19 @@ var __copyProps = (to, from, except, desc) => {
   }
   return to;
 };
-var __toESM = (mod, isNodeMode, target) => (target = mod != null ? __create(__getProtoOf(mod)) : {}, __copyProps(
-  // If the importer is in node compatibility mode or this is not an ESM
-  // file that has been converted to a CommonJS file using a Babel-
-  // compatible transform (i.e. "__esModule" has not been set), then set
-  // "default" to the CommonJS "module.exports" for node compatibility.
-  isNodeMode || !mod || !mod.__esModule ? __defProp(target, "default", { value: mod, enumerable: true }) : target,
-  mod
-));
 var __toCommonJS = (mod) => __copyProps(__defProp({}, "__esModule", { value: true }), mod);
 var updateDeviceId_exports = {};
 __export(updateDeviceId_exports, {
   updateDeviceID: () => updateDeviceID
 });
 module.exports = __toCommonJS(updateDeviceId_exports);
-var import_axios = __toESM(require("axios"));
 var import_axiosParameter = require("./axiosParameter");
 var import_endPoints = require("./endPoints");
 var import_saveValue = require("./saveValue");
 var import_store = require("./store");
 var import_updateDeviceStatus = require("./updateDeviceStatus");
 var import_logging = require("./logging");
+var import_axios = require("./axios");
 async function updateDeviceID(adapter) {
   var _a, _b, _c, _d, _e, _f, _g, _h, _i, _j, _k, _l;
   const store = (0, import_store.initStore)();
@@ -50,9 +40,12 @@ async function updateDeviceID(adapter) {
     const options = (0, import_axiosParameter.getAxiosUpdateDeviceIdParams)();
     adapter.log.debug(`UpdateDeviceID URL: ${sURL}`);
     adapter.log.debug(`UpdateDeviceID options: ${JSON.stringify(options)}`);
-    const response = await import_axios.default.post(sURL, options, {
+    const response = await (0, import_axios.request)(adapter, sURL, options, {
       headers: { "x-token": token }
     });
+    if (!(response == null ? void 0 : response.data)) {
+      return;
+    }
     adapter.log.debug(`UpdateDeviceID response: ${JSON.stringify(response.data)}`);
     adapter.log.debug(`UpdateDeviceID response status: ${JSON.stringify(response.status)}`);
     if (!response || response.status !== 200 || response.data.error_code !== "0") {
@@ -76,10 +69,10 @@ async function updateDeviceID(adapter) {
     adapter.log.debug(`Device: ${store.device}`);
     adapter.log.debug(`Product: ${store.product}`);
     adapter.log.debug(`Reachable: ${store.reachable}`);
-    await (0, import_saveValue.saveValue)("DeviceCode", store.device, "string", adapter);
-    await (0, import_saveValue.saveValue)("ProductCode", store.product, "string", adapter);
+    await (0, import_saveValue.saveValue)({ key: "DeviceCode", value: store.device, stateType: "string", adapter });
+    await (0, import_saveValue.saveValue)({ key: "ProductCode", value: store.product, stateType: "string", adapter });
     if (store.reachable && store.device) {
-      await (0, import_saveValue.saveValue)("info.connection", true, "boolean", adapter);
+      await (0, import_saveValue.saveValue)({ key: "info.connection", value: true, stateType: "boolean", adapter });
       if (store.device != "" && store.product) {
         adapter.log.debug("Update device status");
         await (0, import_updateDeviceStatus.updateDeviceStatus)(adapter);

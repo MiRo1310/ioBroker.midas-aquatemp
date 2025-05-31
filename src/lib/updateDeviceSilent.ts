@@ -22,6 +22,10 @@ export async function updateDeviceSilent(adapter: MidasAquatemp, deviceCode: str
                     headers: { 'x-token': token },
                 },
             );
+            if (!response?.data) {
+                return;
+            }
+
             adapter.log.debug(`DeviceStatus: ${JSON.stringify(response.data)}`);
 
             if (parseInt(response.data.error_code) == 0) {

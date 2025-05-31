@@ -1,9 +1,7 @@
 "use strict";
-var __create = Object.create;
 var __defProp = Object.defineProperty;
 var __getOwnPropDesc = Object.getOwnPropertyDescriptor;
 var __getOwnPropNames = Object.getOwnPropertyNames;
-var __getProtoOf = Object.getPrototypeOf;
 var __hasOwnProp = Object.prototype.hasOwnProperty;
 var __export = (target, all) => {
   for (var name in all)
@@ -17,26 +15,18 @@ var __copyProps = (to, from, except, desc) => {
   }
   return to;
 };
-var __toESM = (mod, isNodeMode, target) => (target = mod != null ? __create(__getProtoOf(mod)) : {}, __copyProps(
-  // If the importer is in node compatibility mode or this is not an ESM
-  // file that has been converted to a CommonJS file using a Babel-
-  // compatible transform (i.e. "__esModule" has not been set), then set
-  // "default" to the CommonJS "module.exports" for node compatibility.
-  isNodeMode || !mod || !mod.__esModule ? __defProp(target, "default", { value: mod, enumerable: true }) : target,
-  mod
-));
 var __toCommonJS = (mod) => __copyProps(__defProp({}, "__esModule", { value: true }), mod);
 var token_exports = {};
 __export(token_exports, {
   updateToken: () => updateToken
 });
 module.exports = __toCommonJS(token_exports);
-var import_axios = __toESM(require("axios"));
 var import_endPoints = require("./endPoints");
 var import_store = require("./store");
 var import_updateDeviceId = require("./updateDeviceId");
 var import_updateDeviceStatus = require("./updateDeviceStatus");
 var import_logging = require("./logging");
+var import_axios = require("./axios");
 async function getToken(adapter) {
   var _a, _b, _c, _d;
   const store = (0, import_store.initStore)();
@@ -45,7 +35,7 @@ async function getToken(adapter) {
     if (!token) {
       adapter.log.debug("Request token");
       const { sUrl, options } = (0, import_endPoints.getOptionsAndSUrl)();
-      const response = await import_axios.default.post(sUrl, options);
+      const response = await (0, import_axios.request)(adapter, sUrl, options);
       if (!response) {
         adapter.log.error("No response from server");
         return;

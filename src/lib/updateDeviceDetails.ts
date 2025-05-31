@@ -5,7 +5,7 @@ import { saveValue } from './saveValue';
 import { initStore } from './store';
 import { errorLogger } from './logging';
 import type { MidasAquatemp } from '../main';
-import { requests } from 'sinon';
+import { request } from './axios';
 
 export const numberToBoolean = (value: number): boolean => {
     return value === 1;
@@ -84,10 +84,13 @@ export async function updateDeviceDetails(adapter: MidasAquatemp): Promise<void>
         if (token) {
             const { sURL } = getSUrlUpdateDeviceId();
 
-            const response = await requests(adapter, sURL, getProtocolCodes(deviceCode), {
+            const response = await request(adapter, sURL, getProtocolCodes(deviceCode), {
                 headers: { 'x-token': token },
             });
-            store._this.log.debug(`DeviceDetails: ${JSON.stringify(response.data)}`);
+            if (!response?.data) {
+                return;
+            }
+            adapter.log.debug(`DeviceDetails: ${JSON.stringify(response.data)}`);
 
             if (parseInt(response.data.error_code) == 0) {
                 const responseValue = apiLevel < 3 ? response.data.object_result : response.data.objectResult;
@@ -106,7 +109,7 @@ export async function updateDeviceDetails(adapter: MidasAquatemp): Promise<void>
                     0: 'R01', // Kühl-Modus (-> R01)
                     2: 'R03', // Auto-Modus (-> R03)
                 };
-                // Ziel-Temperatur anhand Modus
+
                 await saveValue({
                     key: 'tempSet',
                     value: parseFloat(findCodeVal(responseValue, modes[mode])),
@@ -114,7 +117,6 @@ export async function updateDeviceDetails(adapter: MidasAquatemp): Promise<void>
                     adapter: adapter,
                 });
 
-                // Flüstermodus Manual-mute
                 await saveValue({
                     key: 'silent',
                     value: findCodeVal(responseValue, 'Manual-mute') == '1',
@@ -122,25 +124,20 @@ export async function updateDeviceDetails(adapter: MidasAquatemp): Promise<void>
                     adapter: adapter,
                 });
 
-                // Zustand Power
-                if (findCodeVal(responseValue, 'Power') == '1') {
-                    await saveValue({ key: 'state', value: true, stateType: 'boolean', adapter: adapter });
-                    await saveValue({
-                        key: 'mode',
-                        value: findCodeVal(responseValue, 'Mode'),
-                        stateType: 'string',
-                        adapter: adapter,
-                    });
-                } else {
-                    await saveValue({ key: 'state', value: false, stateType: 'boolean', adapter: adapter });
-                    await saveValue({ key: 'mode', value: '-1', stateType: 'string', adapter: adapter });
-                }
+                const powerOpt = findCodeVal(responseValue, 'Power') === '1';
+
+                await saveValue({ key: 'state', value: powerOpt, stateType: 'boolean', adapter: adapter });
+                await saveValue({
+                    key: 'mode',
+                    value: powerOpt ? findCodeVal(responseValue, 'Mode') : '-1',
+                    stateType: 'string',
+                    adapter: adapter,
+                });
 
                 await saveValue({ key: 'info.connection', value: true, stateType: 'boolean', adapter: adapter });
                 return;
             }
 
-            adapter.log.error(`Error: ${JSON.stringify(response.data)}`);
             store.resetOnErrorHandler();
             return;
         }
