@@ -1,8 +1,21 @@
 {
   "common": {
     "name": "midas-aquatemp",
-    "version": "1.2.1",
+    "version": "1.2.2",
     "news": {
+      "1.2.2": {
+        "en": "FIX: Reported errors by sentry",
+        "de": "FIX: Gemeldete Fehler durch Versendung",
+        "ru": "FIX: Сообщения об ошибках часового",
+        "pt": "FIX: Erros reportados por remetente",
+        "nl": "FIX: Gemelde fouten door de wachtdienst",
+        "fr": "FIX: Erreurs signalées par sentinelle",
+        "it": "FIX: Errori segnalati dalla sentinella",
+        "es": "FIX: Errores reportados por centinela",
+        "pl": "FIX: Zgłoszone błędy przez wartownika",
+        "uk": "FIX: Повідомлені помилки відправником",
+        "zh-cn": "FIX:哨兵报告的错误"
+      },
       "1.2.1": {
         "en": "FIX: #50 Cannot read properties of undefined",
         "de": "FIX: #50 Kann nicht lesen Eigenschaften von undefiniert",
