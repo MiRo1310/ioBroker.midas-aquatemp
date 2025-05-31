@@ -28,45 +28,37 @@ var import_store = require("./store");
 var import_updateDeviceStatus = require("./updateDeviceStatus");
 var import_logging = require("./logging");
 var import_axios = require("./axios");
+var import_utils = require("./utils");
 async function updateDeviceID(adapter) {
-  var _a, _b, _c, _d, _e, _f, _g, _h, _i, _j, _k, _l;
+  var _a, _b, _c, _d, _e, _f, _g, _h, _i, _j, _k, _l, _m, _n, _o, _p, _q, _r;
   const store = (0, import_store.initStore)();
   try {
-    const { token, apiLevel } = store;
-    if (!token) {
+    const { token } = store;
+    if (!(0, import_utils.isToken)(token)) {
       return;
     }
-    const { sURL } = (0, import_endPoints.getUpdateDeviceIdSUrl)();
-    const options = (0, import_axiosParameter.getAxiosUpdateDeviceIdParams)();
-    adapter.log.debug(`UpdateDeviceID URL: ${sURL}`);
-    adapter.log.debug(`UpdateDeviceID options: ${JSON.stringify(options)}`);
-    const response = await (0, import_axios.request)(adapter, sURL, options, (0, import_axiosParameter.getHeaders)(token));
-    if (!(response == null ? void 0 : response.data)) {
+    const { data, status } = await (0, import_axios.request)(
+      adapter,
+      (0, import_endPoints.getUpdateDeviceIdSUrl)().sURL,
+      (0, import_axiosParameter.getAxiosUpdateDeviceIdParams)(),
+      (0, import_axiosParameter.getHeaders)(token)
+    );
+    if (!data) {
       return;
     }
-    adapter.log.debug(`UpdateDeviceID response: ${JSON.stringify(response.data)}`);
-    adapter.log.debug(`UpdateDeviceID response status: ${JSON.stringify(response.status)}`);
-    if (!response || response.status !== 200 || response.data.error_code !== "0") {
+    adapter.log.debug(`UpdateDeviceID response: ${JSON.stringify(data)}, status: ${status}`);
+    if (!data || status !== 200 || !(0, import_utils.noError)(data.error_code)) {
       store.resetOnErrorHandler();
       return;
     }
-    if (!((_c = (_b = (_a = response.data) == null ? void 0 : _a.object_result) == null ? void 0 : _b[0]) == null ? void 0 : _c.device_code) && !((_f = (_e = (_d = response.data) == null ? void 0 : _d.objectResult) == null ? void 0 : _e[0]) == null ? void 0 : _f.deviceCode)) {
+    if (!((_b = (_a = data == null ? void 0 : data.object_result) == null ? void 0 : _a[0]) == null ? void 0 : _b.device_code) && !((_d = (_c = data == null ? void 0 : data.objectResult) == null ? void 0 : _c[0]) == null ? void 0 : _d.deviceCode)) {
       adapter.log.error("Error in updateDeviceID: No device code found");
-      adapter.log.error(`Response: ${JSON.stringify(response.data)}`);
       return;
     }
-    if (apiLevel < 3) {
-      store.device = (_g = response.data.object_result[0]) == null ? void 0 : _g.device_code;
-      store.product = (_h = response.data.object_result[0]) == null ? void 0 : _h.product_id;
-      store.reachable = ((_i = response.data.object_result[0]) == null ? void 0 : _i.device_status) == "ONLINE";
-    } else {
-      store.device = (_j = response.data.objectResult[0]) == null ? void 0 : _j.deviceCode;
-      store.product = (_k = response.data.objectResult[0]) == null ? void 0 : _k.productId;
-      store.reachable = ((_l = response.data.objectResult[0]) == null ? void 0 : _l.deviceStatus) == "ONLINE";
-    }
-    adapter.log.debug(`Device: ${store.device}`);
-    adapter.log.debug(`Product: ${store.product}`);
-    adapter.log.debug(`Reachable: ${store.reachable}`);
+    store.device = (_h = (_e = data.object_result) == null ? void 0 : _e[0].device_code) != null ? _h : (_g = (_f = data.objectResult) == null ? void 0 : _f[0]) == null ? void 0 : _g.deviceCode;
+    store.product = (_m = (_j = (_i = data.object_result) == null ? void 0 : _i[0]) == null ? void 0 : _j.product_id) != null ? _m : (_l = (_k = data.objectResult) == null ? void 0 : _k[0]) == null ? void 0 : _l.productId;
+    store.reachable = ((_r = (_o = (_n = data.object_result) == null ? void 0 : _n[0]) == null ? void 0 : _o.device_status) != null ? _r : (_q = (_p = data.objectResult) == null ? void 0 : _p[0]) == null ? void 0 : _q.deviceStatus) == "ONLINE";
+    adapter.log.debug(`device: ${store.device}, product: ${store.product}, reachable: ${store.reachable}`);
     await (0, import_saveValue.saveValue)({ key: "DeviceCode", value: store.device, stateType: "string", adapter });
     await (0, import_saveValue.saveValue)({ key: "ProductCode", value: store.product, stateType: "string", adapter });
     if (store.reachable && store.device) {

@@ -92,11 +92,11 @@ class MidasAquatemp extends utils.Adapter {
       try {
         await (0, import_token.updateToken)(adapter2);
         const mode = await this.getStateAsync(`${dpRoot}.mode`);
-        if (!(mode == null ? void 0 : mode.ack) && (mode == null ? void 0 : mode.val)) {
+        if (!(mode == null ? void 0 : mode.ack) && (mode == null ? void 0 : mode.val) && store.device) {
           await (0, import_updateDevicePower.updateDevicePower)(adapter2, store.device, mode.val);
         }
         const silent = await this.getStateAsync(`${dpRoot}.silent`);
-        if (!(silent == null ? void 0 : silent.ack) && (silent == null ? void 0 : silent.val)) {
+        if (!(silent == null ? void 0 : silent.ack) && (silent == null ? void 0 : silent.val) && store.device) {
           await (0, import_updateDevicePower.updateDevicePower)(adapter2, store.device, silent.val);
         }
       } catch (error) {
@@ -112,7 +112,7 @@ class MidasAquatemp extends utils.Adapter {
         if (!state || state.ack) {
           return;
         }
-        if (id === `${dpRoot}.mode`) {
+        if (id === `${dpRoot}.mode` && store.device) {
           this.log.debug(`Mode: ${JSON.stringify(state)}`);
           if ((0, import_utils.isStateValue)(state)) {
             const mode = parseInt(state.val);
@@ -120,14 +120,14 @@ class MidasAquatemp extends utils.Adapter {
           }
           await this.setState(id, { ack: true });
         }
-        if (id === `${dpRoot}.silent`) {
+        if (id === `${dpRoot}.silent` && store.device) {
           this.log.debug(`Silent: ${JSON.stringify(state)}`);
           if ((0, import_utils.isStateValue)(state)) {
             await (0, import_updateDeviceSilent.updateDeviceSilent)(adapter2, store.device, state.val);
           }
           await this.setState(id, { ack: true });
         }
-        if (id === `${dpRoot}.tempSet`) {
+        if (id === `${dpRoot}.tempSet` && store.device) {
           this.log.debug(`TempSet: ${JSON.stringify(state)}`);
           if ((0, import_utils.isStateValue)(state)) {
             await (0, import_updateDeviceSetTemp.updateDeviceSetTemp)(adapter2, store.device, state.val);

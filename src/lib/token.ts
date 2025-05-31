@@ -5,6 +5,7 @@ import { updateDeviceStatus } from './updateDeviceStatus';
 import { errorLogger } from './logging';
 import type { MidasAquatemp } from '../main';
 import { request } from './axios';
+import type { RequestToken } from '../types/types';
 
 async function getToken(adapter: MidasAquatemp): Promise<void> {
     const store = useStore();
@@ -16,25 +17,24 @@ async function getToken(adapter: MidasAquatemp): Promise<void> {
             adapter.log.debug('Request token');
             const { sUrl, options } = getOptionsAndSUrl();
 
-            const response = await request(adapter, sUrl, options);
-            if (!response) {
+            const { data, status } = await request<RequestToken>(adapter, sUrl, options);
+            if (!data) {
                 adapter.log.error('No response from server');
                 return;
             }
-            if (response.status == 200) {
-                store.token =
-                    response.data?.object_result?.['x-token'] ?? response.data?.objectResult?.['x-token'] ?? null;
+            if (status === 200) {
+                store.token = data?.object_result?.['x-token'] ?? data?.objectResult?.['x-token'] ?? null;
 
                 if (store.token) {
                     adapter.log.debug('Login ok! Token');
                 } else {
-                    adapter.log.error(`Login-error: ${JSON.stringify(response.data)}`);
+                    adapter.log.error(`Login-error: ${JSON.stringify(data)}`);
                 }
 
                 return;
             }
 
-            adapter.log.error(`Login-error: ${response.data}`);
+            adapter.log.error(`Login-error: ${JSON.stringify(data)}`);
             store.resetOnErrorHandler();
             return;
         }

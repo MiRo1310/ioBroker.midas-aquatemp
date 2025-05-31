@@ -79,11 +79,11 @@ export class MidasAquatemp extends utils.Adapter {
                 await updateToken(adapter);
                 const mode = await this.getStateAsync(`${dpRoot}.mode`);
 
-                if (!mode?.ack && mode?.val) {
+                if (!mode?.ack && mode?.val && store.device) {
                     await updateDevicePower(adapter, store.device, mode.val as number);
                 }
                 const silent = await this.getStateAsync(`${dpRoot}.silent`);
-                if (!silent?.ack && silent?.val) {
+                if (!silent?.ack && silent?.val && store.device) {
                     await updateDevicePower(adapter, store.device, silent.val as number);
                 }
             } catch (error: any) {
@@ -101,7 +101,7 @@ export class MidasAquatemp extends utils.Adapter {
                 if (!state || state.ack) {
                     return;
                 }
-                if (id === `${dpRoot}.mode`) {
+                if (id === `${dpRoot}.mode` && store.device) {
                     this.log.debug(`Mode: ${JSON.stringify(state)}`);
                     if (isStateValue(state)) {
                         const mode = parseInt(state.val as string);
@@ -110,7 +110,7 @@ export class MidasAquatemp extends utils.Adapter {
                     await this.setState(id, { ack: true });
                 }
 
-                if (id === `${dpRoot}.silent`) {
+                if (id === `${dpRoot}.silent` && store.device) {
                     this.log.debug(`Silent: ${JSON.stringify(state)}`);
                     if (isStateValue(state)) {
                         await updateDeviceSilent(adapter, store.device, state.val as boolean);
@@ -118,7 +118,7 @@ export class MidasAquatemp extends utils.Adapter {
                     await this.setState(id, { ack: true });
                 }
 
-                if (id === `${dpRoot}.tempSet`) {
+                if (id === `${dpRoot}.tempSet` && store.device) {
                     this.log.debug(`TempSet: ${JSON.stringify(state)}`);
 
                     if (isStateValue(state)) {

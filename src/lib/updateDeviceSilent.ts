@@ -5,6 +5,7 @@ import { initStore } from './store';
 import { errorLogger } from './logging';
 import type { MidasAquatemp } from '../main';
 import { request } from './axios';
+import type { MidasData } from '../types/types';
 
 export async function updateDeviceSilent(adapter: MidasAquatemp, deviceCode: string, silent: boolean): Promise<void> {
     const store = initStore();
@@ -14,23 +15,23 @@ export async function updateDeviceSilent(adapter: MidasAquatemp, deviceCode: str
 
         if (token && token != '') {
             const { sURL } = getSUrl();
-            const response = await request(
+            const { data } = await request<MidasData>(
                 adapter,
                 sURL,
                 getAxiosUpdateDevicePowerParams({ deviceCode, value: silentMode, protocolCode: 'Manual-mute' }),
                 getHeaders(token),
             );
-            if (!response?.data) {
+            if (!data) {
                 return;
             }
 
-            adapter.log.debug(`DeviceStatus: ${JSON.stringify(response.data)}`);
+            adapter.log.debug(`DeviceStatus: ${JSON.stringify(data)}`);
 
-            if (parseInt(response.data.error_code) == 0) {
+            if (data.error_code === '0') {
                 await saveValue({ key: 'silent', value: silent, stateType: 'boolean', adapter: adapter });
                 return;
             }
-            adapter.log.error(`Error: ${JSON.stringify(response.data)}`);
+
             store.resetOnErrorHandler();
         }
     } catch (error: any) {

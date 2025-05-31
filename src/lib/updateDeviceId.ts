@@ -6,27 +6,29 @@ import { initStore } from './store';
 import { updateDeviceStatus } from './updateDeviceStatus';
 import { errorLogger } from './logging';
 import { request } from './axios';
+import type { UpdateDeviceId } from '../types/types';
+import { isToken, noError } from './utils';
 
 export async function updateDeviceID(adapter: MidasAquatemp): Promise<void> {
     const store = initStore();
     try {
         const { token } = store;
-        if (!token) {
+        if (!isToken(token)) {
             return;
         }
-        const { sURL } = getUpdateDeviceIdSUrl();
-        const options = getAxiosUpdateDeviceIdParams();
-        adapter.log.debug(`UpdateDeviceID URL: ${sURL}`);
-        adapter.log.debug(`UpdateDeviceID options: ${JSON.stringify(options)}`);
 
-        const { data, status } = await request(adapter, sURL, options, getHeaders(token));
+        const { data, status } = await request<UpdateDeviceId>(
+            adapter,
+            getUpdateDeviceIdSUrl().sURL,
+            getAxiosUpdateDeviceIdParams(),
+            getHeaders(token),
+        );
         if (!data) {
             return;
         }
-        adapter.log.debug(`UpdateDeviceID response: ${JSON.stringify(data)}`);
-        adapter.log.debug(`UpdateDeviceID response status: ${JSON.stringify(status)}`);
+        adapter.log.debug(`UpdateDeviceID response: ${JSON.stringify(data)}, status: ${status}`);
 
-        if (!data || status !== 200 || data.error_code !== '0') {
+        if (!data || status !== 200 || !noError(data.error_code)) {
             store.resetOnErrorHandler(); // Login-Fehler
             return;
         }

@@ -1,7 +1,7 @@
 {
   "version": 3,
   "sources": ["../../src/lib/utils.ts"],
-  "sourcesContent": ["export const isDefined = <T>(value: T | undefined | null): value is T => value !== undefined && value !== null;\n\nexport const isStateValue = (state?: ioBroker.State): boolean => isDefined(state) && isDefined(state?.val);\n"],
-  "mappings": ";;;;;;;;;;;;;;;;;;AAAA;AAAA;AAAA;AAAA;AAAA;AAAA;AAAO,MAAM,YAAY,CAAI,UAA4C,UAAU,UAAa,UAAU;AAEnG,MAAM,eAAe,CAAC,UAAoC,UAAU,KAAK,KAAK,UAAU,+BAAO,GAAG;",
+  "sourcesContent": ["export const isDefined = <T>(value: T | undefined | null): value is T => value !== undefined && value !== null;\n\nexport const isStateValue = (state?: ioBroker.State): boolean => isDefined(state) && isDefined(state?.val);\n\nexport const isToken = (token?: string | null): token is string => isDefined(token) && token !== '';\n\nexport const noError = (errorCode?: string): boolean => errorCode === '0';\n"],
+  "mappings": ";;;;;;;;;;;;;;;;;;AAAA;AAAA;AAAA;AAAA;AAAA;AAAA;AAAA;AAAA;AAAO,MAAM,YAAY,CAAI,UAA4C,UAAU,UAAa,UAAU;AAEnG,MAAM,eAAe,CAAC,UAAoC,UAAU,KAAK,KAAK,UAAU,+BAAO,GAAG;AAElG,MAAM,UAAU,CAAC,UAA2C,UAAU,KAAK,KAAK,UAAU;AAE1F,MAAM,UAAU,CAAC,cAAgC,cAAc;",
   "names": []
 }

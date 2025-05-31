@@ -28,6 +28,7 @@ var import_saveValue = require("./saveValue");
 var import_store = require("./store");
 var import_logging = require("./logging");
 var import_axios = require("./axios");
+var import_utils = require("./utils");
 const numberToBoolean = (value) => {
   return value === 1;
 };
@@ -88,20 +89,24 @@ const saveValues = async (adapter, value) => {
   });
 };
 async function updateDeviceDetails(adapter) {
+  var _a;
   const store = (0, import_store.initStore)();
   try {
-    const { apiLevel, token, device: deviceCode } = store;
-    if (!token) {
+    const { token, device: deviceCode } = store;
+    if (!token || !deviceCode) {
       return;
     }
     const { sURL } = (0, import_endPoints.getSUrlUpdateDeviceId)();
-    const response = await (0, import_axios.request)(adapter, sURL, (0, import_axiosParameter.getProtocolCodes)(deviceCode), (0, import_axiosParameter.getHeaders)(token));
-    if (!(response == null ? void 0 : response.data)) {
+    const { data } = await (0, import_axios.request)(adapter, sURL, (0, import_axiosParameter.getProtocolCodes)(deviceCode), (0, import_axiosParameter.getHeaders)(token));
+    if (!data) {
       return;
     }
-    adapter.log.debug(`DeviceDetails: ${JSON.stringify(response.data)}`);
-    if (parseInt(response.data.error_code) == 0) {
-      const responseValue = apiLevel < 3 ? response.data.object_result : response.data.objectResult;
+    adapter.log.debug(`DeviceDetails: ${JSON.stringify(data)}`);
+    if ((0, import_utils.noError)(data.error_code)) {
+      const responseValue = (_a = data.object_result) != null ? _a : data.objectResult;
+      if (!responseValue || responseValue.length === 0) {
+        return;
+      }
       await (0, import_saveValue.saveValue)({
         key: "rawJSON",
         value: JSON.stringify(responseValue),

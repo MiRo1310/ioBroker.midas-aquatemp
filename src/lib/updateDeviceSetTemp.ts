@@ -1,10 +1,12 @@
-import axios from 'axios';
 import { getAxiosUpdateDeviceSetTempParams, getHeaders } from './axiosParameter';
 import { getSUrl } from './endPoints';
 import { saveValue } from './saveValue';
 import { initStore } from './store';
 import { errorLogger } from './logging';
 import type { MidasAquatemp } from '../main';
+import { request } from './axios';
+import type { MidasData } from '../types/types';
+import { isToken, noError } from './utils';
 
 export const updateDeviceSetTemp = async (
     adapter: MidasAquatemp,
@@ -17,25 +19,25 @@ export const updateDeviceSetTemp = async (
         const token = store.token;
         const sTemperature = temperature.toString().replace(',', '.');
         const result = await adapter.getStateAsync(`${dpRoot}.mode`);
-        if (!(result && (result.val || result.val === 0))) {
+        if (!(result?.val || result?.val === 0)) {
             return;
         }
 
-        if (token && token != '') {
+        if (isToken(token)) {
             const { sURL } = getSUrl();
 
-            const response = await axios.post(
+            const { data } = await request<MidasData>(
+                adapter,
                 sURL,
                 getAxiosUpdateDeviceSetTempParams({ deviceCode, sTemperature }),
                 getHeaders(token),
             );
-            adapter.log.debug(`DeviceStatus: ${JSON.stringify(response.data)}`);
+            adapter.log.debug(`DeviceStatus: ${JSON.stringify(data)}`);
 
-            if (parseInt(response.data.error_code) == 0) {
+            if (noError(data?.error_code)) {
                 await saveValue({ key: 'tempSet', value: temperature, stateType: 'number', adapter: adapter });
                 return;
             }
-            adapter.log.error(`Error: ${JSON.stringify(response.data)}`);
 
             store.resetOnErrorHandler();
         }

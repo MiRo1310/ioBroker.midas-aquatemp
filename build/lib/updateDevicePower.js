@@ -28,36 +28,34 @@ var import_axiosParameter = require("./axiosParameter");
 var import_saveValue = require("./saveValue");
 var import_logging = require("./logging");
 var import_axios = require("./axios");
+var import_utils = require("./utils");
 async function updateDevicePower(adapter, deviceCode, power) {
   const store = (0, import_store.initStore)();
   try {
     const token = store.token;
     const { powerMode, powerOpt } = (0, import_getSettings.getPowerMode)(power);
-    if (powerOpt === null || powerMode === null) {
+    if (!(0, import_utils.isDefined)(powerOpt) || !(0, import_utils.isDefined)(powerMode) || !store.device || !(0, import_utils.isToken)(token)) {
       return;
     }
-    if (token && token != "") {
-      const { sURL } = (0, import_endPoints.getSUrl)();
-      const response = await (0, import_axios.request)(
-        adapter,
-        sURL,
-        (0, import_axiosParameter.getAxiosUpdateDevicePowerParams)({ deviceCode, value: powerOpt, protocolCode: "Power" }),
-        (0, import_axiosParameter.getHeaders)(token)
-      );
-      if (!(response == null ? void 0 : response.data)) {
-        return;
-      }
-      adapter.log.debug(`DeviceStatus: ${JSON.stringify(response.data)}`);
-      if (parseInt(response.data.error_code) == 0) {
-        await (0, import_saveValue.saveValue)({ key: "mode", value: power.toString(), stateType: "string", adapter });
-        if (power >= 0) {
-          await updateDeviceMode(adapter, store.device, power);
-        }
-        return;
-      }
-      adapter.log.error(`Error: ${JSON.stringify(response.data)}`);
-      store.resetOnErrorHandler();
+    const { sURL } = (0, import_endPoints.getSUrl)();
+    const { data } = await (0, import_axios.request)(
+      adapter,
+      sURL,
+      (0, import_axiosParameter.getAxiosUpdateDevicePowerParams)({ deviceCode, value: powerOpt, protocolCode: "Power" }),
+      (0, import_axiosParameter.getHeaders)(token)
+    );
+    if (!data) {
+      return;
     }
+    adapter.log.debug(`DeviceStatus: ${JSON.stringify(data)}`);
+    if ((0, import_utils.noError)(data.error_code)) {
+      await (0, import_saveValue.saveValue)({ key: "mode", value: power.toString(), stateType: "string", adapter });
+      if (power >= 0) {
+        await updateDeviceMode(adapter, store.device, power);
+      }
+      return;
+    }
+    store.resetOnErrorHandler();
   } catch (error) {
     (0, import_logging.errorLogger)("Error in updateDevicePower", error, adapter);
   }
@@ -68,7 +66,7 @@ async function updateDeviceMode(adapter, deviceCode, mode) {
   try {
     if (token && token != "") {
       const { sURL } = (0, import_endPoints.getSUrl)();
-      const response = await (0, import_axios.request)(
+      const { data } = await (0, import_axios.request)(
         adapter,
         sURL,
         (0, import_axiosParameter.getAxiosUpdateDevicePowerParams)({ deviceCode, value: mode, protocolCode: "mode" }),
@@ -76,15 +74,14 @@ async function updateDeviceMode(adapter, deviceCode, mode) {
           headers: { "x-token": token }
         }
       );
-      if (!(response == null ? void 0 : response.data)) {
+      if (!data) {
         return;
       }
-      adapter.log.debug(`DeviceStatus: ${JSON.stringify(response.data)}`);
-      if (parseInt(response.data.error_code) == 0) {
+      adapter.log.debug(`DeviceStatus: ${JSON.stringify(data)}`);
+      if (data.error_code === "0") {
         await (0, import_saveValue.saveValue)({ key: "mode", value: mode, stateType: "string", adapter });
         return;
       }
-      adapter.log.error(`Error: ${JSON.stringify(response.data)}`);
       store.resetOnErrorHandler();
     }
   } catch (error) {

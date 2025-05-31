@@ -29,6 +29,7 @@ var import_updateDeviceOnError = require("./updateDeviceOnError");
 var import_logging = require("./logging");
 var import_axios = require("./axios");
 var import_axiosParameter = require("./axiosParameter");
+var import_utils = require("./utils");
 async function updateDeviceStatus(adapter) {
   var _a, _b, _c, _d, _e, _f, _g, _h, _i;
   const store = (0, import_store.initStore)();
@@ -49,12 +50,11 @@ async function updateDeviceStatus(adapter) {
         return;
       }
       {
-        store.reachable = ((_e = (_b = (_a = data.object_result) == null ? void 0 : _a[0]) == null ? void 0 : _b.device_status) != null ? _e : (_d = (_c = data.objectResult) == null ? void 0 : _c[0]) == null ? void 0 : _d.deviceStatus) == "ONLINE";
+        store.reachable = ((_e = (_b = (_a = data.object_result) == null ? void 0 : _a[0]) == null ? void 0 : _b.status) != null ? _e : (_d = (_c = data.objectResult) == null ? void 0 : _c[0]) == null ? void 0 : _d.status) == "ONLINE";
       }
-      if (data.error_code == "0") {
+      if ((0, import_utils.noError)(data.error_code)) {
         adapter.log.debug(`DeviceStatus: ${JSON.stringify(data)}`);
         if (((_g = (_f = data == null ? void 0 : data.object_result) == null ? void 0 : _f[0]) == null ? void 0 : _g.is_fault) || ((_i = (_h = data == null ? void 0 : data.objectResult) == null ? void 0 : _h[0]) == null ? void 0 : _i.isFault)) {
-          adapter.log.error(`Error in updateDeviceStatus(): ${JSON.stringify(data)}`);
           await (0, import_saveValue.saveValue)({ key: "error", value: true, stateType: "boolean", adapter });
           await (0, import_updateDeviceDetails.updateDeviceDetails)(adapter);
           await (0, import_updateDeviceOnError.updateDeviceErrorMsg)(adapter);

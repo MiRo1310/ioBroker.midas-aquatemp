@@ -34,21 +34,20 @@ async function updateDeviceSilent(adapter, deviceCode, silent) {
     const silentMode = silent ? "1" : "0";
     if (token && token != "") {
       const { sURL } = (0, import_endPoints.getSUrl)();
-      const response = await (0, import_axios.request)(
+      const { data } = await (0, import_axios.request)(
         adapter,
         sURL,
         (0, import_axiosParameter.getAxiosUpdateDevicePowerParams)({ deviceCode, value: silentMode, protocolCode: "Manual-mute" }),
         (0, import_axiosParameter.getHeaders)(token)
       );
-      if (!(response == null ? void 0 : response.data)) {
+      if (!data) {
         return;
       }
-      adapter.log.debug(`DeviceStatus: ${JSON.stringify(response.data)}`);
-      if (parseInt(response.data.error_code) == 0) {
+      adapter.log.debug(`DeviceStatus: ${JSON.stringify(data)}`);
+      if (data.error_code === "0") {
         await (0, import_saveValue.saveValue)({ key: "silent", value: silent, stateType: "boolean", adapter });
         return;
       }
-      adapter.log.error(`Error: ${JSON.stringify(response.data)}`);
       store.resetOnErrorHandler();
     }
   } catch (error) {
