@@ -27,7 +27,7 @@ export async function updateDevicePower(adapter: MidasAquatemp, deviceCode: stri
 
             adapter.log.debug(`DeviceStatus: ${JSON.stringify(response.data)}`);
             if (parseInt(response.data.error_code) == 0) {
-                await saveValue('mode', power.toString(), 'string', adapter);
+                await saveValue({ key: 'mode', value: power.toString(), stateType: 'string', adapter: adapter });
                 if (power >= 0) {
                     await updateDeviceMode(adapter, store.device, power);
                 }
@@ -57,7 +57,7 @@ async function updateDeviceMode(adapter: MidasAquatemp, deviceCode: string, mode
             adapter.log.debug(`DeviceStatus: ${JSON.stringify(response.data)}`);
 
             if (parseInt(response.data.error_code) == 0) {
-                await saveValue('mode', mode, 'string', adapter);
+                await saveValue({ key: 'mode', value: mode, stateType: 'string', adapter: adapter });
                 return;
             }
             adapter.log.error(`Error: ${JSON.stringify(response.data)}`);

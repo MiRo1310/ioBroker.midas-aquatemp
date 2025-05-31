@@ -67,10 +67,10 @@ export class MidasAquatemp extends utils.Adapter {
         await updateToken(adapter);
 
         async function clearValues(): Promise<void> {
-            await saveValue('error', true, 'boolean', adapter);
-            await saveValue('consumption', 0, 'number', adapter);
-            await saveValue('state', false, 'boolean', adapter);
-            await saveValue('rawJSON', null, 'string', adapter);
+            await saveValue({ key: 'error', value: true, stateType: 'boolean', adapter: adapter });
+            await saveValue({ key: 'consumption', value: 0, stateType: 'number', adapter: adapter });
+            await saveValue({ key: 'state', value: false, stateType: 'boolean', adapter: adapter });
+            await saveValue({ key: 'rawJSON', value: null, stateType: 'string', adapter: adapter });
         }
 
         updateIntervall = store._this.setInterval(async () => {

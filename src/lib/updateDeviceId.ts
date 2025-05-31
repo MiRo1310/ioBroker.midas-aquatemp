@@ -51,11 +51,11 @@ export async function updateDeviceID(adapter: MidasAquatemp): Promise<void> {
         adapter.log.debug(`Product: ${store.product}`);
         adapter.log.debug(`Reachable: ${store.reachable}`);
 
-        await saveValue('DeviceCode', store.device, 'string', adapter);
-        await saveValue('ProductCode', store.product, 'string', adapter);
+        await saveValue({ key: 'DeviceCode', value: store.device, stateType: 'string', adapter: adapter });
+        await saveValue({ key: 'ProductCode', value: store.product, stateType: 'string', adapter: adapter });
 
         if (store.reachable && store.device) {
-            await saveValue('info.connection', true, 'boolean', adapter);
+            await saveValue({ key: 'info.connection', value: true, stateType: 'boolean', adapter: adapter });
             if (store.device != '' && store.product) {
                 adapter.log.debug('Update device status');
                 await updateDeviceStatus(adapter);

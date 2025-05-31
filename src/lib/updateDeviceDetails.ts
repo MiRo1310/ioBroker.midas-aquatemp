@@ -13,28 +13,68 @@ export const numberToBoolean = (value: number): boolean => {
 
 const saveValues = async (adapter: MidasAquatemp, value: any): Promise<void> => {
     // Stromverbrauch T07 x T14 in Watt
-    await saveValue(
-        'consumption',
-        parseFloat(findCodeVal(value, ['T07', 'T7'])) * parseFloat(findCodeVal(value, 'T14')),
-        'number',
-        adapter,
-    );
+    await saveValue({
+        key: 'consumption',
+        value: parseFloat(findCodeVal(value, ['T07', 'T7'])) * parseFloat(findCodeVal(value, 'T14')),
+        stateType: 'number',
+        adapter: adapter,
+    });
     // Luftansaug-Temperatur T01
-    await saveValue('suctionTemp', parseFloat(findCodeVal(value, ['T01', 'T1'])), 'number', adapter);
+    await saveValue({
+        key: 'suctionTemp',
+        value: parseFloat(findCodeVal(value, ['T01', 'T1'])),
+        stateType: 'number',
+        adapter: adapter,
+    });
     // Inlet-Temperatur T02
-    await saveValue('tempIn', parseFloat(findCodeVal(value, ['T02', 'T2'])), 'number', adapter);
+    await saveValue({
+        key: 'tempIn',
+        value: parseFloat(findCodeVal(value, ['T02', 'T2'])),
+        stateType: 'number',
+        adapter: adapter,
+    });
     // outlet-Temperatur T03
-    await saveValue('tempOut', parseFloat(findCodeVal(value, ['T03', 'T3'])), 'number', adapter);
+    await saveValue({
+        key: 'tempOut',
+        value: parseFloat(findCodeVal(value, ['T03', 'T3'])),
+        stateType: 'number',
+        adapter: adapter,
+    });
     // Coil-Temperatur T04
-    await saveValue('coilTemp', parseFloat(findCodeVal(value, ['T04', 'T4'])), 'number', adapter);
+    await saveValue({
+        key: 'coilTemp',
+        value: parseFloat(findCodeVal(value, ['T04', 'T4'])),
+        stateType: 'number',
+        adapter: adapter,
+    });
     // Umgebungs-Temperatur T05
-    await saveValue('ambient', parseFloat(findCodeVal(value, ['T05', 'T5'])), 'number', adapter);
+    await saveValue({
+        key: 'ambient',
+        value: parseFloat(findCodeVal(value, ['T05', 'T5'])),
+        stateType: 'number',
+        adapter: adapter,
+    });
     // Kompressorausgang-Temperatur T06
-    await saveValue('exhaust', parseFloat(findCodeVal(value, ['T06', 'T6'])), 'number', adapter);
+    await saveValue({
+        key: 'exhaust',
+        value: parseFloat(findCodeVal(value, ['T06', 'T6'])),
+        stateType: 'number',
+        adapter: adapter,
+    });
     // Strömungsschalter S03
-    await saveValue('flowSwitch', numberToBoolean(findCodeVal(value, ['S03', 'S3'])), 'boolean', adapter);
+    await saveValue({
+        key: 'flowSwitch',
+        value: numberToBoolean(findCodeVal(value, ['S03', 'S3'])),
+        stateType: 'boolean',
+        adapter: adapter,
+    });
     // Lüfter-Drehzahl T17
-    await saveValue('rotor', parseInt(findCodeVal(value, 'T17')), 'number', adapter);
+    await saveValue({
+        key: 'rotor',
+        value: parseInt(findCodeVal(value, 'T17')),
+        stateType: 'number',
+        adapter: adapter,
+    });
 };
 
 export async function updateDeviceDetails(adapter: MidasAquatemp): Promise<void> {
@@ -52,7 +92,12 @@ export async function updateDeviceDetails(adapter: MidasAquatemp): Promise<void>
             if (parseInt(response.data.error_code) == 0) {
                 const responseValue = apiLevel < 3 ? response.data.object_result : response.data.objectResult;
 
-                await saveValue('rawJSON', JSON.stringify(responseValue), 'string', adapter);
+                await saveValue({
+                    key: 'rawJSON',
+                    value: JSON.stringify(responseValue),
+                    stateType: 'string',
+                    adapter: adapter,
+                });
                 await saveValues(adapter, responseValue);
 
                 const mode: number = findCodeVal(responseValue, 'Mode');
@@ -62,21 +107,36 @@ export async function updateDeviceDetails(adapter: MidasAquatemp): Promise<void>
                     2: 'R03', // Auto-Modus (-> R03)
                 };
                 // Ziel-Temperatur anhand Modus
-                await saveValue('tempSet', parseFloat(findCodeVal(responseValue, modes[mode])), 'number', adapter);
+                await saveValue({
+                    key: 'tempSet',
+                    value: parseFloat(findCodeVal(responseValue, modes[mode])),
+                    stateType: 'number',
+                    adapter: adapter,
+                });
 
                 // Flüstermodus Manual-mute
-                await saveValue('silent', findCodeVal(responseValue, 'Manual-mute') == '1', 'boolean', adapter);
+                await saveValue({
+                    key: 'silent',
+                    value: findCodeVal(responseValue, 'Manual-mute') == '1',
+                    stateType: 'boolean',
+                    adapter: adapter,
+                });
 
                 // Zustand Power
                 if (findCodeVal(responseValue, 'Power') == '1') {
-                    await saveValue('state', true, 'boolean', adapter);
-                    await saveValue('mode', findCodeVal(responseValue, 'Mode'), 'string', adapter);
+                    await saveValue({ key: 'state', value: true, stateType: 'boolean', adapter: adapter });
+                    await saveValue({
+                        key: 'mode',
+                        value: findCodeVal(responseValue, 'Mode'),
+                        stateType: 'string',
+                        adapter: adapter,
+                    });
                 } else {
-                    await saveValue('state', false, 'boolean', adapter);
-                    await saveValue('mode', '-1', 'string', adapter);
+                    await saveValue({ key: 'state', value: false, stateType: 'boolean', adapter: adapter });
+                    await saveValue({ key: 'mode', value: '-1', stateType: 'string', adapter: adapter });
                 }
 
-                await saveValue('info.connection', true, 'boolean', adapter);
+                await saveValue({ key: 'info.connection', value: true, stateType: 'boolean', adapter: adapter });
                 return;
             }
 

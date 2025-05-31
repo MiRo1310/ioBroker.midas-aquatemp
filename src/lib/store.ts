@@ -50,7 +50,7 @@ export function initStore(): Store {
                 this.token = '';
                 this.device = '';
                 this.reachable = false;
-                await saveValue('info.connection', false, 'boolean', this._this);
+                await saveValue({ key: 'info.connection', value: false, stateType: 'boolean', adapter: this._this });
             },
         };
     }

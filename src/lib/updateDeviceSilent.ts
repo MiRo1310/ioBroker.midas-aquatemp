@@ -24,7 +24,7 @@ export async function updateDeviceSilent(adapter: MidasAquatemp, deviceCode: str
             adapter.log.debug(`DeviceStatus: ${JSON.stringify(response.data)}`);
 
             if (parseInt(response.data.error_code) == 0) {
-                await saveValue('silent', silent, 'boolean', adapter);
+                await saveValue({ key: 'silent', value: silent, stateType: 'boolean', adapter: adapter });
                 return;
             }
             adapter.log.error(`Error: ${JSON.stringify(response.data)}`);

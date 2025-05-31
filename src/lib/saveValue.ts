@@ -1,13 +1,19 @@
 import type { MidasAquatemp } from '../main';
 import { initStore } from './store';
 import { errorLogger } from './logging';
+import { isDefined } from './utils';
 
-export const saveValue = async (
-    key: string,
-    value: ioBroker.StateValue,
-    stateType: ioBroker.CommonType,
-    adapter: MidasAquatemp,
-): Promise<void> => {
+export const saveValue = async ({
+    key,
+    value,
+    stateType,
+    adapter,
+}: {
+    key: string;
+    value?: ioBroker.StateValue;
+    stateType: ioBroker.CommonType;
+    adapter: MidasAquatemp;
+}): Promise<void> => {
     const store = initStore();
     const dpRoot = store.getDpRoot();
     try {
@@ -26,7 +32,7 @@ export const saveValue = async (
                 native: {},
             });
         }
-        if (value) {
+        if (isDefined(value)) {
             await adapter.setState(dp, value, true);
         }
     } catch (err: any) {

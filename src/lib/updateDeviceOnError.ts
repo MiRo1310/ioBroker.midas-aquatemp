@@ -26,22 +26,47 @@ export async function updateDeviceErrorMsg(adapter: MidasAquatemp): Promise<void
             );
 
             if (parseInt(response.data.error_code) == 0) {
-                await saveValue('error', true, 'boolean', adapter);
+                await saveValue({ key: 'error', value: true, stateType: 'boolean', adapter: adapter });
 
                 if (apiLevel < 3) {
-                    await saveValue(
-                        'errorMessage',
-                        response.data.object_result[0]?.description ?? '',
-                        'string',
-                        adapter,
-                    );
-                    await saveValue('errorCode', response.data.object_result[0]?.fault_code, 'string', adapter);
-                    await saveValue('errorLevel', response.data.object_result[0]?.error_level, 'string', adapter);
+                    await saveValue({
+                        key: 'errorMessage',
+                        value: response.data.object_result[0]?.description ?? '',
+                        stateType: 'string',
+                        adapter: adapter,
+                    });
+                    await saveValue({
+                        key: 'errorCode',
+                        value: response.data.object_result[0]?.fault_code,
+                        stateType: 'string',
+                        adapter: adapter,
+                    });
+                    await saveValue({
+                        key: 'errorLevel',
+                        value: response.data.object_result[0]?.error_level,
+                        stateType: 'string',
+                        adapter: adapter,
+                    });
                     return;
                 }
-                await saveValue('errorMessage', response.data.objectResult[0]?.description ?? '', 'string', adapter);
-                await saveValue('errorCode', response.data.objectResult[0]?.fault_code, 'string', adapter);
-                await saveValue('errorLevel', response.data.objectResult[0]?.error_level, 'string', adapter);
+                await saveValue({
+                    key: 'errorMessage',
+                    value: response.data.objectResult[0]?.description ?? '',
+                    stateType: 'string',
+                    adapter: adapter,
+                });
+                await saveValue({
+                    key: 'errorCode',
+                    value: response.data.objectResult[0]?.fault_code,
+                    stateType: 'string',
+                    adapter: adapter,
+                });
+                await saveValue({
+                    key: 'errorLevel',
+                    value: response.data.objectResult[0]?.error_level,
+                    stateType: 'string',
+                    adapter: adapter,
+                });
                 return;
             }
             // Login-Fehler

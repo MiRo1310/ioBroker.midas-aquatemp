@@ -42,16 +42,16 @@ export async function updateDeviceStatus(adapter: MidasAquatemp): Promise<void> 
                     store._this.log.error(`Error in updateDeviceStatus(): ${JSON.stringify(response.data)}`);
                     // TODO: Fehlerbeschreibung abrufen
                     //clearValues();
-                    await saveValue('error', true, 'boolean', adapter);
+                    await saveValue({ key: 'error', value: true, stateType: 'boolean', adapter: adapter });
                     await updateDeviceDetails(adapter);
                     await updateDeviceErrorMsg(adapter);
                     return;
                 }
                 // kein Fehler
-                await saveValue('error', false, 'boolean', adapter);
-                await saveValue('errorMessage', '', 'string', adapter);
-                await saveValue('errorCode', '', 'string', adapter);
-                await saveValue('errorLevel', 0, 'number', adapter);
+                await saveValue({ key: 'error', value: false, stateType: 'boolean', adapter: adapter });
+                await saveValue({ key: 'errorMessage', value: '', stateType: 'string', adapter: adapter });
+                await saveValue({ key: 'errorCode', value: '', stateType: 'string', adapter: adapter });
+                await saveValue({ key: 'errorLevel', value: 0, stateType: 'number', adapter: adapter });
                 await updateDeviceDetails(adapter);
 
                 return;
