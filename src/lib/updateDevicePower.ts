@@ -3,9 +3,9 @@ import { initStore } from './store';
 import { getSUrl } from './endPoints';
 import { getAxiosUpdateDevicePowerParams } from './axiosParameter';
 import { saveValue } from './saveValue';
-import axios from 'axios';
 import { errorLogger } from './logging';
 import type { MidasAquatemp } from '../main';
+import { request } from './axios';
 
 export async function updateDevicePower(adapter: MidasAquatemp, deviceCode: string, power: number): Promise<void> {
     const store = initStore();
@@ -17,7 +17,8 @@ export async function updateDevicePower(adapter: MidasAquatemp, deviceCode: stri
         }
         if (token && token != '') {
             const { sURL } = getSUrl();
-            const response = await axios.post(
+            const response = await request(
+                adapter,
                 sURL,
                 getAxiosUpdateDevicePowerParams({ deviceCode, value: powerOpt, protocolCode: 'Power' }),
                 {
@@ -47,7 +48,8 @@ async function updateDeviceMode(adapter: MidasAquatemp, deviceCode: string, mode
     try {
         if (token && token != '') {
             const { sURL } = getSUrl();
-            const response = await axios.post(
+            const response = await request(
+                adapter,
                 sURL,
                 getAxiosUpdateDevicePowerParams({ deviceCode: deviceCode, value: mode, protocolCode: 'mode' }),
                 {

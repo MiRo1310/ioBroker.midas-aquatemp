@@ -1,4 +1,3 @@
-import axios from 'axios';
 import { MidasAquatemp } from '../main';
 import { getUpdateDeviceStatusSUrl } from './endPoints';
 import { saveValue } from './saveValue';
@@ -6,6 +5,7 @@ import { initStore } from './store';
 import { updateDeviceDetails } from './updateDeviceDetails';
 import { updateDeviceErrorMsg } from './updateDeviceOnError';
 import { errorLogger } from './logging';
+import { request } from './axios';
 
 let _this: MidasAquatemp;
 
@@ -19,7 +19,8 @@ export async function updateDeviceStatus(adapter: MidasAquatemp): Promise<void> 
         if (token) {
             const { sURL } = getUpdateDeviceStatusSUrl();
 
-            const response = await axios.post(
+            const response = await request(
+                adapter,
                 sURL,
                 {
                     device_code: deviceCode,

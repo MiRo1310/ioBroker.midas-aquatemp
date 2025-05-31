@@ -1,4 +1,3 @@
-import axios from 'axios';
 import type { Modes } from '../types';
 import { getProtocolCodes } from './axiosParameter';
 import { getSUrlUpdateDeviceId } from './endPoints';
@@ -6,6 +5,7 @@ import { saveValue } from './saveValue';
 import { initStore } from './store';
 import { errorLogger } from './logging';
 import type { MidasAquatemp } from '../main';
+import { requests } from 'sinon';
 
 export const numberToBoolean = (value: number): boolean => {
     return value === 1;
@@ -84,7 +84,7 @@ export async function updateDeviceDetails(adapter: MidasAquatemp): Promise<void>
         if (token) {
             const { sURL } = getSUrlUpdateDeviceId();
 
-            const response = await axios.post(sURL, getProtocolCodes(deviceCode), {
+            const response = await requests(adapter, sURL, getProtocolCodes(deviceCode), {
                 headers: { 'x-token': token },
             });
             store._this.log.debug(`DeviceDetails: ${JSON.stringify(response.data)}`);

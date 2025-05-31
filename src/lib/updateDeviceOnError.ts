@@ -1,8 +1,8 @@
-import axios from 'axios';
 import { saveValue } from './saveValue';
 import { initStore } from './store';
 import { errorLogger } from './logging';
 import type { MidasAquatemp } from '../main';
+import { request } from './axios';
 
 export async function updateDeviceErrorMsg(adapter: MidasAquatemp): Promise<void> {
     const store = initStore();
@@ -14,7 +14,8 @@ export async function updateDeviceErrorMsg(adapter: MidasAquatemp): Promise<void
                     ? `${cloudURL}/app/device/getFaultDataByDeviceCode.json`
                     : `${cloudURL}/app/device/getFaultDataByDeviceCode`;
 
-            const response = await axios.post(
+            const response = await request(
+                adapter,
                 sURL,
                 {
                     device_code: deviceCode,
