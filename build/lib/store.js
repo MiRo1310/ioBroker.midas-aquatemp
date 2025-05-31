@@ -26,7 +26,7 @@ let store;
 function initStore() {
   if (!store) {
     store = {
-      _this: "",
+      adapter: "",
       token: "",
       instance: null,
       username: "",
@@ -52,7 +52,7 @@ function initStore() {
         this.token = "";
         this.device = "";
         this.reachable = false;
-        await (0, import_saveValue.saveValue)("info.connection", false, "boolean", this._this);
+        await (0, import_saveValue.saveValue)({ key: "info.connection", value: false, stateType: "boolean", adapter: this.adapter });
       }
     };
   }

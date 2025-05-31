@@ -1,10 +1,10 @@
-import axios from 'axios';
 import { getAxiosUpdateDevicePowerParams } from './axiosParameter';
 import { getSUrl } from './endPoints';
 import { saveValue } from './saveValue';
 import { initStore } from './store';
 import { errorLogger } from './logging';
 import type { MidasAquatemp } from '../main';
+import { request } from './axios';
 
 export async function updateDeviceSilent(adapter: MidasAquatemp, deviceCode: string, silent: boolean): Promise<void> {
     const store = initStore();
@@ -14,17 +14,22 @@ export async function updateDeviceSilent(adapter: MidasAquatemp, deviceCode: str
 
         if (token && token != '') {
             const { sURL } = getSUrl();
-            const response = await axios.post(
+            const response = await request(
+                adapter,
                 sURL,
                 getAxiosUpdateDevicePowerParams({ deviceCode, value: silentMode, protocolCode: 'Manual-mute' }),
                 {
                     headers: { 'x-token': token },
                 },
             );
+            if (!response?.data) {
+                return;
+            }
+
             adapter.log.debug(`DeviceStatus: ${JSON.stringify(response.data)}`);
 
             if (parseInt(response.data.error_code) == 0) {
-                await saveValue('silent', silent, 'boolean', adapter);
+                await saveValue({ key: 'silent', value: silent, stateType: 'boolean', adapter: adapter });
                 return;
             }
             adapter.log.error(`Error: ${JSON.stringify(response.data)}`);

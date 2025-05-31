@@ -1,4 +1,3 @@
-import axios from 'axios';
 import type { MidasAquatemp } from '../main';
 import { getAxiosUpdateDeviceIdParams } from './axiosParameter';
 import { getUpdateDeviceIdSUrl } from './endPoints';
@@ -6,6 +5,7 @@ import { saveValue } from './saveValue';
 import { initStore } from './store';
 import { updateDeviceStatus } from './updateDeviceStatus';
 import { errorLogger } from './logging';
+import { request } from './axios';
 
 export async function updateDeviceID(adapter: MidasAquatemp): Promise<void> {
     const store = initStore();
@@ -19,10 +19,12 @@ export async function updateDeviceID(adapter: MidasAquatemp): Promise<void> {
         adapter.log.debug(`UpdateDeviceID URL: ${sURL}`);
         adapter.log.debug(`UpdateDeviceID options: ${JSON.stringify(options)}`);
 
-        const response = await axios.post(sURL, options, {
+        const response = await request(adapter, sURL, options, {
             headers: { 'x-token': token },
         });
-
+        if (!response?.data) {
+            return;
+        }
         adapter.log.debug(`UpdateDeviceID response: ${JSON.stringify(response.data)}`);
         adapter.log.debug(`UpdateDeviceID response status: ${JSON.stringify(response.status)}`);
 
@@ -51,11 +53,11 @@ export async function updateDeviceID(adapter: MidasAquatemp): Promise<void> {
         adapter.log.debug(`Product: ${store.product}`);
         adapter.log.debug(`Reachable: ${store.reachable}`);
 
-        await saveValue('DeviceCode', store.device, 'string', adapter);
-        await saveValue('ProductCode', store.product, 'string', adapter);
+        await saveValue({ key: 'DeviceCode', value: store.device, stateType: 'string', adapter: adapter });
+        await saveValue({ key: 'ProductCode', value: store.product, stateType: 'string', adapter: adapter });
 
         if (store.reachable && store.device) {
-            await saveValue('info.connection', true, 'boolean', adapter);
+            await saveValue({ key: 'info.connection', value: true, stateType: 'boolean', adapter: adapter });
             if (store.device != '' && store.product) {
                 adapter.log.debug('Update device status');
                 await updateDeviceStatus(adapter);

@@ -26,46 +26,31 @@ var __toESM = (mod, isNodeMode, target) => (target = mod != null ? __create(__ge
   mod
 ));
 var __toCommonJS = (mod) => __copyProps(__defProp({}, "__esModule", { value: true }), mod);
-var updateDeviceSetTemp_exports = {};
-__export(updateDeviceSetTemp_exports, {
-  updateDeviceSetTemp: () => updateDeviceSetTemp
+var axios_exports = {};
+__export(axios_exports, {
+  request: () => request
 });
-module.exports = __toCommonJS(updateDeviceSetTemp_exports);
+module.exports = __toCommonJS(axios_exports);
 var import_axios = __toESM(require("axios"));
-var import_axiosParameter = require("./axiosParameter");
-var import_endPoints = require("./endPoints");
-var import_saveValue = require("./saveValue");
-var import_store = require("./store");
 var import_logging = require("./logging");
-const updateDeviceSetTemp = async (adapter, deviceCode, temperature) => {
-  const store = (0, import_store.initStore)();
-  const dpRoot = store.getDpRoot();
+const request = async (adapter, url, options = {}, header = { headers: {} }) => {
   try {
-    const token = store.token;
-    const sTemperature = temperature.toString().replace(",", ".");
-    const result = await adapter.getStateAsync(`${dpRoot}.mode`);
-    if (!(result && (result.val || result.val === 0))) {
-      return;
+    const result = await import_axios.default.post(url, options, header);
+    if (result.status === 200) {
+      adapter.log.debug(`Axios request successful: ${JSON.stringify(result.data)}`);
+      return result;
     }
-    if (token && token != "") {
-      const { sURL } = (0, import_endPoints.getSUrl)();
-      const response = await import_axios.default.post(sURL, (0, import_axiosParameter.getAxiosUpdateDeviceSetTempParams)({ deviceCode, sTemperature }), {
-        headers: { "x-token": token }
-      });
-      adapter.log.debug(`DeviceStatus: ${JSON.stringify(response.data)}`);
-      if (parseInt(response.data.error_code) == 0) {
-        await (0, import_saveValue.saveValue)({ key: "tempSet", value: temperature, stateType: "number", adapter });
-        return;
-      }
-      adapter.log.error(`Error: ${JSON.stringify(response.data)}`);
-      store.resetOnErrorHandler();
+    if (result.status === 504) {
+      adapter.log.warn(`Axios request timed out: ${url}`);
+      return result;
     }
-  } catch (error) {
-    (0, import_logging.errorLogger)("Error in updateDeviceSetTemp", error, adapter);
+    return result;
+  } catch (e) {
+    (0, import_logging.errorLogger)("Axios request error", e, adapter);
   }
 };
 // Annotate the CommonJS export names for ESM import in node:
 0 && (module.exports = {
-  updateDeviceSetTemp
+  request
 });
-//# sourceMappingURL=updateDeviceSetTemp.js.map
+//# sourceMappingURL=axios.js.map

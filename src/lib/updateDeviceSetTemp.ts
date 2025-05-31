@@ -30,7 +30,7 @@ export const updateDeviceSetTemp = async (
             adapter.log.debug(`DeviceStatus: ${JSON.stringify(response.data)}`);
 
             if (parseInt(response.data.error_code) == 0) {
-                await saveValue('tempSet', temperature, 'number', adapter);
+                await saveValue({ key: 'tempSet', value: temperature, stateType: 'number', adapter: adapter });
                 return;
             }
             adapter.log.error(`Error: ${JSON.stringify(response.data)}`);

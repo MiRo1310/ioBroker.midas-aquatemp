@@ -1,9 +1,7 @@
 "use strict";
-var __create = Object.create;
 var __defProp = Object.defineProperty;
 var __getOwnPropDesc = Object.getOwnPropertyDescriptor;
 var __getOwnPropNames = Object.getOwnPropertyNames;
-var __getProtoOf = Object.getPrototypeOf;
 var __hasOwnProp = Object.prototype.hasOwnProperty;
 var __export = (target, all) => {
   for (var name in all)
@@ -17,26 +15,18 @@ var __copyProps = (to, from, except, desc) => {
   }
   return to;
 };
-var __toESM = (mod, isNodeMode, target) => (target = mod != null ? __create(__getProtoOf(mod)) : {}, __copyProps(
-  // If the importer is in node compatibility mode or this is not an ESM
-  // file that has been converted to a CommonJS file using a Babel-
-  // compatible transform (i.e. "__esModule" has not been set), then set
-  // "default" to the CommonJS "module.exports" for node compatibility.
-  isNodeMode || !mod || !mod.__esModule ? __defProp(target, "default", { value: mod, enumerable: true }) : target,
-  mod
-));
 var __toCommonJS = (mod) => __copyProps(__defProp({}, "__esModule", { value: true }), mod);
 var updateDeviceSilent_exports = {};
 __export(updateDeviceSilent_exports, {
   updateDeviceSilent: () => updateDeviceSilent
 });
 module.exports = __toCommonJS(updateDeviceSilent_exports);
-var import_axios = __toESM(require("axios"));
 var import_axiosParameter = require("./axiosParameter");
 var import_endPoints = require("./endPoints");
 var import_saveValue = require("./saveValue");
 var import_store = require("./store");
 var import_logging = require("./logging");
+var import_axios = require("./axios");
 async function updateDeviceSilent(adapter, deviceCode, silent) {
   const store = (0, import_store.initStore)();
   try {
@@ -44,16 +34,20 @@ async function updateDeviceSilent(adapter, deviceCode, silent) {
     const silentMode = silent ? "1" : "0";
     if (token && token != "") {
       const { sURL } = (0, import_endPoints.getSUrl)();
-      const response = await import_axios.default.post(
+      const response = await (0, import_axios.request)(
+        adapter,
         sURL,
         (0, import_axiosParameter.getAxiosUpdateDevicePowerParams)({ deviceCode, value: silentMode, protocolCode: "Manual-mute" }),
         {
           headers: { "x-token": token }
         }
       );
+      if (!(response == null ? void 0 : response.data)) {
+        return;
+      }
       adapter.log.debug(`DeviceStatus: ${JSON.stringify(response.data)}`);
       if (parseInt(response.data.error_code) == 0) {
-        await (0, import_saveValue.saveValue)("silent", silent, "boolean", adapter);
+        await (0, import_saveValue.saveValue)({ key: "silent", value: silent, stateType: "boolean", adapter });
         return;
       }
       adapter.log.error(`Error: ${JSON.stringify(response.data)}`);

@@ -1,10 +1,10 @@
-import axios from 'axios';
 import { getOptionsAndSUrl } from './endPoints';
 import { initStore as useStore } from './store';
 import { updateDeviceID } from './updateDeviceId';
 import { updateDeviceStatus } from './updateDeviceStatus';
 import { errorLogger } from './logging';
 import type { MidasAquatemp } from '../main';
+import { request } from './axios';
 
 async function getToken(adapter: MidasAquatemp): Promise<void> {
     const store = useStore();
@@ -16,7 +16,7 @@ async function getToken(adapter: MidasAquatemp): Promise<void> {
             adapter.log.debug('Request token');
             const { sUrl, options } = getOptionsAndSUrl();
 
-            const response = await axios.post(sUrl, options);
+            const response = await request(adapter, sUrl, options);
             if (!response) {
                 adapter.log.error('No response from server');
                 return;

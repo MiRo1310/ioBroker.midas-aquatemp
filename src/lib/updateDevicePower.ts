@@ -3,9 +3,9 @@ import { initStore } from './store';
 import { getSUrl } from './endPoints';
 import { getAxiosUpdateDevicePowerParams } from './axiosParameter';
 import { saveValue } from './saveValue';
-import axios from 'axios';
 import { errorLogger } from './logging';
 import type { MidasAquatemp } from '../main';
+import { request } from './axios';
 
 export async function updateDevicePower(adapter: MidasAquatemp, deviceCode: string, power: number): Promise<void> {
     const store = initStore();
@@ -17,17 +17,20 @@ export async function updateDevicePower(adapter: MidasAquatemp, deviceCode: stri
         }
         if (token && token != '') {
             const { sURL } = getSUrl();
-            const response = await axios.post(
+            const response = await request(
+                adapter,
                 sURL,
                 getAxiosUpdateDevicePowerParams({ deviceCode, value: powerOpt, protocolCode: 'Power' }),
                 {
                     headers: { 'x-token': token },
                 },
             );
-
+            if (!response?.data) {
+                return;
+            }
             adapter.log.debug(`DeviceStatus: ${JSON.stringify(response.data)}`);
             if (parseInt(response.data.error_code) == 0) {
-                await saveValue('mode', power.toString(), 'string', adapter);
+                await saveValue({ key: 'mode', value: power.toString(), stateType: 'string', adapter: adapter });
                 if (power >= 0) {
                     await updateDeviceMode(adapter, store.device, power);
                 }
@@ -47,17 +50,21 @@ async function updateDeviceMode(adapter: MidasAquatemp, deviceCode: string, mode
     try {
         if (token && token != '') {
             const { sURL } = getSUrl();
-            const response = await axios.post(
+            const response = await request(
+                adapter,
                 sURL,
                 getAxiosUpdateDevicePowerParams({ deviceCode: deviceCode, value: mode, protocolCode: 'mode' }),
                 {
                     headers: { 'x-token': token },
                 },
             );
+            if (!response?.data) {
+                return;
+            }
             adapter.log.debug(`DeviceStatus: ${JSON.stringify(response.data)}`);
 
             if (parseInt(response.data.error_code) == 0) {
-                await saveValue('mode', mode, 'string', adapter);
+                await saveValue({ key: 'mode', value: mode, stateType: 'string', adapter: adapter });
                 return;
             }
             adapter.log.error(`Error: ${JSON.stringify(response.data)}`);
