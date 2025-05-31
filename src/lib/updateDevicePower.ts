@@ -1,7 +1,7 @@
 import { getPowerMode } from './getSettings';
 import { initStore } from './store';
 import { getSUrl } from './endPoints';
-import { getAxiosUpdateDevicePowerParams } from './axiosParameter';
+import { getAxiosUpdateDevicePowerParams, getHeaders } from './axiosParameter';
 import { saveValue } from './saveValue';
 import { errorLogger } from './logging';
 import type { MidasAquatemp } from '../main';
@@ -21,9 +21,7 @@ export async function updateDevicePower(adapter: MidasAquatemp, deviceCode: stri
                 adapter,
                 sURL,
                 getAxiosUpdateDevicePowerParams({ deviceCode, value: powerOpt, protocolCode: 'Power' }),
-                {
-                    headers: { 'x-token': token },
-                },
+                getHeaders(token),
             );
             if (!response?.data) {
                 return;

@@ -6,6 +6,7 @@ import { updateDeviceDetails } from './updateDeviceDetails';
 import { updateDeviceErrorMsg } from './updateDeviceOnError';
 import { errorLogger } from './logging';
 import { request } from './axios';
+import { getHeaders } from './axiosParameter';
 
 export async function updateDeviceStatus(adapter: MidasAquatemp): Promise<void> {
     const store = initStore();
@@ -21,9 +22,7 @@ export async function updateDeviceStatus(adapter: MidasAquatemp): Promise<void> 
                     device_code: deviceCode,
                     deviceCode: deviceCode,
                 },
-                {
-                    headers: { 'x-token': token },
-                },
+                getHeaders(token),
             );
             if (!response?.data) {
                 return;

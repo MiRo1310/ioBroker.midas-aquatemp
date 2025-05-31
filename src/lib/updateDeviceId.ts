@@ -1,5 +1,5 @@
 import type { MidasAquatemp } from '../main';
-import { getAxiosUpdateDeviceIdParams } from './axiosParameter';
+import { getAxiosUpdateDeviceIdParams, getHeaders } from './axiosParameter';
 import { getUpdateDeviceIdSUrl } from './endPoints';
 import { saveValue } from './saveValue';
 import { initStore } from './store';
@@ -19,9 +19,7 @@ export async function updateDeviceID(adapter: MidasAquatemp): Promise<void> {
         adapter.log.debug(`UpdateDeviceID URL: ${sURL}`);
         adapter.log.debug(`UpdateDeviceID options: ${JSON.stringify(options)}`);
 
-        const response = await request(adapter, sURL, options, {
-            headers: { 'x-token': token },
-        });
+        const response = await request(adapter, sURL, options, getHeaders(token));
         if (!response?.data) {
             return;
         }

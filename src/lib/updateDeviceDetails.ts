@@ -1,11 +1,12 @@
 import type { Modes } from '../types';
-import { getProtocolCodes } from './axiosParameter';
+import { getHeaders, getProtocolCodes } from './axiosParameter';
 import { getSUrlUpdateDeviceId } from './endPoints';
 import { saveValue } from './saveValue';
 import { initStore } from './store';
 import { errorLogger } from './logging';
 import type { MidasAquatemp } from '../main';
 import { request } from './axios';
+import type { ObjectResultResponse } from '../types/types';
 
 export const numberToBoolean = (value: number): boolean => {
     return value === 1;
@@ -81,73 +82,73 @@ export async function updateDeviceDetails(adapter: MidasAquatemp): Promise<void>
     const store = initStore();
     try {
         const { apiLevel, token, device: deviceCode } = store;
-        if (token) {
-            const { sURL } = getSUrlUpdateDeviceId();
-
-            const response = await request(adapter, sURL, getProtocolCodes(deviceCode), {
-                headers: { 'x-token': token },
-            });
-            if (!response?.data) {
-                return;
-            }
-            adapter.log.debug(`DeviceDetails: ${JSON.stringify(response.data)}`);
-
-            if (parseInt(response.data.error_code) == 0) {
-                const responseValue = apiLevel < 3 ? response.data.object_result : response.data.objectResult;
-
-                await saveValue({
-                    key: 'rawJSON',
-                    value: JSON.stringify(responseValue),
-                    stateType: 'string',
-                    adapter: adapter,
-                });
-                await saveValues(adapter, responseValue);
-
-                const mode: number = findCodeVal(responseValue, 'Mode');
-                const modes: Modes = {
-                    1: 'R02', // Heiz-Modus (-> R02)
-                    0: 'R01', // Kühl-Modus (-> R01)
-                    2: 'R03', // Auto-Modus (-> R03)
-                };
-
-                await saveValue({
-                    key: 'tempSet',
-                    value: parseFloat(findCodeVal(responseValue, modes[mode])),
-                    stateType: 'number',
-                    adapter: adapter,
-                });
-
-                await saveValue({
-                    key: 'silent',
-                    value: findCodeVal(responseValue, 'Manual-mute') == '1',
-                    stateType: 'boolean',
-                    adapter: adapter,
-                });
-
-                const powerOpt = findCodeVal(responseValue, 'Power') === '1';
-
-                await saveValue({ key: 'state', value: powerOpt, stateType: 'boolean', adapter: adapter });
-                await saveValue({
-                    key: 'mode',
-                    value: powerOpt ? findCodeVal(responseValue, 'Mode') : '-1',
-                    stateType: 'string',
-                    adapter: adapter,
-                });
-
-                await saveValue({ key: 'info.connection', value: true, stateType: 'boolean', adapter: adapter });
-                return;
-            }
-
-            store.resetOnErrorHandler();
+        if (!token) {
             return;
         }
+
+        const { sURL } = getSUrlUpdateDeviceId();
+
+        const response = await request(adapter, sURL, getProtocolCodes(deviceCode), getHeaders(token));
+        if (!response?.data) {
+            return;
+        }
+        adapter.log.debug(`DeviceDetails: ${JSON.stringify(response.data)}`);
+
+        if (parseInt(response.data.error_code) == 0) {
+            const responseValue: ObjectResultResponse =
+                apiLevel < 3 ? response.data.object_result : response.data.objectResult;
+
+            await saveValue({
+                key: 'rawJSON',
+                value: JSON.stringify(responseValue),
+                stateType: 'string',
+                adapter: adapter,
+            });
+            await saveValues(adapter, responseValue);
+
+            const mode: number = findCodeVal(responseValue, 'Mode');
+            const modes: Modes = {
+                1: 'R02', // Heiz-Modus (-> R02)
+                0: 'R01', // Kühl-Modus (-> R01)
+                2: 'R03', // Auto-Modus (-> R03)
+            };
+
+            await saveValue({
+                key: 'tempSet',
+                value: parseFloat(findCodeVal(responseValue, modes[mode])),
+                stateType: 'number',
+                adapter: adapter,
+            });
+
+            await saveValue({
+                key: 'silent',
+                value: findCodeVal(responseValue, 'Manual-mute') == '1',
+                stateType: 'boolean',
+                adapter: adapter,
+            });
+
+            const powerOpt = findCodeVal(responseValue, 'Power') === '1';
+
+            await saveValue({ key: 'state', value: powerOpt, stateType: 'boolean', adapter: adapter });
+            await saveValue({
+                key: 'mode',
+                value: powerOpt ? findCodeVal(responseValue, 'Mode') : '-1',
+                stateType: 'string',
+                adapter: adapter,
+            });
+
+            await saveValue({ key: 'info.connection', value: true, stateType: 'boolean', adapter: adapter });
+            return;
+        }
+
+        store.resetOnErrorHandler();
         return;
     } catch (error: any) {
         errorLogger('Error updateDeviceDetails', error, adapter);
     }
 }
 
-function findCodeVal(result: { value: string; code: string }[], code: string | string[]): any {
+function findCodeVal(result: ObjectResultResponse, code: string | string[]): any {
     if (!Array.isArray(code)) {
         return result.find(item => item.code === code)?.value || '';
     }

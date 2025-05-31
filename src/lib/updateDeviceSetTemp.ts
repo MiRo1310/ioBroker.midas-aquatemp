@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { getAxiosUpdateDeviceSetTempParams } from './axiosParameter';
+import { getAxiosUpdateDeviceSetTempParams, getHeaders } from './axiosParameter';
 import { getSUrl } from './endPoints';
 import { saveValue } from './saveValue';
 import { initStore } from './store';
@@ -24,9 +24,11 @@ export const updateDeviceSetTemp = async (
         if (token && token != '') {
             const { sURL } = getSUrl();
 
-            const response = await axios.post(sURL, getAxiosUpdateDeviceSetTempParams({ deviceCode, sTemperature }), {
-                headers: { 'x-token': token },
-            });
+            const response = await axios.post(
+                sURL,
+                getAxiosUpdateDeviceSetTempParams({ deviceCode, sTemperature }),
+                getHeaders(token),
+            );
             adapter.log.debug(`DeviceStatus: ${JSON.stringify(response.data)}`);
 
             if (parseInt(response.data.error_code) == 0) {

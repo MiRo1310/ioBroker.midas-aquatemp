@@ -1,4 +1,4 @@
-import { getAxiosUpdateDevicePowerParams } from './axiosParameter';
+import { getAxiosUpdateDevicePowerParams, getHeaders } from './axiosParameter';
 import { getSUrl } from './endPoints';
 import { saveValue } from './saveValue';
 import { initStore } from './store';
@@ -18,9 +18,7 @@ export async function updateDeviceSilent(adapter: MidasAquatemp, deviceCode: str
                 adapter,
                 sURL,
                 getAxiosUpdateDevicePowerParams({ deviceCode, value: silentMode, protocolCode: 'Manual-mute' }),
-                {
-                    headers: { 'x-token': token },
-                },
+                getHeaders(token),
             );
             if (!response?.data) {
                 return;
