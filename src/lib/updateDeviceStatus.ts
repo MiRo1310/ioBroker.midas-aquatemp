@@ -11,11 +11,11 @@ import { getHeaders } from './axiosParameter';
 export async function updateDeviceStatus(adapter: MidasAquatemp): Promise<void> {
     const store = initStore();
     try {
-        const { token, device: deviceCode, apiLevel } = store;
+        const { token, device: deviceCode } = store;
         if (token) {
             const { sURL } = getUpdateDeviceStatusSUrl();
 
-            const response = await request(
+            const { data } = await request(
                 adapter,
                 sURL,
                 {
@@ -24,21 +24,19 @@ export async function updateDeviceStatus(adapter: MidasAquatemp): Promise<void> 
                 },
                 getHeaders(token),
             );
-            if (!response?.data) {
+            if (!data) {
                 return;
             }
             {
                 store.reachable =
-                    apiLevel < 3
-                        ? response.data.object_result?.[0]?.device_status == 'ONLINE'
-                        : response.data.objectResult?.[0]?.deviceStatus == 'ONLINE';
+                    (data.object_result?.[0]?.device_status ?? data.objectResult?.[0]?.deviceStatus) == 'ONLINE';
             }
 
-            if (parseInt(response.data.error_code) == 0) {
-                adapter.log.debug(`DeviceStatus: ${JSON.stringify(response.data)}`);
+            if (data.error_code == '0') {
+                adapter.log.debug(`DeviceStatus: ${JSON.stringify(data)}`);
 
-                if (response.data?.object_result?.is_fault || response?.data?.objectResult?.isFault) {
-                    adapter.log.error(`Error in updateDeviceStatus(): ${JSON.stringify(response.data)}`);
+                if (data?.object_result?.[0]?.is_fault || data?.objectResult?.[0]?.isFault) {
+                    adapter.log.error(`Error in updateDeviceStatus(): ${JSON.stringify(data)}`);
                     // TODO: Fehlerbeschreibung abrufen
                     //clearValues();
                     await saveValue({ key: 'error', value: true, stateType: 'boolean', adapter: adapter });

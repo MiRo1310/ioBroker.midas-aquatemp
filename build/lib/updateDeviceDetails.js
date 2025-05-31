@@ -91,59 +91,57 @@ async function updateDeviceDetails(adapter) {
   const store = (0, import_store.initStore)();
   try {
     const { apiLevel, token, device: deviceCode } = store;
-    if (token) {
-      const { sURL } = (0, import_endPoints.getSUrlUpdateDeviceId)();
-      const response = await (0, import_axios.request)(adapter, sURL, (0, import_axiosParameter.getProtocolCodes)(deviceCode), {
-        headers: { "x-token": token }
-      });
-      if (!(response == null ? void 0 : response.data)) {
-        return;
-      }
-      adapter.log.debug(`DeviceDetails: ${JSON.stringify(response.data)}`);
-      if (parseInt(response.data.error_code) == 0) {
-        const responseValue = apiLevel < 3 ? response.data.object_result : response.data.objectResult;
-        await (0, import_saveValue.saveValue)({
-          key: "rawJSON",
-          value: JSON.stringify(responseValue),
-          stateType: "string",
-          adapter
-        });
-        await saveValues(adapter, responseValue);
-        const mode = findCodeVal(responseValue, "Mode");
-        const modes = {
-          1: "R02",
-          // Heiz-Modus (-> R02)
-          0: "R01",
-          // Kühl-Modus (-> R01)
-          2: "R03"
-          // Auto-Modus (-> R03)
-        };
-        await (0, import_saveValue.saveValue)({
-          key: "tempSet",
-          value: parseFloat(findCodeVal(responseValue, modes[mode])),
-          stateType: "number",
-          adapter
-        });
-        await (0, import_saveValue.saveValue)({
-          key: "silent",
-          value: findCodeVal(responseValue, "Manual-mute") == "1",
-          stateType: "boolean",
-          adapter
-        });
-        const powerOpt = findCodeVal(responseValue, "Power") === "1";
-        await (0, import_saveValue.saveValue)({ key: "state", value: powerOpt, stateType: "boolean", adapter });
-        await (0, import_saveValue.saveValue)({
-          key: "mode",
-          value: powerOpt ? findCodeVal(responseValue, "Mode") : "-1",
-          stateType: "string",
-          adapter
-        });
-        await (0, import_saveValue.saveValue)({ key: "info.connection", value: true, stateType: "boolean", adapter });
-        return;
-      }
-      store.resetOnErrorHandler();
+    if (!token) {
       return;
     }
+    const { sURL } = (0, import_endPoints.getSUrlUpdateDeviceId)();
+    const response = await (0, import_axios.request)(adapter, sURL, (0, import_axiosParameter.getProtocolCodes)(deviceCode), (0, import_axiosParameter.getHeaders)(token));
+    if (!(response == null ? void 0 : response.data)) {
+      return;
+    }
+    adapter.log.debug(`DeviceDetails: ${JSON.stringify(response.data)}`);
+    if (parseInt(response.data.error_code) == 0) {
+      const responseValue = apiLevel < 3 ? response.data.object_result : response.data.objectResult;
+      await (0, import_saveValue.saveValue)({
+        key: "rawJSON",
+        value: JSON.stringify(responseValue),
+        stateType: "string",
+        adapter
+      });
+      await saveValues(adapter, responseValue);
+      const mode = findCodeVal(responseValue, "Mode");
+      const modes = {
+        1: "R02",
+        // Heiz-Modus (-> R02)
+        0: "R01",
+        // Kühl-Modus (-> R01)
+        2: "R03"
+        // Auto-Modus (-> R03)
+      };
+      await (0, import_saveValue.saveValue)({
+        key: "tempSet",
+        value: parseFloat(findCodeVal(responseValue, modes[mode])),
+        stateType: "number",
+        adapter
+      });
+      await (0, import_saveValue.saveValue)({
+        key: "silent",
+        value: findCodeVal(responseValue, "Manual-mute") == "1",
+        stateType: "boolean",
+        adapter
+      });
+      const powerOpt = findCodeVal(responseValue, "Power") === "1";
+      await (0, import_saveValue.saveValue)({ key: "state", value: powerOpt, stateType: "boolean", adapter });
+      await (0, import_saveValue.saveValue)({
+        key: "mode",
+        value: powerOpt ? findCodeVal(responseValue, "Mode") : "-1",
+        stateType: "string",
+        adapter
+      });
+      await (0, import_saveValue.saveValue)({ key: "info.connection", value: true, stateType: "boolean", adapter });
+      return;
+    }
+    store.resetOnErrorHandler();
     return;
   } catch (error) {
     (0, import_logging.errorLogger)("Error updateDeviceDetails", error, adapter);

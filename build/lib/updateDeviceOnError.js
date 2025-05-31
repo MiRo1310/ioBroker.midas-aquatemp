@@ -25,45 +25,44 @@ var import_saveValue = require("./saveValue");
 var import_store = require("./store");
 var import_logging = require("./logging");
 var import_axios = require("./axios");
+var import_axiosParameter = require("./axiosParameter");
 async function updateDeviceErrorMsg(adapter) {
-  var _a, _b, _c, _d, _e, _f, _g, _h;
+  var _a, _b, _c, _d, _e, _f, _g, _h, _i, _j, _k, _l, _m, _n;
   const store = (0, import_store.initStore)();
   try {
     const { token, apiLevel, cloudURL, device: deviceCode } = store;
     if (token) {
       const sURL = apiLevel < 3 ? `${cloudURL}/app/device/getFaultDataByDeviceCode.json` : `${cloudURL}/app/device/getFaultDataByDeviceCode`;
-      const response = await (0, import_axios.request)(
+      const { data } = await (0, import_axios.request)(
         adapter,
         sURL,
         {
           device_code: deviceCode,
           deviceCode
         },
-        {
-          headers: { "x-token": token }
-        }
+        (0, import_axiosParameter.getHeaders)(token)
       );
-      if (!(response == null ? void 0 : response.data)) {
+      if (!data) {
         return;
       }
-      if (parseInt(response.data.error_code) == 0) {
+      if (data.error_code === "0") {
         await (0, import_saveValue.saveValue)({ key: "error", value: true, stateType: "boolean", adapter });
         if (apiLevel < 3) {
           await (0, import_saveValue.saveValue)({
             key: "errorMessage",
-            value: (_b = (_a = response.data.object_result[0]) == null ? void 0 : _a.description) != null ? _b : "",
+            value: (_c = (_b = (_a = data.object_result) == null ? void 0 : _a[0]) == null ? void 0 : _b.description) != null ? _c : "",
             stateType: "string",
             adapter
           });
           await (0, import_saveValue.saveValue)({
             key: "errorCode",
-            value: (_c = response.data.object_result[0]) == null ? void 0 : _c.fault_code,
+            value: (_e = (_d = data.object_result) == null ? void 0 : _d[0]) == null ? void 0 : _e.fault_code,
             stateType: "string",
             adapter
           });
           await (0, import_saveValue.saveValue)({
             key: "errorLevel",
-            value: (_d = response.data.object_result[0]) == null ? void 0 : _d.error_level,
+            value: (_g = (_f = data.object_result) == null ? void 0 : _f[0]) == null ? void 0 : _g.error_level,
             stateType: "string",
             adapter
           });
@@ -71,19 +70,19 @@ async function updateDeviceErrorMsg(adapter) {
         }
         await (0, import_saveValue.saveValue)({
           key: "errorMessage",
-          value: (_f = (_e = response.data.objectResult[0]) == null ? void 0 : _e.description) != null ? _f : "",
+          value: (_j = (_i = (_h = data.objectResult) == null ? void 0 : _h[0]) == null ? void 0 : _i.description) != null ? _j : "",
           stateType: "string",
           adapter
         });
         await (0, import_saveValue.saveValue)({
           key: "errorCode",
-          value: (_g = response.data.objectResult[0]) == null ? void 0 : _g.fault_code,
+          value: (_l = (_k = data.objectResult) == null ? void 0 : _k[0]) == null ? void 0 : _l.faultCode,
           stateType: "string",
           adapter
         });
         await (0, import_saveValue.saveValue)({
           key: "errorLevel",
-          value: (_h = response.data.objectResult[0]) == null ? void 0 : _h.error_level,
+          value: (_n = (_m = data.objectResult) == null ? void 0 : _m[0]) == null ? void 0 : _n.errorLevel,
           stateType: "string",
           adapter
         });

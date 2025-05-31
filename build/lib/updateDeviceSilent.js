@@ -38,9 +38,7 @@ async function updateDeviceSilent(adapter, deviceCode, silent) {
         adapter,
         sURL,
         (0, import_axiosParameter.getAxiosUpdateDevicePowerParams)({ deviceCode, value: silentMode, protocolCode: "Manual-mute" }),
-        {
-          headers: { "x-token": token }
-        }
+        (0, import_axiosParameter.getHeaders)(token)
       );
       if (!(response == null ? void 0 : response.data)) {
         return;

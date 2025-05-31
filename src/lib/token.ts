@@ -10,7 +10,7 @@ async function getToken(adapter: MidasAquatemp): Promise<void> {
     const store = useStore();
 
     try {
-        const { token, apiLevel } = store;
+        const { token } = store;
 
         if (!token) {
             adapter.log.debug('Request token');
@@ -23,9 +23,8 @@ async function getToken(adapter: MidasAquatemp): Promise<void> {
             }
             if (response.status == 200) {
                 store.token =
-                    apiLevel < 3
-                        ? response.data?.object_result?.['x-token']
-                        : (store.token = response.data?.objectResult?.['x-token']);
+                    response.data?.object_result?.['x-token'] ?? response.data?.objectResult?.['x-token'] ?? null;
+
                 if (store.token) {
                     adapter.log.debug('Login ok! Token');
                 } else {

@@ -49,9 +49,11 @@ const updateDeviceSetTemp = async (adapter, deviceCode, temperature) => {
     }
     if (token && token != "") {
       const { sURL } = (0, import_endPoints.getSUrl)();
-      const response = await import_axios.default.post(sURL, (0, import_axiosParameter.getAxiosUpdateDeviceSetTempParams)({ deviceCode, sTemperature }), {
-        headers: { "x-token": token }
-      });
+      const response = await import_axios.default.post(
+        sURL,
+        (0, import_axiosParameter.getAxiosUpdateDeviceSetTempParams)({ deviceCode, sTemperature }),
+        (0, import_axiosParameter.getHeaders)(token)
+      );
       adapter.log.debug(`DeviceStatus: ${JSON.stringify(response.data)}`);
       if (parseInt(response.data.error_code) == 0) {
         await (0, import_saveValue.saveValue)({ key: "tempSet", value: temperature, stateType: "number", adapter });

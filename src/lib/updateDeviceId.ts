@@ -10,7 +10,7 @@ import { request } from './axios';
 export async function updateDeviceID(adapter: MidasAquatemp): Promise<void> {
     const store = initStore();
     try {
-        const { token, apiLevel } = store;
+        const { token } = store;
         if (!token) {
             return;
         }
@@ -19,37 +19,28 @@ export async function updateDeviceID(adapter: MidasAquatemp): Promise<void> {
         adapter.log.debug(`UpdateDeviceID URL: ${sURL}`);
         adapter.log.debug(`UpdateDeviceID options: ${JSON.stringify(options)}`);
 
-        const response = await request(adapter, sURL, options, getHeaders(token));
-        if (!response?.data) {
+        const { data, status } = await request(adapter, sURL, options, getHeaders(token));
+        if (!data) {
             return;
         }
-        adapter.log.debug(`UpdateDeviceID response: ${JSON.stringify(response.data)}`);
-        adapter.log.debug(`UpdateDeviceID response status: ${JSON.stringify(response.status)}`);
+        adapter.log.debug(`UpdateDeviceID response: ${JSON.stringify(data)}`);
+        adapter.log.debug(`UpdateDeviceID response status: ${JSON.stringify(status)}`);
 
-        if (!response || response.status !== 200 || response.data.error_code !== '0') {
-            // Login-Fehler
-            store.resetOnErrorHandler();
+        if (!data || status !== 200 || data.error_code !== '0') {
+            store.resetOnErrorHandler(); // Login-Fehler
             return;
         }
 
-        if (!response.data?.object_result?.[0]?.device_code && !response.data?.objectResult?.[0]?.deviceCode) {
+        if (!data?.object_result?.[0]?.device_code && !data?.objectResult?.[0]?.deviceCode) {
             adapter.log.error('Error in updateDeviceID: No device code found');
-            adapter.log.error(`Response: ${JSON.stringify(response.data)}`);
             return;
         }
 
-        if (apiLevel < 3) {
-            store.device = response.data.object_result[0]?.device_code;
-            store.product = response.data.object_result[0]?.product_id;
-            store.reachable = response.data.object_result[0]?.device_status == 'ONLINE';
-        } else {
-            store.device = response.data.objectResult[0]?.deviceCode;
-            store.product = response.data.objectResult[0]?.productId;
-            store.reachable = response.data.objectResult[0]?.deviceStatus == 'ONLINE';
-        }
-        adapter.log.debug(`Device: ${store.device}`);
-        adapter.log.debug(`Product: ${store.product}`);
-        adapter.log.debug(`Reachable: ${store.reachable}`);
+        store.device = data.object_result?.[0].device_code ?? data.objectResult?.[0]?.deviceCode;
+        store.product = data.object_result?.[0]?.product_id ?? data.objectResult?.[0]?.productId;
+        store.reachable = (data.object_result?.[0]?.device_status ?? data.objectResult?.[0]?.deviceStatus) == 'ONLINE';
+
+        adapter.log.debug(`device: ${store.device}, product: ${store.product}, reachable: ${store.reachable}`);
 
         await saveValue({ key: 'DeviceCode', value: store.device, stateType: 'string', adapter: adapter });
         await saveValue({ key: 'ProductCode', value: store.product, stateType: 'string', adapter: adapter });

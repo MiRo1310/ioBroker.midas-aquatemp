@@ -82,22 +82,24 @@ export async function updateDeviceDetails(adapter: MidasAquatemp): Promise<void>
     const store = initStore();
     try {
         const { apiLevel, token, device: deviceCode } = store;
-        if (!token) {
+        if (!token || !deviceCode) {
             return;
         }
 
         const { sURL } = getSUrlUpdateDeviceId();
 
-        const response = await request(adapter, sURL, getProtocolCodes(deviceCode), getHeaders(token));
-        if (!response?.data) {
+        const { data } = await request(adapter, sURL, getProtocolCodes(deviceCode), getHeaders(token));
+
+        if (!data) {
             return;
         }
-        adapter.log.debug(`DeviceDetails: ${JSON.stringify(response.data)}`);
+        adapter.log.debug(`DeviceDetails: ${JSON.stringify(data)}`);
 
-        if (parseInt(response.data.error_code) == 0) {
-            const responseValue: ObjectResultResponse =
-                apiLevel < 3 ? response.data.object_result : response.data.objectResult;
-
+        if (data.error_code === '0') {
+            const responseValue = data.object_result ?? data.objectResult;
+            if (!responseValue || responseValue.length === 0) {
+                return;
+            }
             await saveValue({
                 key: 'rawJSON',
                 value: JSON.stringify(responseValue),

@@ -15,7 +15,7 @@ export async function updateDeviceErrorMsg(adapter: MidasAquatemp): Promise<void
                     ? `${cloudURL}/app/device/getFaultDataByDeviceCode.json`
                     : `${cloudURL}/app/device/getFaultDataByDeviceCode`;
 
-            const response = await request(
+            const { data } = await request(
                 adapter,
                 sURL,
                 {
@@ -24,29 +24,29 @@ export async function updateDeviceErrorMsg(adapter: MidasAquatemp): Promise<void
                 },
                 getHeaders(token),
             );
-            if (!response?.data) {
+            if (!data) {
                 return;
             }
 
-            if (parseInt(response.data.error_code) == 0) {
+            if (data.error_code === '0') {
                 await saveValue({ key: 'error', value: true, stateType: 'boolean', adapter: adapter });
 
                 if (apiLevel < 3) {
                     await saveValue({
                         key: 'errorMessage',
-                        value: response.data.object_result[0]?.description ?? '',
+                        value: data.object_result?.[0]?.description ?? '',
                         stateType: 'string',
                         adapter: adapter,
                     });
                     await saveValue({
                         key: 'errorCode',
-                        value: response.data.object_result[0]?.fault_code,
+                        value: data.object_result?.[0]?.fault_code,
                         stateType: 'string',
                         adapter: adapter,
                     });
                     await saveValue({
                         key: 'errorLevel',
-                        value: response.data.object_result[0]?.error_level,
+                        value: data.object_result?.[0]?.error_level,
                         stateType: 'string',
                         adapter: adapter,
                     });
@@ -54,19 +54,19 @@ export async function updateDeviceErrorMsg(adapter: MidasAquatemp): Promise<void
                 }
                 await saveValue({
                     key: 'errorMessage',
-                    value: response.data.objectResult[0]?.description ?? '',
+                    value: data.objectResult?.[0]?.description ?? '',
                     stateType: 'string',
                     adapter: adapter,
                 });
                 await saveValue({
                     key: 'errorCode',
-                    value: response.data.objectResult[0]?.fault_code,
+                    value: data.objectResult?.[0]?.faultCode,
                     stateType: 'string',
                     adapter: adapter,
                 });
                 await saveValue({
                     key: 'errorLevel',
-                    value: response.data.objectResult[0]?.error_level,
+                    value: data.objectResult?.[0]?.errorLevel,
                     stateType: 'string',
                     adapter: adapter,
                 });

@@ -42,9 +42,7 @@ async function updateDevicePower(adapter, deviceCode, power) {
         adapter,
         sURL,
         (0, import_axiosParameter.getAxiosUpdateDevicePowerParams)({ deviceCode, value: powerOpt, protocolCode: "Power" }),
-        {
-          headers: { "x-token": token }
-        }
+        (0, import_axiosParameter.getHeaders)(token)
       );
       if (!(response == null ? void 0 : response.data)) {
         return;

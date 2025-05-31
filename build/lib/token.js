@@ -28,10 +28,10 @@ var import_updateDeviceStatus = require("./updateDeviceStatus");
 var import_logging = require("./logging");
 var import_axios = require("./axios");
 async function getToken(adapter) {
-  var _a, _b, _c, _d;
+  var _a, _b, _c, _d, _e, _f;
   const store = (0, import_store.initStore)();
   try {
-    const { token, apiLevel } = store;
+    const { token } = store;
     if (!token) {
       adapter.log.debug("Request token");
       const { sUrl, options } = (0, import_endPoints.getOptionsAndSUrl)();
@@ -41,7 +41,7 @@ async function getToken(adapter) {
         return;
       }
       if (response.status == 200) {
-        store.token = apiLevel < 3 ? (_b = (_a = response.data) == null ? void 0 : _a.object_result) == null ? void 0 : _b["x-token"] : store.token = (_d = (_c = response.data) == null ? void 0 : _c.objectResult) == null ? void 0 : _d["x-token"];
+        store.token = (_f = (_e = (_b = (_a = response.data) == null ? void 0 : _a.object_result) == null ? void 0 : _b["x-token"]) != null ? _e : (_d = (_c = response.data) == null ? void 0 : _c.objectResult) == null ? void 0 : _d["x-token"]) != null ? _f : null;
         if (store.token) {
           adapter.log.debug("Login ok! Token");
         } else {

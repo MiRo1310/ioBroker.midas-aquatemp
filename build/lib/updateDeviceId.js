@@ -40,9 +40,7 @@ async function updateDeviceID(adapter) {
     const options = (0, import_axiosParameter.getAxiosUpdateDeviceIdParams)();
     adapter.log.debug(`UpdateDeviceID URL: ${sURL}`);
     adapter.log.debug(`UpdateDeviceID options: ${JSON.stringify(options)}`);
-    const response = await (0, import_axios.request)(adapter, sURL, options, {
-      headers: { "x-token": token }
-    });
+    const response = await (0, import_axios.request)(adapter, sURL, options, (0, import_axiosParameter.getHeaders)(token));
     if (!(response == null ? void 0 : response.data)) {
       return;
     }
