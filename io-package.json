@@ -1,8 +1,21 @@
 {
   "common": {
     "name": "midas-aquatemp",
-    "version": "1.2.2",
+    "version": "1.2.3",
     "news": {
+      "1.2.3": {
+        "en": "FEAT: Add types, fix some errors",
+        "de": "FEAT: Typen hinzufügen, Fehler beheben",
+        "ru": "FEAT: Добавьте типы, исправьте некоторые ошибки",
+        "pt": "FEAT: Adicionar tipos, corrigir alguns erros",
+        "nl": "FEAT: Voeg soorten toe, repareer enkele fouten",
+        "fr": "FAT: Ajouter des types, corriger certaines erreurs",
+        "it": "FEAT: Aggiungere tipi, correggere alcuni errori",
+        "es": "FEAT: Agregar tipos, corregir algunos errores",
+        "pl": "FEAT: Dodawanie typów, naprawianie błędów",
+        "uk": "FEAT: Додати типи, виправити деякі помилки",
+        "zh-cn": "FEAT: 添加类型, 修正一些错误"
+      },
       "1.2.2": {
         "en": "FIX: Reported errors by sentry",
         "de": "FIX: Gemeldete Fehler durch Versendung",
@@ -80,19 +93,6 @@
         "pl": "FEAT: Dodaj stany zapisywalne\nFEAT: Dane są również aktualizowane, gdy ogrzewanie jest wyłączone\nFIX: Pobierz żeton\nFIX: # 7 Błąd z useStore ()",
         "uk": "FEAT: Додати написати штати\nFEAT: Дані також оновлено, коли опалення вимкнено\nFIX: Отримати токен\nFIX: #7 Помилка з використаннямStore()",
         "zh-cn": "FEAT: 添加可写入状态\nFEAT: 数据也在加热关闭时更新\nFIX: 获取符号\nFIX: # 7 使用Store( ) 出错"
-      },
-      "0.0.1": {
-        "en": "initial release",
-        "de": "Erstveröffentlichung",
-        "ru": "Начальная версия",
-        "pt": "lançamento inicial",
-        "nl": "Eerste uitgave",
-        "fr": "Première version",
-        "it": "Versione iniziale",
-        "es": "Versión inicial",
-        "pl": "Pierwsze wydanie",
-        "uk": "Початкова версія",
-        "zh-cn": "首次出版"
       }
     },
     "titleLang": {

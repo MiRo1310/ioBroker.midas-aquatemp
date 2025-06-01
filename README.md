@@ -37,7 +37,7 @@ If you have problems, contact us.
 	Placeholder for the next version (at the beginning of the line):
 	### **WORK IN PROGRESS**
 -->
-### **WORK IN PROGRESS**
+### 1.2.3 (2025-06-01)
 
 -   FEAT: Add types, fix some errors
 
