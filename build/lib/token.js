@@ -27,12 +27,13 @@ var import_updateDeviceId = require("./updateDeviceId");
 var import_updateDeviceStatus = require("./updateDeviceStatus");
 var import_logging = require("./logging");
 var import_axios = require("./axios");
+var import_utils = require("./utils");
 async function getToken(adapter) {
   var _a, _b, _c, _d;
   const store = (0, import_store.initStore)();
   try {
     const { token } = store;
-    if (token) {
+    if ((0, import_utils.isToken)(token)) {
       return;
     }
     adapter.log.debug("Request token");
