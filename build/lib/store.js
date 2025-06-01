@@ -27,7 +27,7 @@ function initStore() {
   if (!store) {
     store = {
       adapter: "",
-      token: "",
+      token: null,
       instance: null,
       username: "",
       encryptedPassword: "",
@@ -49,7 +49,7 @@ function initStore() {
         return `midas-aquatemp.${this.instance}`;
       },
       resetOnErrorHandler: async function() {
-        this.token = "";
+        this.token = null;
         this.device = "";
         this.reachable = false;
         await (0, import_saveValue.saveValue)({ key: "info.connection", value: false, stateType: "boolean", adapter: this.adapter });

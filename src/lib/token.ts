@@ -6,6 +6,7 @@ import { errorLogger } from './logging';
 import type { MidasAquatemp } from '../main';
 import { request } from './axios';
 import type { RequestToken } from '../types/types';
+import { isToken } from './utils';
 
 async function getToken(adapter: MidasAquatemp): Promise<void> {
     const store = useStore();
@@ -13,7 +14,7 @@ async function getToken(adapter: MidasAquatemp): Promise<void> {
     try {
         const { token } = store;
 
-        if (token) {
+        if (isToken(token)) {
             return;
         }
 
