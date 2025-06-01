@@ -48,8 +48,8 @@ export async function updateDeviceStatus(adapter: MidasAquatemp): Promise<void> 
             await updateDeviceDetails(adapter);
             return;
         }
-        store.resetOnErrorHandler();
     } catch (error: any) {
+        store.resetOnErrorHandler();
         errorLogger('Error in updateDeviceStatus', error, adapter);
     }
 }
