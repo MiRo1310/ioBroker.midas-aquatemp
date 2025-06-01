@@ -1,10 +1,12 @@
-import axios from 'axios';
-import { getAxiosUpdateDeviceSetTempParams } from './axiosParameter';
+import { getAxiosUpdateDeviceSetTempParams, getHeaders } from './axiosParameter';
 import { getSUrl } from './endPoints';
 import { saveValue } from './saveValue';
 import { initStore } from './store';
 import { errorLogger } from './logging';
 import type { MidasAquatemp } from '../main';
+import { request } from './axios';
+import type { MidasData } from '../types/types';
+import { isToken } from './utils';
 
 export const updateDeviceSetTemp = async (
     adapter: MidasAquatemp,
@@ -17,25 +19,27 @@ export const updateDeviceSetTemp = async (
         const token = store.token;
         const sTemperature = temperature.toString().replace(',', '.');
         const result = await adapter.getStateAsync(`${dpRoot}.mode`);
-        if (!(result && (result.val || result.val === 0))) {
+        if (!(result?.val || result?.val === 0)) {
             return;
         }
 
-        if (token && token != '') {
+        if (isToken(token)) {
             const { sURL } = getSUrl();
 
-            const response = await axios.post(sURL, getAxiosUpdateDeviceSetTempParams({ deviceCode, sTemperature }), {
-                headers: { 'x-token': token },
-            });
-            adapter.log.debug(`DeviceStatus: ${JSON.stringify(response.data)}`);
+            const { data, error } = await request<MidasData>(
+                adapter,
+                sURL,
+                getAxiosUpdateDeviceSetTempParams({ deviceCode, sTemperature }),
+                getHeaders(token),
+            );
+            adapter.log.debug(`DeviceStatus: ${JSON.stringify(data)}`);
 
-            if (parseInt(response.data.error_code) == 0) {
-                await saveValue({ key: 'tempSet', value: temperature, stateType: 'number', adapter: adapter });
+            if (error) {
+                store.resetOnErrorHandler();
                 return;
             }
-            adapter.log.error(`Error: ${JSON.stringify(response.data)}`);
 
-            store.resetOnErrorHandler();
+            await saveValue({ key: 'tempSet', value: temperature, stateType: 'number', adapter: adapter });
         }
     } catch (error: any) {
         errorLogger('Error in updateDeviceSetTemp', error, adapter);

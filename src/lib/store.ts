@@ -12,8 +12,8 @@ interface Store {
     AQUATEMP_OTHER1: string;
     apiLevel: number;
     interval: number;
-    device: string;
-    product: string;
+    device?: string;
+    product?: string;
     reachable: boolean;
     useDeviceMac: boolean;
     getDpRoot: () => string;
@@ -32,8 +32,8 @@ export function initStore(): Store {
             cloudURL: '',
             apiLevel: 3,
             interval: 60000,
-            device: '',
-            product: '',
+            device: undefined,
+            product: undefined,
             reachable: false,
             useDeviceMac: false,
             // ProductIDs:

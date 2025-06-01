@@ -34,8 +34,8 @@ function initStore() {
       cloudURL: "",
       apiLevel: 3,
       interval: 6e4,
-      device: "",
-      product: "",
+      device: void 0,
+      product: void 0,
       reachable: false,
       useDeviceMac: false,
       // ProductIDs:

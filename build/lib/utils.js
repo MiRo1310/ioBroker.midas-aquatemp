@@ -19,14 +19,20 @@ var __toCommonJS = (mod) => __copyProps(__defProp({}, "__esModule", { value: tru
 var utils_exports = {};
 __export(utils_exports, {
   isDefined: () => isDefined,
-  isStateValue: () => isStateValue
+  isStateValue: () => isStateValue,
+  isToken: () => isToken,
+  noError: () => noError
 });
 module.exports = __toCommonJS(utils_exports);
 const isDefined = (value) => value !== void 0 && value !== null;
 const isStateValue = (state) => isDefined(state) && isDefined(state == null ? void 0 : state.val);
+const isToken = (token) => isDefined(token) && token !== "";
+const noError = (errorCode) => errorCode === "0";
 // Annotate the CommonJS export names for ESM import in node:
 0 && (module.exports = {
   isDefined,
-  isStateValue
+  isStateValue,
+  isToken,
+  noError
 });
 //# sourceMappingURL=utils.js.map

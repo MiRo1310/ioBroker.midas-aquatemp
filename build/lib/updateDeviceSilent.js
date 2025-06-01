@@ -33,25 +33,18 @@ async function updateDeviceSilent(adapter, deviceCode, silent) {
     const token = store.token;
     const silentMode = silent ? "1" : "0";
     if (token && token != "") {
-      const { sURL } = (0, import_endPoints.getSUrl)();
-      const response = await (0, import_axios.request)(
+      const { data, error } = await (0, import_axios.request)(
         adapter,
-        sURL,
+        (0, import_endPoints.getSUrl)().sURL,
         (0, import_axiosParameter.getAxiosUpdateDevicePowerParams)({ deviceCode, value: silentMode, protocolCode: "Manual-mute" }),
-        {
-          headers: { "x-token": token }
-        }
+        (0, import_axiosParameter.getHeaders)(token)
       );
-      if (!(response == null ? void 0 : response.data)) {
+      if (!data || error) {
+        store.resetOnErrorHandler();
         return;
       }
-      adapter.log.debug(`DeviceStatus: ${JSON.stringify(response.data)}`);
-      if (parseInt(response.data.error_code) == 0) {
-        await (0, import_saveValue.saveValue)({ key: "silent", value: silent, stateType: "boolean", adapter });
-        return;
-      }
-      adapter.log.error(`Error: ${JSON.stringify(response.data)}`);
-      store.resetOnErrorHandler();
+      adapter.log.debug(`DeviceStatus: ${JSON.stringify(data)}`);
+      await (0, import_saveValue.saveValue)({ key: "silent", value: silent, stateType: "boolean", adapter });
     }
   } catch (error) {
     (0, import_logging.errorLogger)("Error in updateDeviceSilent", error, adapter);

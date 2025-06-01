@@ -174,3 +174,9 @@ export const getAxiosUpdateDeviceIdParams = (): { body: { productIds: string[] }
         },
     };
 };
+
+export const getHeaders = (token: string): { headers: { 'x-token': string } } => {
+    return {
+        headers: { 'x-token': token },
+    };
+};

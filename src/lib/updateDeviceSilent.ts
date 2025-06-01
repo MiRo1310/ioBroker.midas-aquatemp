@@ -1,10 +1,11 @@
-import { getAxiosUpdateDevicePowerParams } from './axiosParameter';
+import { getAxiosUpdateDevicePowerParams, getHeaders } from './axiosParameter';
 import { getSUrl } from './endPoints';
 import { saveValue } from './saveValue';
 import { initStore } from './store';
 import { errorLogger } from './logging';
 import type { MidasAquatemp } from '../main';
 import { request } from './axios';
+import type { MidasData } from '../types/types';
 
 export async function updateDeviceSilent(adapter: MidasAquatemp, deviceCode: string, silent: boolean): Promise<void> {
     const store = initStore();
@@ -13,27 +14,20 @@ export async function updateDeviceSilent(adapter: MidasAquatemp, deviceCode: str
         const silentMode = silent ? '1' : '0';
 
         if (token && token != '') {
-            const { sURL } = getSUrl();
-            const response = await request(
+            const { data, error } = await request<MidasData>(
                 adapter,
-                sURL,
+                getSUrl().sURL,
                 getAxiosUpdateDevicePowerParams({ deviceCode, value: silentMode, protocolCode: 'Manual-mute' }),
-                {
-                    headers: { 'x-token': token },
-                },
+                getHeaders(token),
             );
-            if (!response?.data) {
+            if (!data || error) {
+                store.resetOnErrorHandler();
                 return;
             }
 
-            adapter.log.debug(`DeviceStatus: ${JSON.stringify(response.data)}`);
+            adapter.log.debug(`DeviceStatus: ${JSON.stringify(data)}`);
 
-            if (parseInt(response.data.error_code) == 0) {
-                await saveValue({ key: 'silent', value: silent, stateType: 'boolean', adapter: adapter });
-                return;
-            }
-            adapter.log.error(`Error: ${JSON.stringify(response.data)}`);
-            store.resetOnErrorHandler();
+            await saveValue({ key: 'silent', value: silent, stateType: 'boolean', adapter: adapter });
         }
     } catch (error: any) {
         errorLogger('Error in updateDeviceSilent', error, adapter);

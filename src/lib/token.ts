@@ -5,39 +5,34 @@ import { updateDeviceStatus } from './updateDeviceStatus';
 import { errorLogger } from './logging';
 import type { MidasAquatemp } from '../main';
 import { request } from './axios';
+import type { RequestToken } from '../types/types';
 
 async function getToken(adapter: MidasAquatemp): Promise<void> {
     const store = useStore();
 
     try {
-        const { token, apiLevel } = store;
+        const { token } = store;
 
-        if (!token) {
-            adapter.log.debug('Request token');
-            const { sUrl, options } = getOptionsAndSUrl();
+        if (token) {
+            return;
+        }
 
-            const response = await request(adapter, sUrl, options);
-            if (!response) {
-                adapter.log.error('No response from server');
-                return;
-            }
-            if (response.status == 200) {
-                store.token =
-                    apiLevel < 3
-                        ? response.data?.object_result?.['x-token']
-                        : (store.token = response.data?.objectResult?.['x-token']);
-                if (store.token) {
-                    adapter.log.debug('Login ok! Token');
-                } else {
-                    adapter.log.error(`Login-error: ${JSON.stringify(response.data)}`);
-                }
+        adapter.log.debug('Request token');
+        const { sUrl, options } = getOptionsAndSUrl();
 
-                return;
-            }
+        const { data, error } = await request<RequestToken>(adapter, sUrl, options);
 
-            adapter.log.error(`Login-error: ${response.data}`);
+        if (error || !data) {
+            adapter.log.error(`Login-error: ${JSON.stringify(data)}`);
             store.resetOnErrorHandler();
             return;
+        }
+        store.token = data?.object_result?.['x-token'] ?? data?.objectResult?.['x-token'] ?? null;
+
+        if (store.token) {
+            adapter.log.debug('Login ok! Token');
+        } else {
+            adapter.log.error(`Login-error: ${JSON.stringify(data)}`);
         }
     } catch (error) {
         errorLogger('Error in getToken', error, adapter);

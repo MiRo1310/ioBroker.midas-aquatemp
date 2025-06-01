@@ -31,27 +31,23 @@ async function getToken(adapter) {
   var _a, _b, _c, _d;
   const store = (0, import_store.initStore)();
   try {
-    const { token, apiLevel } = store;
-    if (!token) {
-      adapter.log.debug("Request token");
-      const { sUrl, options } = (0, import_endPoints.getOptionsAndSUrl)();
-      const response = await (0, import_axios.request)(adapter, sUrl, options);
-      if (!response) {
-        adapter.log.error("No response from server");
-        return;
-      }
-      if (response.status == 200) {
-        store.token = apiLevel < 3 ? (_b = (_a = response.data) == null ? void 0 : _a.object_result) == null ? void 0 : _b["x-token"] : store.token = (_d = (_c = response.data) == null ? void 0 : _c.objectResult) == null ? void 0 : _d["x-token"];
-        if (store.token) {
-          adapter.log.debug("Login ok! Token");
-        } else {
-          adapter.log.error(`Login-error: ${JSON.stringify(response.data)}`);
-        }
-        return;
-      }
-      adapter.log.error(`Login-error: ${response.data}`);
+    const { token } = store;
+    if (token) {
+      return;
+    }
+    adapter.log.debug("Request token");
+    const { sUrl, options } = (0, import_endPoints.getOptionsAndSUrl)();
+    const { data, error } = await (0, import_axios.request)(adapter, sUrl, options);
+    if (error || !data) {
+      adapter.log.error(`Login-error: ${JSON.stringify(data)}`);
       store.resetOnErrorHandler();
       return;
+    }
+    store.token = (_d = (_c = (_a = data == null ? void 0 : data.object_result) == null ? void 0 : _a["x-token"]) != null ? _c : (_b = data == null ? void 0 : data.objectResult) == null ? void 0 : _b["x-token"]) != null ? _d : null;
+    if (store.token) {
+      adapter.log.debug("Login ok! Token");
+    } else {
+      adapter.log.error(`Login-error: ${JSON.stringify(data)}`);
     }
   } catch (error) {
     (0, import_logging.errorLogger)("Error in getToken", error, adapter);

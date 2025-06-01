@@ -28,47 +28,40 @@ var import_updateDeviceDetails = require("./updateDeviceDetails");
 var import_updateDeviceOnError = require("./updateDeviceOnError");
 var import_logging = require("./logging");
 var import_axios = require("./axios");
+var import_axiosParameter = require("./axiosParameter");
 async function updateDeviceStatus(adapter) {
-  var _a, _b, _c, _d, _e, _f, _g, _h;
+  var _a, _b, _c, _d, _e, _f, _g, _h, _i;
   const store = (0, import_store.initStore)();
   try {
-    const { token, device: deviceCode, apiLevel } = store;
+    const { token, device: deviceCode } = store;
     if (token) {
       const { sURL } = (0, import_endPoints.getUpdateDeviceStatusSUrl)();
-      const response = await (0, import_axios.request)(
+      const { data, error } = await (0, import_axios.request)(
         adapter,
         sURL,
         {
           device_code: deviceCode,
           deviceCode
         },
-        {
-          headers: { "x-token": token }
-        }
+        (0, import_axiosParameter.getHeaders)(token)
       );
-      if (!(response == null ? void 0 : response.data)) {
+      if (!data || error) {
+        store.resetOnErrorHandler();
         return;
       }
-      {
-        store.reachable = apiLevel < 3 ? ((_b = (_a = response.data.object_result) == null ? void 0 : _a[0]) == null ? void 0 : _b.device_status) == "ONLINE" : ((_d = (_c = response.data.objectResult) == null ? void 0 : _c[0]) == null ? void 0 : _d.deviceStatus) == "ONLINE";
-      }
-      if (parseInt(response.data.error_code) == 0) {
-        adapter.log.debug(`DeviceStatus: ${JSON.stringify(response.data)}`);
-        if (((_f = (_e = response.data) == null ? void 0 : _e.object_result) == null ? void 0 : _f.is_fault) || ((_h = (_g = response == null ? void 0 : response.data) == null ? void 0 : _g.objectResult) == null ? void 0 : _h.isFault)) {
-          adapter.log.error(`Error in updateDeviceStatus(): ${JSON.stringify(response.data)}`);
-          await (0, import_saveValue.saveValue)({ key: "error", value: true, stateType: "boolean", adapter });
-          await (0, import_updateDeviceDetails.updateDeviceDetails)(adapter);
-          await (0, import_updateDeviceOnError.updateDeviceErrorMsg)(adapter);
-          return;
-        }
-        await (0, import_saveValue.saveValue)({ key: "error", value: false, stateType: "boolean", adapter });
-        await (0, import_saveValue.saveValue)({ key: "errorMessage", value: "", stateType: "string", adapter });
-        await (0, import_saveValue.saveValue)({ key: "errorCode", value: "", stateType: "string", adapter });
-        await (0, import_saveValue.saveValue)({ key: "errorLevel", value: 0, stateType: "number", adapter });
+      store.reachable = ((_e = (_b = (_a = data.object_result) == null ? void 0 : _a[0]) == null ? void 0 : _b.status) != null ? _e : (_d = (_c = data.objectResult) == null ? void 0 : _c[0]) == null ? void 0 : _d.status) == "ONLINE";
+      adapter.log.debug(`DeviceStatus: ${JSON.stringify(data)}`);
+      if (((_g = (_f = data == null ? void 0 : data.object_result) == null ? void 0 : _f[0]) == null ? void 0 : _g.is_fault) || ((_i = (_h = data == null ? void 0 : data.objectResult) == null ? void 0 : _h[0]) == null ? void 0 : _i.isFault)) {
+        await (0, import_saveValue.saveValue)({ key: "error", value: true, stateType: "boolean", adapter });
         await (0, import_updateDeviceDetails.updateDeviceDetails)(adapter);
+        await (0, import_updateDeviceOnError.updateDeviceErrorMsg)(adapter);
         return;
       }
-      store.resetOnErrorHandler();
+      await (0, import_saveValue.saveValue)({ key: "error", value: false, stateType: "boolean", adapter });
+      await (0, import_saveValue.saveValue)({ key: "errorMessage", value: "", stateType: "string", adapter });
+      await (0, import_saveValue.saveValue)({ key: "errorCode", value: "", stateType: "string", adapter });
+      await (0, import_saveValue.saveValue)({ key: "errorLevel", value: 0, stateType: "number", adapter });
+      await (0, import_updateDeviceDetails.updateDeviceDetails)(adapter);
       return;
     }
     store.resetOnErrorHandler();

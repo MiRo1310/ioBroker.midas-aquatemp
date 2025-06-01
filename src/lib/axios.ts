@@ -1,27 +1,22 @@
-import type { AxiosResponse } from 'axios';
-// eslint-disable-next-line no-duplicate-imports
 import axios from 'axios';
 import { errorLogger } from './logging';
 import type { MidasAquatemp } from '../main';
 
-export const request = async (
+export const request = async <T>(
     adapter: MidasAquatemp,
     url: string,
     options = {},
     header = { headers: {} },
-): Promise<AxiosResponse | undefined> => {
+): Promise<{ status?: number; data: T | undefined; error: boolean }> => {
     try {
         const result = await axios.post(url, options, header);
         if (result.status === 200) {
-            adapter.log.debug(`Axios request successful: ${JSON.stringify(result.data)}`);
-            return result;
+            return { error: false, status: result.status, data: result.data as T };
         }
-        if (result.status === 504) {
-            adapter.log.warn(`Axios request timed out: ${url}`);
-            return result;
-        }
-        return result;
+
+        return { error: true, status: result.status, data: result.data };
     } catch (e) {
         errorLogger('Axios request error', e, adapter);
+        return { status: 500, data: undefined, error: true };
     }
 };

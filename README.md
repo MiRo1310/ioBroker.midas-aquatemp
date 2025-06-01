@@ -37,6 +37,10 @@ If you have problems, contact us.
 	Placeholder for the next version (at the beginning of the line):
 	### **WORK IN PROGRESS**
 -->
+**WORK IN PROGRESS**
+
+-   FEAT: Add types, fix some errors
+
 ### 1.2.2 (2025-05-31)
 
 -   FIX: Reported errors by sentry
