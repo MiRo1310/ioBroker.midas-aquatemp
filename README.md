@@ -37,7 +37,7 @@ If you have problems, contact us.
 	Placeholder for the next version (at the beginning of the line):
 	### **WORK IN PROGRESS**
 -->
-**WORK IN PROGRESS**
+### **WORK IN PROGRESS**
 
 -   FEAT: Add types, fix some errors
 
