@@ -32,7 +32,10 @@ export async function updateDeviceID(adapter: MidasAquatemp): Promise<void> {
         }
 
         if (!data?.object_result?.[0]?.device_code && !data?.objectResult?.[0]?.deviceCode) {
-            adapter.log.error('Error in updateDeviceID: No device code found');
+            store.resetOnErrorHandler();
+            adapter.log.error(
+                'No device code found. Maybe the token is not valid. Please check if there are not two usages of the same account. In the next loop the token will be refreshed.',
+            );
             return;
         }
 
