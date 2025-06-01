@@ -1,8 +1,21 @@
 {
   "common": {
     "name": "midas-aquatemp",
-    "version": "1.2.3",
+    "version": "1.2.4",
     "news": {
+      "1.2.4": {
+        "en": "Fix: Error in updateDeviceID: No device code found",
+        "de": "Fix: Fehler im UpdateDeviceID: Keine Gerätecode gefunden",
+        "ru": "Исправление: ошибка в обновленииDeviceID: Код устройства не найден",
+        "pt": "Corrigir: Erro no updateDeviceID: Nenhum código de dispositivo encontrado",
+        "nl": "Fix: Fout in updateDeviceID: Geen apparaatcode gevonden",
+        "fr": "Correction : Erreur dans la mise à jourDeviceID : Aucun code de périphérique trouvé",
+        "it": "Correzione: Errore nell'aggiornamentoDeviceID: Nessun codice del dispositivo trovato",
+        "es": "Corrección: Error en la actualizaciónDeviceID: No hay código de dispositivo encontrado",
+        "pl": "Fix: Błąd w updateDeviceID: Nie znaleziono kodu urządzenia",
+        "uk": "Виправлення: помилка в оновленніDeviceID: Не знайдено коду пристрою",
+        "zh-cn": "修正: 更新DeviceID时出错 : 未找到设备代码"
+      },
       "1.2.3": {
         "en": "FEAT: Add types, fix some errors",
         "de": "FEAT: Typen hinzufügen, Fehler beheben",
@@ -80,19 +93,6 @@
         "pl": "FEAT: Usuń sprawdzanie isPoolsana\nFEAT: # 16 Dodaj flowSwitch",
         "uk": "FEAT: Зніміть прапорець\nFEAT: #16 Додати потік",
         "zh-cn": "FEAT: 删除为 Poolsana 检查\nFEAT : # 16 添加流量开关"
-      },
-      "1.0.0": {
-        "en": "FEAT: Add writeable states\nFEAT: Data is also updated when the heating is off\nFIX: Get token\nFIX: #7 Error with useStore()",
-        "de": "FEAT: Schreibbare Zustände hinzufügen\nFEAT: Daten werden auch aktualisiert, wenn die Heizung abgeschaltet ist\nFIX: Get token\nFIX: #7 Fehler mit useStore()",
-        "ru": "FEAT: Добавить состояния записи\nFEAT: Данные также обновляются, когда отопление отключено\nFIX: Get token\nFIX: #7 Ошибка с useStore()",
-        "pt": "FEAT: Adicionar estados escreventes\nFEAT: Os dados também são atualizados quando o aquecimento está desligado\nFIX: Get token\nFIX: #7 Erro com useStore()",
-        "nl": "FEAT: schrijfbare toestanden toevoegen\nFEAT: De gegevens worden ook bijgewerkt wanneer de verwarming uit is\nKrijg token\nFIX: #7 Fout bij gebruikStore()",
-        "fr": "FEUILLE: Ajouter des états lisibles\nFEAT: Les données sont également mises à jour lorsque le chauffage est éteint\nObtenez un jeton\nFIX: #7 Erreur avec useStore()",
-        "it": "FEAT: Aggiungi stati scrivibili\nCARAT: I dati vengono aggiornati anche quando il riscaldamento è spento\nFIX: Get token\nFIX: #7 Errore con useStore()",
-        "es": "FEAT: Añadir estados escribibles\nFEAT: Los datos también se actualizan cuando la calefacción está apagada\nFIX: Token\nFIX: #7 Error con useStore()",
-        "pl": "FEAT: Dodaj stany zapisywalne\nFEAT: Dane są również aktualizowane, gdy ogrzewanie jest wyłączone\nFIX: Pobierz żeton\nFIX: # 7 Błąd z useStore ()",
-        "uk": "FEAT: Додати написати штати\nFEAT: Дані також оновлено, коли опалення вимкнено\nFIX: Отримати токен\nFIX: #7 Помилка з використаннямStore()",
-        "zh-cn": "FEAT: 添加可写入状态\nFEAT: 数据也在加热关闭时更新\nFIX: 获取符号\nFIX: # 7 使用Store( ) 出错"
       }
     },
     "titleLang": {
