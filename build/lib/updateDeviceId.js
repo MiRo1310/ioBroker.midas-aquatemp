@@ -49,7 +49,10 @@ async function updateDeviceID(adapter) {
       return;
     }
     if (!((_b = (_a = data == null ? void 0 : data.object_result) == null ? void 0 : _a[0]) == null ? void 0 : _b.device_code) && !((_d = (_c = data == null ? void 0 : data.objectResult) == null ? void 0 : _c[0]) == null ? void 0 : _d.deviceCode)) {
-      adapter.log.error("Error in updateDeviceID: No device code found");
+      store.resetOnErrorHandler();
+      adapter.log.error(
+        "No device code found. Maybe the token is not valid. Please check if there are not two usages of the same account. In the next loop the token will be refreshed."
+      );
       return;
     }
     store.device = (_h = (_e = data.object_result) == null ? void 0 : _e[0].device_code) != null ? _h : (_g = (_f = data.objectResult) == null ? void 0 : _f[0]) == null ? void 0 : _g.deviceCode;
