@@ -64,8 +64,8 @@ async function updateDeviceStatus(adapter) {
       await (0, import_updateDeviceDetails.updateDeviceDetails)(adapter);
       return;
     }
-    store.resetOnErrorHandler();
   } catch (error) {
+    store.resetOnErrorHandler();
     (0, import_logging.errorLogger)("Error in updateDeviceStatus", error, adapter);
   }
 }
