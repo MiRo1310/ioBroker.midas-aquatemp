@@ -37,8 +37,8 @@ async function getToken(adapter) {
     }
     adapter.log.debug("Request token");
     const { sUrl, options } = (0, import_endPoints.getOptionsAndSUrl)();
-    const { data, status } = await (0, import_axios.request)(adapter, sUrl, options);
-    if (status !== 200 || !data) {
+    const { data, error } = await (0, import_axios.request)(adapter, sUrl, options);
+    if (error || !data) {
       adapter.log.error(`Login-error: ${JSON.stringify(data)}`);
       store.resetOnErrorHandler();
       return;

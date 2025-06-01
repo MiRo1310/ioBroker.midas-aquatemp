@@ -5,7 +5,6 @@ import type { MidasAquatemp } from '../main';
 import { request } from './axios';
 import { getHeaders } from './axiosParameter';
 import type { MidasData } from '../types/types';
-import { noError } from './utils';
 
 export async function updateDeviceErrorMsg(adapter: MidasAquatemp): Promise<void> {
     const store = initStore();
@@ -19,7 +18,7 @@ export async function updateDeviceErrorMsg(adapter: MidasAquatemp): Promise<void
                 ? `${cloudURL}/app/device/getFaultDataByDeviceCode.json`
                 : `${cloudURL}/app/device/getFaultDataByDeviceCode`;
 
-        const { data } = await request<MidasData>(
+        const { data, error } = await request<MidasData>(
             adapter,
             sURL,
             {
@@ -29,7 +28,7 @@ export async function updateDeviceErrorMsg(adapter: MidasAquatemp): Promise<void
             getHeaders(token),
         );
 
-        if (!data || !noError(data.error_code)) {
+        if (!data || error) {
             store.resetOnErrorHandler();
             return;
         }

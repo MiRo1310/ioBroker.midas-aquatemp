@@ -38,13 +38,13 @@ async function updateDevicePower(adapter, deviceCode, power) {
       return;
     }
     const { sURL } = (0, import_endPoints.getSUrl)();
-    const { data } = await (0, import_axios.request)(
+    const { data, error } = await (0, import_axios.request)(
       adapter,
       sURL,
       (0, import_axiosParameter.getAxiosUpdateDevicePowerParams)({ deviceCode, value: powerOpt, protocolCode: "Power" }),
       (0, import_axiosParameter.getHeaders)(token)
     );
-    if (!data || !(0, import_utils.noError)(data.error_code)) {
+    if (!data || error) {
       store.resetOnErrorHandler();
       return;
     }
@@ -63,7 +63,7 @@ async function updateDeviceMode(adapter, deviceCode, mode) {
   try {
     if (token && token != "") {
       const { sURL } = (0, import_endPoints.getSUrl)();
-      const { data } = await (0, import_axios.request)(
+      const { data, error } = await (0, import_axios.request)(
         adapter,
         sURL,
         (0, import_axiosParameter.getAxiosUpdateDevicePowerParams)({ deviceCode, value: mode, protocolCode: "mode" }),
@@ -71,7 +71,7 @@ async function updateDeviceMode(adapter, deviceCode, mode) {
           headers: { "x-token": token }
         }
       );
-      if (!data || !(0, import_utils.noError)(data.error_code)) {
+      if (!data || error) {
         store.resetOnErrorHandler();
         return;
       }

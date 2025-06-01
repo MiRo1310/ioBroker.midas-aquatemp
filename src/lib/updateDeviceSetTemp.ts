@@ -6,7 +6,7 @@ import { errorLogger } from './logging';
 import type { MidasAquatemp } from '../main';
 import { request } from './axios';
 import type { MidasData } from '../types/types';
-import { isToken, noError } from './utils';
+import { isToken } from './utils';
 
 export const updateDeviceSetTemp = async (
     adapter: MidasAquatemp,
@@ -26,7 +26,7 @@ export const updateDeviceSetTemp = async (
         if (isToken(token)) {
             const { sURL } = getSUrl();
 
-            const { data } = await request<MidasData>(
+            const { data, error } = await request<MidasData>(
                 adapter,
                 sURL,
                 getAxiosUpdateDeviceSetTempParams({ deviceCode, sTemperature }),
@@ -34,7 +34,7 @@ export const updateDeviceSetTemp = async (
             );
             adapter.log.debug(`DeviceStatus: ${JSON.stringify(data)}`);
 
-            if (!noError(data?.error_code)) {
+            if (error) {
                 store.resetOnErrorHandler();
                 return;
             }

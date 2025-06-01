@@ -7,7 +7,7 @@ import { errorLogger } from './logging';
 import type { MidasAquatemp } from '../main';
 import { request } from './axios';
 import type { MidasData } from '../types/types';
-import { isDefined, isToken, noError } from './utils';
+import { isDefined, isToken } from './utils';
 
 export async function updateDevicePower(adapter: MidasAquatemp, deviceCode: string, power: number): Promise<void> {
     const store = initStore();
@@ -20,13 +20,13 @@ export async function updateDevicePower(adapter: MidasAquatemp, deviceCode: stri
         }
 
         const { sURL } = getSUrl();
-        const { data } = await request<MidasData>(
+        const { data, error } = await request<MidasData>(
             adapter,
             sURL,
             getAxiosUpdateDevicePowerParams({ deviceCode, value: powerOpt, protocolCode: 'Power' }),
             getHeaders(token),
         );
-        if (!data || !noError(data.error_code)) {
+        if (!data || error) {
             store.resetOnErrorHandler();
             return;
         }
@@ -47,7 +47,7 @@ async function updateDeviceMode(adapter: MidasAquatemp, deviceCode: string, mode
     try {
         if (token && token != '') {
             const { sURL } = getSUrl();
-            const { data } = await request<MidasData>(
+            const { data, error } = await request<MidasData>(
                 adapter,
                 sURL,
                 getAxiosUpdateDevicePowerParams({ deviceCode: deviceCode, value: mode, protocolCode: 'mode' }),
@@ -55,7 +55,7 @@ async function updateDeviceMode(adapter: MidasAquatemp, deviceCode: string, mode
                     headers: { 'x-token': token },
                 },
             );
-            if (!data || !noError(data.error_code)) {
+            if (!data || error) {
                 store.resetOnErrorHandler();
                 return;
             }

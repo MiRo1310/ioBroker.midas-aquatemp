@@ -7,18 +7,16 @@ export const request = async <T>(
     url: string,
     options = {},
     header = { headers: {} },
-): Promise<{ status?: number; data: T | undefined }> => {
+): Promise<{ status?: number; data: T | undefined; error: boolean }> => {
     try {
         const result = await axios.post(url, options, header);
         if (result.status === 200) {
-            adapter.log.debug(`Axios request successful: ${JSON.stringify(result.data)}`);
+            return { error: false, status: result.status, data: result.data as T };
         }
-        if (result.status === 504) {
-            adapter.log.warn(`Axios request timed out: ${url}`);
-        }
-        return { status: result.status, data: result.data };
+
+        return { error: true, status: result.status, data: result.data };
     } catch (e) {
         errorLogger('Axios request error', e, adapter);
-        return { status: 500, data: undefined };
+        return { status: 500, data: undefined, error: true };
     }
 };

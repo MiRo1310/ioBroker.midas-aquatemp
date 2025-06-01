@@ -26,7 +26,6 @@ var import_store = require("./store");
 var import_logging = require("./logging");
 var import_axios = require("./axios");
 var import_axiosParameter = require("./axiosParameter");
-var import_utils = require("./utils");
 async function updateDeviceErrorMsg(adapter) {
   var _a, _b, _c, _d, _e, _f, _g, _h, _i, _j, _k, _l, _m, _n, _o, _p;
   const store = (0, import_store.initStore)();
@@ -36,7 +35,7 @@ async function updateDeviceErrorMsg(adapter) {
       return;
     }
     const sURL = apiLevel < 3 ? `${cloudURL}/app/device/getFaultDataByDeviceCode.json` : `${cloudURL}/app/device/getFaultDataByDeviceCode`;
-    const { data } = await (0, import_axios.request)(
+    const { data, error } = await (0, import_axios.request)(
       adapter,
       sURL,
       {
@@ -45,7 +44,7 @@ async function updateDeviceErrorMsg(adapter) {
       },
       (0, import_axiosParameter.getHeaders)(token)
     );
-    if (!data || !(0, import_utils.noError)(data.error_code)) {
+    if (!data || error) {
       store.resetOnErrorHandler();
       return;
     }

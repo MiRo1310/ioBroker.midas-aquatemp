@@ -20,9 +20,9 @@ async function getToken(adapter: MidasAquatemp): Promise<void> {
         adapter.log.debug('Request token');
         const { sUrl, options } = getOptionsAndSUrl();
 
-        const { data, status } = await request<RequestToken>(adapter, sUrl, options);
+        const { data, error } = await request<RequestToken>(adapter, sUrl, options);
 
-        if (status !== 200 || !data) {
+        if (error || !data) {
             adapter.log.error(`Login-error: ${JSON.stringify(data)}`);
             store.resetOnErrorHandler();
             return;

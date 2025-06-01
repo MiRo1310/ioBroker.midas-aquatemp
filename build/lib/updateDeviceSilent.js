@@ -27,21 +27,19 @@ var import_saveValue = require("./saveValue");
 var import_store = require("./store");
 var import_logging = require("./logging");
 var import_axios = require("./axios");
-var import_utils = require("./utils");
 async function updateDeviceSilent(adapter, deviceCode, silent) {
   const store = (0, import_store.initStore)();
   try {
     const token = store.token;
     const silentMode = silent ? "1" : "0";
     if (token && token != "") {
-      const { sURL } = (0, import_endPoints.getSUrl)();
-      const { data } = await (0, import_axios.request)(
+      const { data, error } = await (0, import_axios.request)(
         adapter,
-        sURL,
+        (0, import_endPoints.getSUrl)().sURL,
         (0, import_axiosParameter.getAxiosUpdateDevicePowerParams)({ deviceCode, value: silentMode, protocolCode: "Manual-mute" }),
         (0, import_axiosParameter.getHeaders)(token)
       );
-      if (!data || !(0, import_utils.noError)(data.error_code)) {
+      if (!data || error) {
         store.resetOnErrorHandler();
         return;
       }

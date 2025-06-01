@@ -40,14 +40,14 @@ const updateDeviceSetTemp = async (adapter, deviceCode, temperature) => {
     }
     if ((0, import_utils.isToken)(token)) {
       const { sURL } = (0, import_endPoints.getSUrl)();
-      const { data } = await (0, import_axios.request)(
+      const { data, error } = await (0, import_axios.request)(
         adapter,
         sURL,
         (0, import_axiosParameter.getAxiosUpdateDeviceSetTempParams)({ deviceCode, sTemperature }),
         (0, import_axiosParameter.getHeaders)(token)
       );
       adapter.log.debug(`DeviceStatus: ${JSON.stringify(data)}`);
-      if (!(0, import_utils.noError)(data == null ? void 0 : data.error_code)) {
+      if (error) {
         store.resetOnErrorHandler();
         return;
       }

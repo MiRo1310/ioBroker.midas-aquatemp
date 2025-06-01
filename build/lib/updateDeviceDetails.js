@@ -28,7 +28,6 @@ var import_saveValue = require("./saveValue");
 var import_store = require("./store");
 var import_logging = require("./logging");
 var import_axios = require("./axios");
-var import_utils = require("./utils");
 const numberToBoolean = (value) => {
   return value === 1;
 };
@@ -97,8 +96,13 @@ async function updateDeviceDetails(adapter) {
       return;
     }
     const { sURL } = (0, import_endPoints.getSUrlUpdateDeviceId)();
-    const { data } = await (0, import_axios.request)(adapter, sURL, (0, import_axiosParameter.getProtocolCodes)(deviceCode), (0, import_axiosParameter.getHeaders)(token));
-    if (!data || !(0, import_utils.noError)(data.error_code)) {
+    const { data, error } = await (0, import_axios.request)(
+      adapter,
+      sURL,
+      (0, import_axiosParameter.getProtocolCodes)(deviceCode),
+      (0, import_axiosParameter.getHeaders)(token)
+    );
+    if (!data || error) {
       store.resetOnErrorHandler();
       return;
     }

@@ -37,15 +37,12 @@ const request = async (adapter, url, options = {}, header = { headers: {} }) => 
   try {
     const result = await import_axios.default.post(url, options, header);
     if (result.status === 200) {
-      adapter.log.debug(`Axios request successful: ${JSON.stringify(result.data)}`);
+      return { error: false, status: result.status, data: result.data };
     }
-    if (result.status === 504) {
-      adapter.log.warn(`Axios request timed out: ${url}`);
-    }
-    return { status: result.status, data: result.data };
+    return { error: true, status: result.status, data: result.data };
   } catch (e) {
     (0, import_logging.errorLogger)("Axios request error", e, adapter);
-    return { status: 500, data: void 0 };
+    return { status: 500, data: void 0, error: true };
   }
 };
 // Annotate the CommonJS export names for ESM import in node:

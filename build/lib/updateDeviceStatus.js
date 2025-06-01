@@ -29,7 +29,6 @@ var import_updateDeviceOnError = require("./updateDeviceOnError");
 var import_logging = require("./logging");
 var import_axios = require("./axios");
 var import_axiosParameter = require("./axiosParameter");
-var import_utils = require("./utils");
 async function updateDeviceStatus(adapter) {
   var _a, _b, _c, _d, _e, _f, _g, _h, _i;
   const store = (0, import_store.initStore)();
@@ -37,7 +36,7 @@ async function updateDeviceStatus(adapter) {
     const { token, device: deviceCode } = store;
     if (token) {
       const { sURL } = (0, import_endPoints.getUpdateDeviceStatusSUrl)();
-      const { data } = await (0, import_axios.request)(
+      const { data, error } = await (0, import_axios.request)(
         adapter,
         sURL,
         {
@@ -46,7 +45,7 @@ async function updateDeviceStatus(adapter) {
         },
         (0, import_axiosParameter.getHeaders)(token)
       );
-      if (!data || !(0, import_utils.noError)(data.error_code)) {
+      if (!data || error) {
         store.resetOnErrorHandler();
         return;
       }

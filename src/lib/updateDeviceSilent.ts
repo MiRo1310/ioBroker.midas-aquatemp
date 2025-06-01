@@ -6,7 +6,6 @@ import { errorLogger } from './logging';
 import type { MidasAquatemp } from '../main';
 import { request } from './axios';
 import type { MidasData } from '../types/types';
-import { noError } from './utils';
 
 export async function updateDeviceSilent(adapter: MidasAquatemp, deviceCode: string, silent: boolean): Promise<void> {
     const store = initStore();
@@ -15,14 +14,13 @@ export async function updateDeviceSilent(adapter: MidasAquatemp, deviceCode: str
         const silentMode = silent ? '1' : '0';
 
         if (token && token != '') {
-            const { sURL } = getSUrl();
-            const { data } = await request<MidasData>(
+            const { data, error } = await request<MidasData>(
                 adapter,
-                sURL,
+                getSUrl().sURL,
                 getAxiosUpdateDevicePowerParams({ deviceCode, value: silentMode, protocolCode: 'Manual-mute' }),
                 getHeaders(token),
             );
-            if (!data || !noError(data.error_code)) {
+            if (!data || error) {
                 store.resetOnErrorHandler();
                 return;
             }

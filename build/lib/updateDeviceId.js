@@ -37,14 +37,14 @@ async function updateDeviceID(adapter) {
     if (!(0, import_utils.isToken)(token)) {
       return;
     }
-    const { data, status } = await (0, import_axios.request)(
+    const { data, status, error } = await (0, import_axios.request)(
       adapter,
       (0, import_endPoints.getUpdateDeviceIdSUrl)().sURL,
       (0, import_axiosParameter.getAxiosUpdateDeviceIdParams)(),
       (0, import_axiosParameter.getHeaders)(token)
     );
     adapter.log.debug(`UpdateDeviceID response: ${JSON.stringify(data)}, status: ${status}`);
-    if (!data || status !== 200 || !(0, import_utils.noError)(data.error_code)) {
+    if (!data || error) {
       store.resetOnErrorHandler();
       return;
     }
@@ -61,7 +61,6 @@ async function updateDeviceID(adapter) {
     if (store.reachable && store.device) {
       await (0, import_saveValue.saveValue)({ key: "info.connection", value: true, stateType: "boolean", adapter });
       if (store.device != "" && store.product) {
-        adapter.log.debug("Update device status");
         await (0, import_updateDeviceStatus.updateDeviceStatus)(adapter);
       }
       return;
