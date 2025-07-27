@@ -43,7 +43,7 @@
 			"lg": 4,
 			"md": 6,
 			"sm": 8,
-			"xs": 8
+			"xs": 12
 
 		},
 		"useDeviceMac": {
@@ -53,8 +53,7 @@
 			"lg": 2,
 			"md": 3,
 			"sm": 4,
-			"xs": 4,
-			"newLine": false
+			"xs": 12
 		},
 
 		"selectApi": {
@@ -86,17 +85,32 @@
 		"text1": {
 			"type": "staticText",
 			"text": "staticText1",
-			"newLine": true
+			"newLine": true,
+			"xl": 12,
+			"lg": 12,
+			"md": 12,
+			"sm": 12,
+			"xs": 12
 		},
 		"text2": {
 			"type": "staticText",
 			"text": "staticText2",
-			"newLine": true
+			"newLine": true,
+			"xl": 12,
+			"lg": 12,
+			"md": 12,
+			"sm": 12,
+			"xs": 12
 		},
 		"text3": {
 			"type": "staticText",
 			"text": "staticText3",
-			"newLine": true
+			"newLine": true,
+			"xl": 12,
+			"lg": 12,
+			"md": 12,
+			"sm": 12,
+			"xs": 12
 		}
 	}
 }
