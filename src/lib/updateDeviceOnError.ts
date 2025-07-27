@@ -33,24 +33,24 @@ export async function updateDeviceErrorMsg(adapter: MidasAquatemp): Promise<void
             return;
         }
 
-        await saveValue({ key: 'error', value: true, stateType: 'boolean', adapter: adapter });
+        await saveValue({ key: 'error', value: true, stateType: 'boolean', adapter });
         await saveValue({
             key: 'errorMessage',
             value: data.objectResult?.[0]?.description ?? data.object_result?.[0]?.description ?? '',
             stateType: 'string',
-            adapter: adapter,
+            adapter,
         });
         await saveValue({
             key: 'errorCode',
             value: data.objectResult?.[0]?.faultCode ?? data.object_result?.[0]?.fault_code,
             stateType: 'string',
-            adapter: adapter,
+            adapter,
         });
         await saveValue({
             key: 'errorLevel',
             value: data.objectResult?.[0]?.errorLevel ?? data.object_result?.[0]?.error_level,
             stateType: 'string',
-            adapter: adapter,
+            adapter,
         });
     } catch (error: any) {
         errorLogger('Error in updateDeviceErrorMsg', error, adapter);

@@ -6,13 +6,21 @@
 			"type": "text",
 			"label": "Username",
 			"newLine": true,
-			"sm": 2
+			"xl": 2,
+			"lg": 4,
+			"md": 6,
+			"sm": 8,
+			"xs": 12
 		},
 		"password": {
 			"type": "password",
 			"label": "password",
 			"newLine": true,
-			"sm": 2
+			"xl": 2,
+			"lg": 4,
+			"md": 6,
+			"sm": 8,
+			"xs": 12
 		},
 
 		"refresh": {
@@ -20,24 +28,43 @@
 			"label": "refresh",
 			"min": 60,
 			"default": 60,
-			"newLine": true
+			"newLine": true,
+			"xl": 2,
+			"lg": 4,
+			"md": 6,
+			"sm": 8,
+			"xs": 12
 		},
 		"deviceMac": {
 			"type": "text",
 			"label": "Device Mac",
-			"sm": 3
+			"newLine": true,
+			"xl": 2,
+			"lg": 4,
+			"md": 6,
+			"sm": 8,
+			"xs": 8
+
 		},
 		"useDeviceMac": {
 			"type": "checkbox",
 			"label": "Use Device Mac",
-			"sm": 1,
+			"xl": 2,
+			"lg": 2,
+			"md": 3,
+			"sm": 4,
+			"xs": 4,
 			"newLine": false
 		},
 
 		"selectApi": {
 			"type": "select",
 			"label": "Api Level",
-			"sm": 1,
+			"xl": 2,
+			"lg": 4,
+			"md": 6,
+			"sm": 8,
+			"xs": 12,
 			"default": 3,
 
 			"options": [
