@@ -1,8 +1,21 @@
 {
   "common": {
     "name": "midas-aquatemp",
-    "version": "1.2.4",
+    "version": "1.2.5",
     "news": {
+      "1.2.5": {
+        "en": "Add size attributes to jsonConfig\nMinimal admin version: 7.4.10\nBreaking change: minimal supported node.js version is 20.x",
+        "de": "Größe Attribute zu jsonConfig hinzufügen\nMinimal Admin-Version: ANHANG\nBreaking change: minimal unterstützt node.js version is 20.x",
+        "ru": "Добавить атрибуты размера в jsonConfig\nМинимальная версия admin: 7.4.10\nИзменения: минимальная поддержка node.js версии 20.x",
+        "pt": "Adicionar atributos de tamanho ao jsonConfig\nVersão mínima do administrador: 7.4.10\nQuebrar a alteração: versão mínima suportada do nodo.js é 20.x",
+        "nl": "Attributen voor grootte toevoegen aan jsonConfig\nMinimale admin versie: 7,4.10\nBreaking change: minimale ondersteunde node.js versie is 20.x",
+        "fr": "Ajouter des attributs de taille à jsonConfig\nVersion administrative minimale : 7.4.10\nBreaking change: la version minimale prise en charge node.js est 20.x",
+        "it": "Aggiungi attributi di dimensione a jsonConfig\nVersione Minimal admin: 7.4.10\nCambiamento di rottura: versione node.js supportata minima è 20.x",
+        "es": "Añadir atributos de tamaño a jsonConfig\nVersión de administración mínima: 7.4.10\nCambio de ruptura: la versión mínima de node.js es 20.x",
+        "pl": "Dodaj atrybuty rozmiaru do jsonConfig\nMinimalna wersja administratora: 7.4.10\nZmiana łamania: minimalna obsługiwana wersja node.js to 20.x",
+        "uk": "Додати атрибути розмірів в jsonConfig\nМінімальна версія адміністратора: 7.4.10 Р\nЗміна розривів: мінімальний підтриманий вузол.js версія 20.x",
+        "zh-cn": "添加大小属性到 jsonConfig\n最小管理员版本 : 7.4.10 (中文(简体) )\n中断更改:最小支持的节点.js版本为20x"
+      },
       "1.2.4": {
         "en": "Fix: Error in updateDeviceID: No device code found",
         "de": "Fix: Fehler im UpdateDeviceID: Keine Gerätecode gefunden",
@@ -80,19 +93,6 @@
         "pl": "FIX: # 17 stan tryb zmiany",
         "uk": "FIX: #17 Режим зміни стану",
         "zh-cn": "FIX: # 17 状态更改模式"
-      },
-      "1.1.0": {
-        "en": "FEAT: Remove isPoolsana check\nFEAT: #16 Add flowSwitch",
-        "de": "FEAT: Entfernen isPoolsana überprüfen\nFEAT: #16 Add flowSwitch",
-        "ru": "FEAT: Удалить проверку Poolsana\n#16 Добавить поток",
-        "pt": "FEAT: Remover isPoolsana verificar\nFEAT: #16 Adicionar fluxoSwitch",
-        "nl": "FEAT: Verwijder isPoolsana controle\nFEAT: #16 Voeg stroom toeSwitch",
-        "fr": "VIANDE: Enlever la vérification isPoolsana\nFEUILLE: #16 Ajouter le commutateur de débit",
-        "it": "FEAT: Remove isPoolsana check\nFEAT: #16 Aggiungi flussoSwitch",
-        "es": "FEAT: Remove isPoolsana check\nFEAT: #16 Add flowSwitch",
-        "pl": "FEAT: Usuń sprawdzanie isPoolsana\nFEAT: # 16 Dodaj flowSwitch",
-        "uk": "FEAT: Зніміть прапорець\nFEAT: #16 Додати потік",
-        "zh-cn": "FEAT: 删除为 Poolsana 检查\nFEAT : # 16 添加流量开关"
       }
     },
     "titleLang": {
