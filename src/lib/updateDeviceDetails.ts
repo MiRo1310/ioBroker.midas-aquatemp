@@ -8,8 +8,8 @@ import type { MidasAquatemp } from '../main';
 import { request } from './axios';
 import type { DeviceDetails, ObjectResultResponse } from '../types/types';
 
-export const numberToBoolean = (value: number): boolean => {
-    return value === 1;
+export const numberToBoolean = (value: string): boolean => {
+    return value === '1';
 };
 
 const saveValues = async (adapter: MidasAquatemp, value: any): Promise<void> => {
@@ -114,7 +114,7 @@ export async function updateDeviceDetails(adapter: MidasAquatemp): Promise<void>
         });
         await saveValues(adapter, responseValue);
 
-        const mode: number = findCodeVal(responseValue, 'Mode');
+        const mode = findCodeVal(responseValue, 'Mode');
         const modes: Modes = {
             1: 'R02', // Heiz-Modus (-> R02)
             0: 'R01', // Kühl-Modus (-> R01)
@@ -151,13 +151,13 @@ export async function updateDeviceDetails(adapter: MidasAquatemp): Promise<void>
     }
 }
 
-function findCodeVal(result: ObjectResultResponse, code: string | string[]): any {
+function findCodeVal(result: ObjectResultResponse, code: string | string[]): string {
     if (!Array.isArray(code)) {
         return result.find(item => item.code === code)?.value || '';
     }
     for (let i = 0; i < code.length; i++) {
         const val = result.find(item => item.code === code[i])?.value;
-        if (val !== '0' && val !== '') {
+        if (val && val !== '0' && val !== '') {
             return val;
         }
     }

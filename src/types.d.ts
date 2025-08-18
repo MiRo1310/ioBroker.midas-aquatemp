@@ -68,6 +68,4 @@ export interface InputGetAxiosUpdateDeviceSetTempParams {
     deviceCode: string;
     sTemperature: string;
 }
-export interface Modes {
-    [key: number]: string;
-}
+export type Modes = Record<string, string>;
