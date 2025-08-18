@@ -157,9 +157,9 @@ function findCodeVal(result: ObjectResultResponse, code: string | string[]): any
     }
     for (let i = 0; i < code.length; i++) {
         const val = result.find(item => item.code === code[i])?.value;
-        if (val !== '0') {
+        if (val !== '0' && val !== '') {
             return val;
         }
     }
-    return '0';
+    return '';
 }
