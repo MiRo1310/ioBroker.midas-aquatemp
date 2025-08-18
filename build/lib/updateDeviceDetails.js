@@ -29,7 +29,7 @@ var import_store = require("./store");
 var import_logging = require("./logging");
 var import_axios = require("./axios");
 const numberToBoolean = (value) => {
-  return value === 1;
+  return value === "1";
 };
 const saveValues = async (adapter, value) => {
   await (0, import_saveValue.saveValue)({
@@ -159,7 +159,7 @@ function findCodeVal(result, code) {
   }
   for (let i = 0; i < code.length; i++) {
     const val = (_b = result.find((item) => item.code === code[i])) == null ? void 0 : _b.value;
-    if (val !== "0" && val !== "") {
+    if (val && val !== "0" && val !== "") {
       return val;
     }
   }

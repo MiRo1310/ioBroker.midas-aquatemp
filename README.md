@@ -37,6 +37,10 @@ If you have problems, contact us.
 	Placeholder for the next version (at the beginning of the line):
 	### **WORK IN PROGRESS**
 -->
+### **WORK IN PROGRESS**
+
+- FIX: Value formatting and value filtering
+
 ### 1.2.5 (2025-08-02)
 
 - Add size attributes to jsonConfig
