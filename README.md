@@ -39,6 +39,7 @@ If you have problems, contact us.
 -->
 ### **WORK IN PROGRESS**
 
+- CHORE: Update dependencies
 - FIX: Value formatting and value filtering
 
 ### 1.2.5 (2025-08-02)
