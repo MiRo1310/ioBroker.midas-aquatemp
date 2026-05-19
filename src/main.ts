@@ -12,7 +12,7 @@ import { encryptPassword } from './lib/encryptPassword';
 import { setupEndpoints } from './lib/endPoints';
 import { saveValue } from './lib/saveValue';
 
-import { updateToken } from './lib/token';
+import { ensureToken, updateToken } from './lib/token';
 
 import { updateDevicePower } from './lib/updateDevicePower';
 import { updateDeviceSetTemp } from './lib/updateDeviceSetTemp';
@@ -83,8 +83,8 @@ export class MidasAquatemp extends utils.Adapter {
                     await updateDevicePower(adapter, store.device, mode.val as number);
                 }
                 const silent = await this.getStateAsync(`${dpRoot}.silent`);
-                if (!silent?.ack && silent?.val && store.device) {
-                    await updateDevicePower(adapter, store.device, silent.val as number);
+                if (!silent?.ack && store.device) {
+                    await updateDeviceSilent(adapter, store.device, !!silent?.val);
                 }
             } catch (error: any) {
                 errorLogger('Error in updateInterval', error, adapter);
@@ -103,8 +103,9 @@ export class MidasAquatemp extends utils.Adapter {
                 }
                 if (id === `${dpRoot}.mode` && store.device) {
                     this.log.debug(`Mode: ${JSON.stringify(state)}`);
+                    await ensureToken(adapter);
                     if (isStateValue(state)) {
-                        const mode = parseInt(state.val as string);
+                        const mode = parseInt(String(state.val), 10);
                         await updateDevicePower(adapter, store.device, mode);
                     }
                     await this.setState(id, { ack: true });
@@ -112,6 +113,7 @@ export class MidasAquatemp extends utils.Adapter {
 
                 if (id === `${dpRoot}.silent` && store.device) {
                     this.log.debug(`Silent: ${JSON.stringify(state)}`);
+                    await ensureToken(adapter);
                     if (isStateValue(state)) {
                         await updateDeviceSilent(adapter, store.device, state.val as boolean);
                     }
@@ -120,7 +122,7 @@ export class MidasAquatemp extends utils.Adapter {
 
                 if (id === `${dpRoot}.tempSet` && store.device) {
                     this.log.debug(`TempSet: ${JSON.stringify(state)}`);
-
+                    await ensureToken(adapter);
                     if (isStateValue(state)) {
                         await updateDeviceSetTemp(adapter, store.device, state.val as number);
                     }
