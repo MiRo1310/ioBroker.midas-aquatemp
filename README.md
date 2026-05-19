@@ -37,8 +37,21 @@ If you have problems, contact us.
 	Placeholder for the next version (at the beginning of the line):
 	### **WORK IN PROGRESS**
 -->
+
 ### **WORK IN PROGRESS**
 
+- FIX: Cloud API compatibility after linked-go changes (API level 3)
+- FIX: Correct `deviceList` request payload (`productIds` no longer nested in `body`)
+- FIX: `getDeviceStatus` fault detection (`is_fault` read from object, not array)
+- FIX: SSL handling for cloud endpoints (`rejectUnauthorized: false`)
+- FIX: Mode control uses protocol code `Mode` instead of `mode`
+- FIX: Silent mode polling called `updateDevicePower` instead of `updateDeviceSilent`
+- FIX: Product-specific protocol codes for Poolsana vs. other devices
+- FIX: Temperature and consumption values only updated when device is powered on
+- FIX: Set temperature fallback (`Set_Temp`, `R02`, `R03`, `R01`)
+- FIX: Invalid numeric values are no longer written as `NaN`
+- FIX: API responses with `error_code` other than `0` are treated as errors
+- FIX: Token refresh before control commands (`ensureToken`)
 - CHORE: Update dependencies
 - FIX: Value formatting and value filtering
 
