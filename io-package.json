@@ -1,8 +1,21 @@
 {
   "common": {
     "name": "midas-aquatemp",
-    "version": "1.2.5",
+    "version": "1.2.6",
     "news": {
+      "1.2.6": {
+        "en": "Fix: Cloud API compatibility after linked-go changes (deviceList, getDeviceStatus, SSL, control commands, product-specific protocol codes)",
+        "de": "Fix: Cloud-API-Kompatibilität nach linked-go Änderungen (deviceList, getDeviceStatus, SSL, Steuerbefehle, produktspezifische Protokoll-Codes)",
+        "ru": "Исправление: совместимость с облачным API после изменений linked-go",
+        "pt": "Correção: compatibilidade da API na nuvem após alterações linked-go",
+        "nl": "Fix: cloud API-compatibiliteit na linked-go wijzigingen",
+        "fr": "Correction : compatibilité API cloud après les changements linked-go",
+        "it": "Correzione: compatibilità API cloud dopo le modifiche linked-go",
+        "es": "Corrección: compatibilidad API en la nube tras cambios linked-go",
+        "pl": "Fix: zgodność API chmury po zmianach linked-go",
+        "uk": "Виправлення: сумісність хмарного API після змін linked-go",
+        "zh-cn": "修复：linked-go 更改后的云 API 兼容性"
+      },
       "1.2.5": {
         "en": "Add size attributes to jsonConfig\nMinimal admin version: 7.4.10\nBreaking change: minimal supported node.js version is 20.x",
         "de": "Größe Attribute zu jsonConfig hinzufügen\nMinimal Admin-Version: ANHANG\nBreaking change: minimal unterstützt node.js version is 20.x",
