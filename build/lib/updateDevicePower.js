@@ -66,7 +66,7 @@ async function updateDeviceMode(adapter, deviceCode, mode) {
       const { data, error } = await (0, import_axios.request)(
         adapter,
         sURL,
-        (0, import_axiosParameter.getAxiosUpdateDevicePowerParams)({ deviceCode, value: mode, protocolCode: "mode" }),
+        (0, import_axiosParameter.getAxiosUpdateDevicePowerParams)({ deviceCode, value: mode, protocolCode: "Mode" }),
         {
           headers: { "x-token": token }
         }

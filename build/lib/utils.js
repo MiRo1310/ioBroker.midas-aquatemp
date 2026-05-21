@@ -18,21 +18,54 @@ var __copyProps = (to, from, except, desc) => {
 var __toCommonJS = (mod) => __copyProps(__defProp({}, "__esModule", { value: true }), mod);
 var utils_exports = {};
 __export(utils_exports, {
+  findCodeVal: () => findCodeVal,
+  isApiSuccess: () => isApiSuccess,
   isDefined: () => isDefined,
   isStateValue: () => isStateValue,
   isToken: () => isToken,
-  noError: () => noError
+  parseIntOrNull: () => parseIntOrNull,
+  parseNumberOrNull: () => parseNumberOrNull
 });
 module.exports = __toCommonJS(utils_exports);
 const isDefined = (value) => value !== void 0 && value !== null;
 const isStateValue = (state) => isDefined(state) && isDefined(state == null ? void 0 : state.val);
 const isToken = (token) => isDefined(token) && token !== "";
-const noError = (errorCode) => errorCode === "0";
+const isApiSuccess = (errorCode) => errorCode === void 0 || errorCode === null || parseInt(String(errorCode), 10) === 0;
+const parseNumberOrNull = (value) => {
+  if (value === "") {
+    return null;
+  }
+  const num = parseFloat(String(value).replace(",", "."));
+  return Number.isFinite(num) ? num : null;
+};
+const parseIntOrNull = (value) => {
+  if (value === "") {
+    return null;
+  }
+  const num = parseInt(String(value), 10);
+  return Number.isFinite(num) ? num : null;
+};
+function findCodeVal(result, code) {
+  var _a, _b, _c;
+  if (!Array.isArray(code)) {
+    return (_b = (_a = result.find((item) => item.code === code)) == null ? void 0 : _a.value) != null ? _b : "";
+  }
+  for (let i = 0; i < code.length; i++) {
+    const val = (_c = result.find((item) => item.code === code[i])) == null ? void 0 : _c.value;
+    if (val !== void 0 && val !== null && val !== "") {
+      return val;
+    }
+  }
+  return "";
+}
 // Annotate the CommonJS export names for ESM import in node:
 0 && (module.exports = {
+  findCodeVal,
+  isApiSuccess,
   isDefined,
   isStateValue,
   isToken,
-  noError
+  parseIntOrNull,
+  parseNumberOrNull
 });
 //# sourceMappingURL=utils.js.map

@@ -50,7 +50,7 @@ async function updateDeviceMode(adapter: MidasAquatemp, deviceCode: string, mode
             const { data, error } = await request<MidasData>(
                 adapter,
                 sURL,
-                getAxiosUpdateDevicePowerParams({ deviceCode: deviceCode, value: mode, protocolCode: 'mode' }),
+                getAxiosUpdateDevicePowerParams({ deviceCode: deviceCode, value: mode, protocolCode: 'Mode' }),
                 {
                     headers: { 'x-token': token },
                 },

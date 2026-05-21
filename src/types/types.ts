@@ -39,16 +39,14 @@ interface DefaultParams {
 
 export interface DeviceStatus extends DefaultParams {
     object_result?: {
-        // TODO : Not validated Type
-        is_fault: boolean;
-        isFault: boolean;
-        status: string;
-    }[];
+        is_fault?: boolean;
+        status?: string;
+    };
     objectResult?: {
-        is_fault: boolean; // Validated Type
-        isFault: boolean;
-        status: string;
-    }[];
+        is_fault?: boolean;
+        isFault?: boolean;
+        status?: string;
+    };
 }
 
 export interface UpdateDeviceId extends DefaultParams {
@@ -124,4 +122,5 @@ export interface DeviceDetails extends DefaultParams {
 export interface RequestToken {
     object_result?: { 'x-token': string };
     objectResult?: { 'x-token': string };
+    error_code?: string;
 }

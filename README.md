@@ -25,6 +25,21 @@ If this don´t work you can add the device mac, which you can find in the app an
 
 -   flowSwitch does not work for all devices
 
+### TLS notes
+
+TLS certificate validation is enabled by default.
+
+For troubleshooting only, insecure TLS mode can be enabled via:
+
+- adapter setting: `Allow insecure TLS (not recommended)`
+- environment variable: `MIDAS_AQUATEMP_INSECURE_TLS=true`
+
+Optional host allowlist for insecure mode:
+
+- `MIDAS_AQUATEMP_INSECURE_TLS_HOSTS=host1,host2`
+
+When insecure mode is active, the adapter logs a warning.
+
 ### Supported devices
 
 -   Poolsana InverterPro Series (17, 21) with Wifi-Adapter for Mida Inverter-heater
@@ -37,8 +52,21 @@ If you have problems, contact us.
 	Placeholder for the next version (at the beginning of the line):
 	### **WORK IN PROGRESS**
 -->
+
 ### **WORK IN PROGRESS**
 
+- FIX: Cloud API compatibility after linked-go changes (API level 3)
+- FIX: Correct `deviceList` request payload (`productIds` no longer nested in `body`)
+- FIX: `getDeviceStatus` fault detection (`is_fault` read from object, not array)
+- FIX: TLS validation enabled by default; optional insecure mode via config/env with warning
+- FIX: Mode control uses protocol code `Mode` instead of `mode`
+- FIX: Silent mode polling called `updateDevicePower` instead of `updateDeviceSilent`
+- FIX: Product-specific protocol codes for Poolsana vs. other devices
+- FIX: Temperature and consumption values only updated when device is powered on
+- FIX: Set temperature fallback (`Set_Temp`, `R02`, `R03`, `R01`)
+- FIX: Invalid numeric values are no longer written as `NaN`
+- FIX: API responses with `error_code` other than `0` are treated as errors
+- FIX: Token refresh before control commands (`ensureToken`)
 - CHORE: Update dependencies
 - FIX: Value formatting and value filtering
 
