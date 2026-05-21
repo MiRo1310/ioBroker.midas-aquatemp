@@ -122,4 +122,5 @@ export interface DeviceDetails extends DefaultParams {
 export interface RequestToken {
     object_result?: { 'x-token': string };
     objectResult?: { 'x-token': string };
+    error_code?: string;
 }

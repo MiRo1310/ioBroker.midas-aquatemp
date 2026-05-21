@@ -170,7 +170,8 @@
     "password": "",
     "refresh": 60,
     "deviceMac": "",
-    "useDeviceMac": false
+    "useDeviceMac": false,
+    "allowInsecureTls": false
   },
   "protectedNative": [
     "password"

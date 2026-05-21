@@ -8,11 +8,7 @@ import { request } from './axios';
 import type { DeviceDetails } from '../types/types';
 import { findCodeVal, parseIntOrNull, parseNumberOrNull } from './utils';
 
-async function saveNumberIfValid(
-    adapter: MidasAquatemp,
-    key: string,
-    value: number | null,
-): Promise<boolean> {
+async function saveNumberIfValid(adapter: MidasAquatemp, key: string, value: number | null): Promise<boolean> {
     if (value === null || !Number.isFinite(value)) {
         return false;
     }

@@ -19,8 +19,7 @@ export async function updateDeviceStatus(adapter: MidasAquatemp): Promise<void> 
 
         const { sURL } = getUpdateDeviceStatusSUrl();
 
-        const payload =
-            apiLevel < 3 ? { device_code: deviceCode } : { deviceCode };
+        const payload = apiLevel < 3 ? { device_code: deviceCode } : { deviceCode };
 
         const { data, error } = await request<DeviceStatus>(adapter, sURL, payload, getHeaders(token));
         if (!data || error) {

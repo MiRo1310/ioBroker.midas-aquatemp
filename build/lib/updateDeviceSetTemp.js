@@ -33,9 +33,19 @@ const updateDeviceSetTemp = async (adapter, deviceCode, temperature) => {
   const dpRoot = store.getDpRoot();
   try {
     const token = store.token;
-    const sTemperature = temperature.toString().replace(",", ".");
+    const numericTemperature = typeof temperature === "number" ? temperature : parseFloat(String(temperature).replace(",", "."));
+    if (!Number.isFinite(numericTemperature)) {
+      adapter.log.warn(`Invalid set temperature: ${temperature}`);
+      return;
+    }
+    const sTemperature = numericTemperature.toString().replace(",", ".");
     const result = await adapter.getStateAsync(`${dpRoot}.mode`);
-    if (!((result == null ? void 0 : result.val) || (result == null ? void 0 : result.val) === 0)) {
+    if (!result) {
+      adapter.log.warn(`Invalid mode: ${result}`);
+      return;
+    }
+    if (String(result == null ? void 0 : result.val) === "-1") {
+      adapter.log.warn(`Mode set to: ${result == null ? void 0 : result.val}`);
       return;
     }
     if ((0, import_utils.isToken)(token)) {
@@ -51,7 +61,7 @@ const updateDeviceSetTemp = async (adapter, deviceCode, temperature) => {
         store.resetOnErrorHandler();
         return;
       }
-      await (0, import_saveValue.saveValue)({ key: "tempSet", value: temperature, stateType: "number", adapter });
+      await (0, import_saveValue.saveValue)({ key: "tempSet", value: numericTemperature, stateType: "number", adapter });
     }
   } catch (error) {
     (0, import_logging.errorLogger)("Error in updateDeviceSetTemp", error, adapter);

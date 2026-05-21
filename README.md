@@ -25,6 +25,21 @@ If this don´t work you can add the device mac, which you can find in the app an
 
 -   flowSwitch does not work for all devices
 
+### TLS notes
+
+TLS certificate validation is enabled by default.
+
+For troubleshooting only, insecure TLS mode can be enabled via:
+
+- adapter setting: `Allow insecure TLS (not recommended)`
+- environment variable: `MIDAS_AQUATEMP_INSECURE_TLS=true`
+
+Optional host allowlist for insecure mode:
+
+- `MIDAS_AQUATEMP_INSECURE_TLS_HOSTS=host1,host2`
+
+When insecure mode is active, the adapter logs a warning.
+
 ### Supported devices
 
 -   Poolsana InverterPro Series (17, 21) with Wifi-Adapter for Mida Inverter-heater
@@ -43,7 +58,7 @@ If you have problems, contact us.
 - FIX: Cloud API compatibility after linked-go changes (API level 3)
 - FIX: Correct `deviceList` request payload (`productIds` no longer nested in `body`)
 - FIX: `getDeviceStatus` fault detection (`is_fault` read from object, not array)
-- FIX: SSL handling for cloud endpoints (`rejectUnauthorized: false`)
+- FIX: TLS validation enabled by default; optional insecure mode via config/env with warning
 - FIX: Mode control uses protocol code `Mode` instead of `mode`
 - FIX: Silent mode polling called `updateDevicePower` instead of `updateDeviceSilent`
 - FIX: Product-specific protocol codes for Poolsana vs. other devices

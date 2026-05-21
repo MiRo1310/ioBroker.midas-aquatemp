@@ -1,8 +1,8 @@
 import type {
     InputGetAxiosUpdateDevicePowerParams,
     InputGetAxiosUpdateDeviceSetTempParams,
-    ReturnGetAxiosUpdateDevicePowerParams,
-    ReturnGetAxiosUpdateDeviceSetTempParams,
+    AxiosUpdateDeviceParams,
+    AxiosUpdateDeviceParam,
 } from '../types';
 import { initStore } from './store';
 
@@ -95,11 +95,7 @@ export const getAxiosUpdateDeviceIdParams = (): { product_ids?: string[]; produc
     return store.apiLevel < 3 ? { product_ids: PRODUCT_IDS } : { productIds: PRODUCT_IDS };
 };
 
-const controlParam = (
-    deviceCode: string,
-    protocolCode: string,
-    value: string | number,
-): Record<string, string | number> => {
+const controlParam = (deviceCode: string, protocolCode: string, value: string | number): AxiosUpdateDeviceParam => {
     const store = initStore();
     return store.apiLevel < 3
         ? { device_code: deviceCode, protocol_code: protocolCode, value }
@@ -110,7 +106,7 @@ export const getAxiosUpdateDevicePowerParams = ({
     deviceCode,
     value,
     protocolCode,
-}: InputGetAxiosUpdateDevicePowerParams): ReturnGetAxiosUpdateDevicePowerParams => {
+}: InputGetAxiosUpdateDevicePowerParams): AxiosUpdateDeviceParams => {
     return {
         param: [controlParam(deviceCode, protocolCode, value)],
     };
@@ -119,7 +115,7 @@ export const getAxiosUpdateDevicePowerParams = ({
 export const getAxiosUpdateDeviceSetTempParams = ({
     deviceCode,
     sTemperature,
-}: InputGetAxiosUpdateDeviceSetTempParams): ReturnGetAxiosUpdateDeviceSetTempParams => {
+}: InputGetAxiosUpdateDeviceSetTempParams): AxiosUpdateDeviceParams => {
     return {
         param: ['R01', 'R02', 'R03', 'Set_Temp'].map(code => controlParam(deviceCode, code, sTemperature)),
     };

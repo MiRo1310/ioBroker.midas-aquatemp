@@ -82,8 +82,9 @@ export class MidasAquatemp extends utils.Adapter {
                 if (!mode?.ack && mode?.val && store.device) {
                     await updateDevicePower(adapter, store.device, mode.val as number);
                 }
+
                 const silent = await this.getStateAsync(`${dpRoot}.silent`);
-                if (!silent?.ack && store.device) {
+                if (!silent?.ack && isStateValue(silent) && store.device) {
                     await updateDeviceSilent(adapter, store.device, !!silent?.val);
                 }
             } catch (error: any) {
@@ -101,28 +102,46 @@ export class MidasAquatemp extends utils.Adapter {
                 if (!state || state.ack) {
                     return;
                 }
-                if (id === `${dpRoot}.mode` && store.device) {
+
+                const isRelevantId = id === `${dpRoot}.mode` || id === `${dpRoot}.silent` || id === `${dpRoot}.tempSet`;
+
+                if (!isRelevantId || !store.device) {
+                    return;
+                }
+                await ensureToken(adapter);
+
+                if (id === `${dpRoot}.mode`) {
                     this.log.debug(`Mode: ${JSON.stringify(state)}`);
-                    await ensureToken(adapter);
-                    if (isStateValue(state)) {
-                        const mode = parseInt(String(state.val), 10);
-                        await updateDevicePower(adapter, store.device, mode);
+
+                    if (!isStateValue(state)) {
+                        this.log.warn(`Ignoring invalid mode state payload for ${id}: ${JSON.stringify(state)}`);
+                        return;
                     }
+
+                    const mode = Number(state.val);
+                    const allowedModes = new Set([-1, 0, 1, 2]);
+                    if (!Number.isFinite(mode) || !Number.isInteger(mode) || !allowedModes.has(mode)) {
+                        this.log.warn(
+                            `Ignoring unsupported mode value for ${id}: ${JSON.stringify(state.val)} (allowed: -1, 0, 1, 2)`,
+                        );
+                        return;
+                    }
+
+                    await updateDevicePower(adapter, store.device, mode);
                     await this.setState(id, { ack: true });
                 }
 
-                if (id === `${dpRoot}.silent` && store.device) {
+                if (id === `${dpRoot}.silent`) {
                     this.log.debug(`Silent: ${JSON.stringify(state)}`);
-                    await ensureToken(adapter);
+
                     if (isStateValue(state)) {
                         await updateDeviceSilent(adapter, store.device, state.val as boolean);
                     }
                     await this.setState(id, { ack: true });
                 }
 
-                if (id === `${dpRoot}.tempSet` && store.device) {
+                if (id === `${dpRoot}.tempSet`) {
                     this.log.debug(`TempSet: ${JSON.stringify(state)}`);
-                    await ensureToken(adapter);
                     if (isStateValue(state)) {
                         await updateDeviceSetTemp(adapter, store.device, state.val as number);
                     }
