@@ -19,7 +19,9 @@ describe('module to test => function to test', () => {
         // or using the should() syntax
         result.should.equal(expected);
     });
-    // ... more tests => it
+    it('Test', () => {
+        true.should.be.be.true;
+    });
 });
 
 // ... more test suites => describe
