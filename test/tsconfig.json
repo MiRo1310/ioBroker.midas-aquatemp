@@ -1,11 +1,15 @@
 {
-	"extends": "./tsconfig.json",
-	"compilerOptions": {		
+	"extends": "../tsconfig.json",
+	"compilerOptions": {
 		"noImplicitAny": false,
-		"noEmit": false,
-		"outDir": "./build/",	
+		"noEmit": true,
+		"rootDir": "..",
+		"ignoreDeprecations": "6.0",
+		"types": ["node", "mocha", "chai"]
 	},
 	"include": [
-		"./test/lib/utils.test.ts"
+		"../src/**/*.ts",
+		"./**/*.ts",
+		"./mocha.setup.js"
 	]
 }

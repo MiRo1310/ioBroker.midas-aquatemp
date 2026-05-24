@@ -2,6 +2,7 @@
 {
 	"extends": "./tsconfig.json",
 	"compilerOptions": {
+		"ignoreDeprecations": "6.0",
 		"allowJs": false,
 		"checkJs": false,
 		"noEmit": false,
