@@ -29,9 +29,15 @@ export async function updateDeviceStatus(adapter: MidasAquatemp): Promise<void> 
 
         adapter.log.debug(`DeviceStatus: ${JSON.stringify(data)}`);
 
+        const status = apiLevel < 3 ? data.object_result?.status : data.objectResult?.status;
+        store.reachable = status === 'ONLINE';
+        await saveValue({ key: 'info.connection', value: store.reachable, stateType: 'boolean', adapter });
+        if (!store.reachable) {
+            return;
+        }
+
         const isFault =
             apiLevel < 3 ? data.object_result?.is_fault : (data.objectResult?.is_fault ?? data.objectResult?.isFault);
-
         if (isFault === true) {
             await saveValue({ key: 'error', value: true, stateType: 'boolean', adapter });
             await updateDeviceDetails(adapter);
