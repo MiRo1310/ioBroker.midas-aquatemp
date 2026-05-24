@@ -29,7 +29,7 @@ var import_logging = require("./logging");
 var import_axios = require("./axios");
 var import_utils = require("./utils");
 async function saveNumberIfValid(adapter, key, value) {
-  if (value === null || !Number.isFinite(value)) {
+  if (!Number.isFinite(value)) {
     return false;
   }
   await (0, import_saveValue.saveValue)({ key, value, stateType: "number", adapter });
@@ -75,30 +75,38 @@ async function updateDeviceDetails(adapter) {
       const tOut = "T03";
       const tCoil = isPoolsana ? "T04" : "T4";
       const tAmb = isPoolsana ? "T05" : "T5";
-      const powerVal = (0, import_utils.parseNumberOrNull)((0, import_utils.findCodeVal)(responseValue, tPower));
-      const ampVal = (0, import_utils.parseNumberOrNull)((0, import_utils.findCodeVal)(responseValue, tAmp));
-      if (powerVal !== null && ampVal !== null) {
-        await (0, import_saveValue.saveValue)({
-          key: "consumption",
-          value: powerVal * ampVal,
-          stateType: "number",
-          adapter
-        });
-      }
-      await saveNumberIfValid(adapter, "suctionTemp", (0, import_utils.parseNumberOrNull)((0, import_utils.findCodeVal)(responseValue, tSuction)));
-      await saveNumberIfValid(adapter, "tempIn", (0, import_utils.parseNumberOrNull)((0, import_utils.findCodeVal)(responseValue, tIn)));
-      await saveNumberIfValid(adapter, "tempOut", (0, import_utils.parseNumberOrNull)((0, import_utils.findCodeVal)(responseValue, tOut)));
-      await saveNumberIfValid(adapter, "coilTemp", (0, import_utils.parseNumberOrNull)((0, import_utils.findCodeVal)(responseValue, tCoil)));
-      await saveNumberIfValid(adapter, "ambient", (0, import_utils.parseNumberOrNull)((0, import_utils.findCodeVal)(responseValue, tAmb)));
+      const flowSwitch = isPoolsana ? "S03" : "S3";
+      const powerVal = (0, import_utils.parseNumber)((0, import_utils.findCodeVal)(responseValue, tPower));
+      const ampVal = (0, import_utils.parseNumber)((0, import_utils.findCodeVal)(responseValue, tAmp));
+      const consumptionValue = (0, import_utils.isDefined)(powerVal) && (0, import_utils.isDefined)(ampVal) ? powerVal * ampVal : 0;
+      await (0, import_saveValue.saveValue)({
+        key: "consumption",
+        value: consumptionValue,
+        stateType: "number",
+        adapter
+      });
+      const flowSwitchValue = (0, import_utils.findCodeVal)(responseValue, flowSwitch);
+      await saveNumberIfValid(adapter, "suctionTemp", (0, import_utils.parseNumber)((0, import_utils.findCodeVal)(responseValue, tSuction)));
+      await saveNumberIfValid(adapter, "tempIn", (0, import_utils.parseNumber)((0, import_utils.findCodeVal)(responseValue, tIn)));
+      await saveNumberIfValid(adapter, "tempOut", (0, import_utils.parseNumber)((0, import_utils.findCodeVal)(responseValue, tOut)));
+      await saveNumberIfValid(adapter, "coilTemp", (0, import_utils.parseNumber)((0, import_utils.findCodeVal)(responseValue, tCoil)));
+      await saveNumberIfValid(adapter, "ambient", (0, import_utils.parseNumber)((0, import_utils.findCodeVal)(responseValue, tAmb)));
+      await saveNumberIfValid(adapter, "voltage", ampVal);
+      await (0, import_saveValue.saveValue)({
+        key: "flowSwitch",
+        value: flowSwitchValue ? [1, "1", "true", true].includes(flowSwitchValue) : null,
+        stateType: "boolean",
+        adapter
+      });
       await saveNumberIfValid(adapter, "rotor", (0, import_utils.parseIntOrNull)((0, import_utils.findCodeVal)(responseValue, "T17")));
     } else {
       await (0, import_saveValue.saveValue)({ key: "consumption", value: 0, stateType: "number", adapter });
       await (0, import_saveValue.saveValue)({ key: "rotor", value: 0, stateType: "number", adapter });
     }
     const setTempCandidates = ["Set_Temp", "R02", "R03", "R01"];
-    let setTempValue = null;
+    let setTempValue = 0;
     for (const code of setTempCandidates) {
-      setTempValue = (0, import_utils.parseNumberOrNull)((0, import_utils.findCodeVal)(responseValue, code));
+      setTempValue = (0, import_utils.parseNumber)((0, import_utils.findCodeVal)(responseValue, code));
       if (setTempValue !== null) {
         if (code !== "Set_Temp") {
           adapter.log.debug(`Set-temp fallback: ${code}=${setTempValue}`);

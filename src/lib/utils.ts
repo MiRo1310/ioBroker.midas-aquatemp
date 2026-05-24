@@ -9,20 +9,20 @@ export const isToken = (token?: string | null): token is string => isDefined(tok
 export const isApiSuccess = (errorCode?: string | number): boolean =>
     errorCode === undefined || errorCode === null || parseInt(String(errorCode), 10) === 0;
 
-export const parseNumberOrNull = (value: string): number | null => {
+export const parseNumber = (value: string): number => {
     if (value === '') {
-        return null;
+        return 0;
     }
     const num = parseFloat(String(value).replace(',', '.'));
-    return Number.isFinite(num) ? num : null;
+    return Number.isFinite(num) ? num : 0;
 };
 
-export const parseIntOrNull = (value: string): number | null => {
+export const parseIntOrNull = (value: string): number => {
     if (value === '') {
-        return null;
+        return 0;
     }
     const num = parseInt(String(value), 10);
-    return Number.isFinite(num) ? num : null;
+    return Number.isFinite(num) ? num : 0;
 };
 
 export function findCodeVal(result: ObjectResultResponse, code: string | string[]): string {

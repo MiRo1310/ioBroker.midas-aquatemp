@@ -67,6 +67,26 @@ export const createObjects = async (adapter: MidasAquatemp): Promise<void> => {
             def: 0,
         },
         {
+            id: `${dpRoot}.voltage`,
+            name: {
+                en: 'Voltage',
+                de: 'Spannung',
+                ru: 'Напряжение',
+                pt: 'Tensao',
+                nl: 'Spanning',
+                fr: 'Tension',
+                it: 'Tensione',
+                es: 'Tension',
+                pl: 'Napiecie',
+                uk: 'Napruha',
+                'zh-cn': '电压',
+            },
+            type: 'number',
+            role: 'value.voltage',
+            unit: 'V',
+            def: 0,
+        },
+        {
             id: `${dpRoot}.error`,
             name: {
                 en: 'Error',

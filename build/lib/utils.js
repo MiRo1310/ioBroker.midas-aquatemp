@@ -24,26 +24,26 @@ __export(utils_exports, {
   isStateValue: () => isStateValue,
   isToken: () => isToken,
   parseIntOrNull: () => parseIntOrNull,
-  parseNumberOrNull: () => parseNumberOrNull
+  parseNumber: () => parseNumber
 });
 module.exports = __toCommonJS(utils_exports);
 const isDefined = (value) => value !== void 0 && value !== null;
 const isStateValue = (state) => isDefined(state) && isDefined(state == null ? void 0 : state.val);
 const isToken = (token) => isDefined(token) && token !== "";
 const isApiSuccess = (errorCode) => errorCode === void 0 || errorCode === null || parseInt(String(errorCode), 10) === 0;
-const parseNumberOrNull = (value) => {
+const parseNumber = (value) => {
   if (value === "") {
-    return null;
+    return 0;
   }
   const num = parseFloat(String(value).replace(",", "."));
-  return Number.isFinite(num) ? num : null;
+  return Number.isFinite(num) ? num : 0;
 };
 const parseIntOrNull = (value) => {
   if (value === "") {
-    return null;
+    return 0;
   }
   const num = parseInt(String(value), 10);
-  return Number.isFinite(num) ? num : null;
+  return Number.isFinite(num) ? num : 0;
 };
 function findCodeVal(result, code) {
   var _a, _b, _c;
@@ -66,6 +66,6 @@ function findCodeVal(result, code) {
   isStateValue,
   isToken,
   parseIntOrNull,
-  parseNumberOrNull
+  parseNumber
 });
 //# sourceMappingURL=utils.js.map

@@ -86,6 +86,26 @@ const createObjects = async (adapter) => {
       def: 0
     },
     {
+      id: `${dpRoot}.voltage`,
+      name: {
+        en: "Voltage",
+        de: "Spannung",
+        ru: "\u041D\u0430\u043F\u0440\u044F\u0436\u0435\u043D\u0438\u0435",
+        pt: "Tensao",
+        nl: "Spanning",
+        fr: "Tension",
+        it: "Tensione",
+        es: "Tension",
+        pl: "Napiecie",
+        uk: "Napruha",
+        "zh-cn": "\u7535\u538B"
+      },
+      type: "number",
+      role: "value.voltage",
+      unit: "V",
+      def: 0
+    },
+    {
       id: `${dpRoot}.error`,
       name: {
         en: "Error",

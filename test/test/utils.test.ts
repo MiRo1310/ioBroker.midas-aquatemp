@@ -8,7 +8,7 @@ import {
     isStateValue,
     isToken,
     parseIntOrNull,
-    parseNumberOrNull,
+    parseNumber,
 } from '../../src/lib/utils.ts';
 
 describe('utils.ts', () => {
@@ -69,23 +69,23 @@ describe('utils.ts', () => {
 
     describe('parseNumberOrNull', () => {
         it('returns null for empty input', () => {
-            expect(parseNumberOrNull('')).to.equal(null);
+            expect(parseNumber('')).to.equal(0);
         });
 
         it('parses decimal values including comma notation', () => {
-            expect(parseNumberOrNull('12.5')).to.equal(12.5);
-            expect(parseNumberOrNull('12,5')).to.equal(12.5);
-            expect(parseNumberOrNull('-2,75')).to.equal(-2.75);
+            expect(parseNumber('12.5')).to.equal(12.5);
+            expect(parseNumber('12,5')).to.equal(12.5);
+            expect(parseNumber('-2,75')).to.equal(-2.75);
         });
 
         it('returns null for invalid numeric values', () => {
-            expect(parseNumberOrNull('abc')).to.equal(null);
+            expect(parseNumber('abc')).to.equal(0);
         });
     });
 
     describe('parseIntOrNull', () => {
         it('returns null for empty input', () => {
-            expect(parseIntOrNull('')).to.equal(null);
+            expect(parseIntOrNull('')).to.equal(0);
         });
 
         it('parses integer values', () => {
@@ -94,7 +94,7 @@ describe('utils.ts', () => {
         });
 
         it('returns null for invalid values', () => {
-            expect(parseIntOrNull('abc')).to.equal(null);
+            expect(parseIntOrNull('abc')).to.equal(0);
         });
     });
 

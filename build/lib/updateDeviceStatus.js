@@ -30,7 +30,7 @@ var import_logging = require("./logging");
 var import_axios = require("./axios");
 var import_axiosParameter = require("./axiosParameter");
 async function updateDeviceStatus(adapter) {
-  var _a, _b, _c, _d;
+  var _a, _b, _c, _d, _e, _f;
   const store = (0, import_store.initStore)();
   try {
     const { token, device: deviceCode, apiLevel } = store;
@@ -45,7 +45,13 @@ async function updateDeviceStatus(adapter) {
       return;
     }
     adapter.log.debug(`DeviceStatus: ${JSON.stringify(data)}`);
-    const isFault = apiLevel < 3 ? (_a = data.object_result) == null ? void 0 : _a.is_fault : (_d = (_b = data.objectResult) == null ? void 0 : _b.is_fault) != null ? _d : (_c = data.objectResult) == null ? void 0 : _c.isFault;
+    const status = apiLevel < 3 ? (_a = data.object_result) == null ? void 0 : _a.status : (_b = data.objectResult) == null ? void 0 : _b.status;
+    store.reachable = status === "ONLINE";
+    await (0, import_saveValue.saveValue)({ key: "info.connection", value: store.reachable, stateType: "boolean", adapter });
+    if (!store.reachable) {
+      return;
+    }
+    const isFault = apiLevel < 3 ? (_c = data.object_result) == null ? void 0 : _c.is_fault : (_f = (_d = data.objectResult) == null ? void 0 : _d.is_fault) != null ? _f : (_e = data.objectResult) == null ? void 0 : _e.isFault;
     if (isFault === true) {
       await (0, import_saveValue.saveValue)({ key: "error", value: true, stateType: "boolean", adapter });
       await (0, import_updateDeviceDetails.updateDeviceDetails)(adapter);

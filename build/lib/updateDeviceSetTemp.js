@@ -44,6 +44,10 @@ const updateDeviceSetTemp = async (adapter, deviceCode, temperature) => {
       adapter.log.warn(`Invalid mode: ${result}`);
       return;
     }
+    if (result.val === null || result.val === void 0) {
+      adapter.log.warn(`Invalid mode: ${result.val}`);
+      return;
+    }
     if (String(result == null ? void 0 : result.val) === "-1") {
       adapter.log.warn(`Mode set to: ${result == null ? void 0 : result.val}`);
       return;
