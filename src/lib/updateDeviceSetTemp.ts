@@ -31,6 +31,11 @@ export const updateDeviceSetTemp = async (
             return;
         }
 
+        if (result.val === null || result.val === undefined) {
+            adapter.log.warn(`Invalid mode: ${result.val}`);
+            return;
+        }
+
         if (String(result?.val) === '-1') {
             adapter.log.warn(`Mode set to: ${result?.val}`);
             return;
