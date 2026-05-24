@@ -1,7 +1,6 @@
 import type { MidasAquatemp } from '../main';
 import { initStore } from './store';
 import { errorLogger } from './logging';
-import { isDefined } from './utils';
 
 export const saveValue = async ({
     key,
@@ -32,9 +31,7 @@ export const saveValue = async ({
                 native: {},
             });
         }
-        if (isDefined(value)) {
-            await adapter.setState(dp, value, true);
-        }
+        await adapter.setState(dp, value ?? null, true);
     } catch (err: any) {
         errorLogger('Error in saveValue', err, adapter);
     }

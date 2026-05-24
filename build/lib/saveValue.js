@@ -23,7 +23,6 @@ __export(saveValue_exports, {
 module.exports = __toCommonJS(saveValue_exports);
 var import_store = require("./store");
 var import_logging = require("./logging");
-var import_utils = require("./utils");
 const saveValue = async ({
   key,
   value,
@@ -47,9 +46,7 @@ const saveValue = async ({
         native: {}
       });
     }
-    if ((0, import_utils.isDefined)(value)) {
-      await adapter.setState(dp, value, true);
-    }
+    await adapter.setState(dp, value != null ? value : null, true);
   } catch (err) {
     (0, import_logging.errorLogger)("Error in saveValue", err, adapter);
   }

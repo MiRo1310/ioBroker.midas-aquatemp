@@ -24,22 +24,22 @@ __export(utils_exports, {
   isStateValue: () => isStateValue,
   isToken: () => isToken,
   parseIntOrNull: () => parseIntOrNull,
-  parseNumber: () => parseNumber
+  parseNumberOrNull: () => parseNumberOrNull
 });
 module.exports = __toCommonJS(utils_exports);
 const isDefined = (value) => value !== void 0 && value !== null;
 const isStateValue = (state) => isDefined(state) && isDefined(state == null ? void 0 : state.val);
 const isToken = (token) => isDefined(token) && token !== "";
 const isApiSuccess = (errorCode) => errorCode === void 0 || errorCode === null || parseInt(String(errorCode), 10) === 0;
-const parseNumber = (value) => {
-  if (value === "") {
+const parseNumberOrNull = (value) => {
+  if (value === "" || !isDefined(value)) {
     return 0;
   }
   const num = parseFloat(String(value).replace(",", "."));
   return Number.isFinite(num) ? num : 0;
 };
 const parseIntOrNull = (value) => {
-  if (value === "") {
+  if (value === "" || !isDefined(value)) {
     return 0;
   }
   const num = parseInt(String(value), 10);
@@ -48,15 +48,15 @@ const parseIntOrNull = (value) => {
 function findCodeVal(result, code) {
   var _a, _b, _c;
   if (!Array.isArray(code)) {
-    return (_b = (_a = result.find((item) => item.code === code)) == null ? void 0 : _a.value) != null ? _b : "";
+    return (_b = (_a = result.find((item) => item.code === code)) == null ? void 0 : _a.value) != null ? _b : null;
   }
   for (let i = 0; i < code.length; i++) {
     const val = (_c = result.find((item) => item.code === code[i])) == null ? void 0 : _c.value;
-    if (val !== void 0 && val !== null && val !== "") {
+    if (isDefined(val) && val !== "") {
       return val;
     }
   }
-  return "";
+  return null;
 }
 // Annotate the CommonJS export names for ESM import in node:
 0 && (module.exports = {
@@ -66,6 +66,6 @@ function findCodeVal(result, code) {
   isStateValue,
   isToken,
   parseIntOrNull,
-  parseNumber
+  parseNumberOrNull
 });
 //# sourceMappingURL=utils.js.map

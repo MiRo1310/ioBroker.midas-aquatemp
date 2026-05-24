@@ -6,7 +6,7 @@ import { errorLogger } from './logging';
 import type { MidasAquatemp } from '../main';
 import { request } from './axios';
 import type { DeviceDetails } from '../types/types';
-import { findCodeVal, isDefined, parseIntOrNull, parseNumber } from './utils';
+import { findCodeVal, isDefined, parseIntOrNull, parseNumberOrNull } from './utils';
 
 async function saveNumberIfValid(adapter: MidasAquatemp, key: string, value: number): Promise<boolean> {
     if (!Number.isFinite(value)) {
@@ -57,7 +57,7 @@ export async function updateDeviceDetails(adapter: MidasAquatemp): Promise<void>
 
         if (powerOn) {
             const tPower = isPoolsana ? 'T07' : 'T7';
-            const tAmp = 'T14';
+            const tVoltage = 'T14';
             const tSuction = isPoolsana ? 'T01' : 'T1';
             const tIn = isPoolsana ? 'T02' : 'T2';
             const tOut = 'T03';
@@ -65,9 +65,9 @@ export async function updateDeviceDetails(adapter: MidasAquatemp): Promise<void>
             const tAmb = isPoolsana ? 'T05' : 'T5';
             const flowSwitch = isPoolsana ? 'S03' : 'S3';
 
-            const powerVal = parseNumber(findCodeVal(responseValue, tPower));
-            const ampVal = parseNumber(findCodeVal(responseValue, tAmp));
-            const consumptionValue = isDefined(powerVal) && isDefined(ampVal) ? powerVal * ampVal : 0;
+            const powerVal = parseNumberOrNull(findCodeVal(responseValue, tPower));
+            const tVoltageVal = parseNumberOrNull(findCodeVal(responseValue, tVoltage));
+            const consumptionValue = isDefined(powerVal) && isDefined(tVoltageVal) ? powerVal * tVoltageVal : 0;
 
             await saveValue({
                 key: 'consumption',
@@ -78,12 +78,12 @@ export async function updateDeviceDetails(adapter: MidasAquatemp): Promise<void>
 
             const flowSwitchValue = findCodeVal(responseValue, flowSwitch);
 
-            await saveNumberIfValid(adapter, 'suctionTemp', parseNumber(findCodeVal(responseValue, tSuction)));
-            await saveNumberIfValid(adapter, 'tempIn', parseNumber(findCodeVal(responseValue, tIn)));
-            await saveNumberIfValid(adapter, 'tempOut', parseNumber(findCodeVal(responseValue, tOut)));
-            await saveNumberIfValid(adapter, 'coilTemp', parseNumber(findCodeVal(responseValue, tCoil)));
-            await saveNumberIfValid(adapter, 'ambient', parseNumber(findCodeVal(responseValue, tAmb)));
-            await saveNumberIfValid(adapter, 'voltage', ampVal);
+            await saveNumberIfValid(adapter, 'suctionTemp', parseNumberOrNull(findCodeVal(responseValue, tSuction)));
+            await saveNumberIfValid(adapter, 'tempIn', parseNumberOrNull(findCodeVal(responseValue, tIn)));
+            await saveNumberIfValid(adapter, 'tempOut', parseNumberOrNull(findCodeVal(responseValue, tOut)));
+            await saveNumberIfValid(adapter, 'coilTemp', parseNumberOrNull(findCodeVal(responseValue, tCoil)));
+            await saveNumberIfValid(adapter, 'ambient', parseNumberOrNull(findCodeVal(responseValue, tAmb)));
+            await saveNumberIfValid(adapter, 'voltage', tVoltageVal);
             await saveValue({
                 key: 'flowSwitch',
                 value: flowSwitchValue ? [1, '1', 'true', true].includes(flowSwitchValue) : null,
@@ -99,7 +99,7 @@ export async function updateDeviceDetails(adapter: MidasAquatemp): Promise<void>
         const setTempCandidates = ['Set_Temp', 'R02', 'R03', 'R01'];
         let setTempValue = 0;
         for (const code of setTempCandidates) {
-            setTempValue = parseNumber(findCodeVal(responseValue, code));
+            setTempValue = parseNumberOrNull(findCodeVal(responseValue, code));
             if (setTempValue !== null) {
                 if (code !== 'Set_Temp') {
                     adapter.log.debug(`Set-temp fallback: ${code}=${setTempValue}`);

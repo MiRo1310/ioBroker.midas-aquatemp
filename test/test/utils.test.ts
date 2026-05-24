@@ -8,7 +8,7 @@ import {
     isStateValue,
     isToken,
     parseIntOrNull,
-    parseNumber,
+    parseNumberOrNull,
 } from '../../src/lib/utils.ts';
 
 describe('utils.ts', () => {
@@ -69,17 +69,17 @@ describe('utils.ts', () => {
 
     describe('parseNumberOrNull', () => {
         it('returns null for empty input', () => {
-            expect(parseNumber('')).to.equal(0);
+            expect(parseNumberOrNull('')).to.equal(0);
         });
 
         it('parses decimal values including comma notation', () => {
-            expect(parseNumber('12.5')).to.equal(12.5);
-            expect(parseNumber('12,5')).to.equal(12.5);
-            expect(parseNumber('-2,75')).to.equal(-2.75);
+            expect(parseNumberOrNull('12.5')).to.equal(12.5);
+            expect(parseNumberOrNull('12,5')).to.equal(12.5);
+            expect(parseNumberOrNull('-2,75')).to.equal(-2.75);
         });
 
         it('returns null for invalid numeric values', () => {
-            expect(parseNumber('abc')).to.equal(0);
+            expect(parseNumberOrNull('abc')).to.equal(0);
         });
     });
 
@@ -114,8 +114,8 @@ describe('utils.ts', () => {
         });
 
         it('returns empty string when no value is found', () => {
-            expect(findCodeVal(response, 'UNKNOWN')).to.equal('');
-            expect(findCodeVal(response, ['A', 'UNKNOWN'])).to.equal('');
+            expect(findCodeVal(response, 'UNKNOWN')).to.equal(null);
+            expect(findCodeVal(response, ['A', 'UNKNOWN'])).to.equal(null);
         });
     });
 });
