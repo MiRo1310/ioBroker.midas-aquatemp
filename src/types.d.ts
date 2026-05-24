@@ -26,17 +26,7 @@ export interface InputGetAxiosUpdateDevicePowerParams {
     value: number | string;
     protocolCode: string;
 }
-// export interface ReturnGetAxiosUpdateDeviceSetTempParams {
-//     param: [
-//         {
-//             device_code: string;
-//             deviceCode: string;
-//             protocol_code: string;
-//             protocolCode: string;
-//             value: string |number;
-//         },
-//     ];
-// }
+
 export interface InputGetAxiosUpdateDeviceSetTempParams {
     deviceCode: string;
     sTemperature: string;

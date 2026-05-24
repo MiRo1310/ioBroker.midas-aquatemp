@@ -55,15 +55,36 @@ export async function updateDeviceDetails(adapter: MidasAquatemp): Promise<void>
         const isPoolsana = product === store.AQUATEMP_POOLSANA;
         const powerOn = findCodeVal(responseValue, 'Power') === '1';
 
+        const mode = findCodeVal(responseValue, 'Mode');
+        const modes = {
+            1: 'R02', // Heiz-Modus (-> R02)
+            0: 'R01', // Kühl-Modus (-> R01)
+            2: 'R03', // Auto-Modus (-> R03)
+        };
+        const tempSetValue = findCodeVal(responseValue, 'Set_Temp');
+        const tempSetValueByMode = mode
+            ? findCodeVal(responseValue, modes[parseInt(mode) as keyof typeof modes])
+            : null;
+
+        await saveValue({
+            key: 'tempSet',
+            value:
+                (tempSetValue ? parseFloat(tempSetValue) : null) ??
+                (tempSetValueByMode ? parseFloat(tempSetValueByMode) : null),
+            stateType: 'number',
+            adapter: adapter,
+        });
+
         if (powerOn) {
             const tPower = isPoolsana ? 'T07' : 'T7';
             const tVoltage = 'T14';
             const tSuction = isPoolsana ? 'T01' : 'T1';
             const tIn = isPoolsana ? 'T02' : 'T2';
-            const tOut = 'T03';
+            const tOut = isPoolsana ? 'T03' : 'T3';
             const tCoil = isPoolsana ? 'T04' : 'T4';
             const tAmb = isPoolsana ? 'T05' : 'T5';
             const flowSwitch = isPoolsana ? 'S03' : 'S3';
+            const tRotor = 'T17';
 
             const powerVal = parseNumberOrNull(findCodeVal(responseValue, tPower));
             const tVoltageVal = parseNumberOrNull(findCodeVal(responseValue, tVoltage));
@@ -90,24 +111,11 @@ export async function updateDeviceDetails(adapter: MidasAquatemp): Promise<void>
                 stateType: 'boolean',
                 adapter,
             });
-            await saveNumberIfValid(adapter, 'rotor', parseIntOrNull(findCodeVal(responseValue, 'T17')));
+            await saveNumberIfValid(adapter, 'rotor', parseIntOrNull(findCodeVal(responseValue, tRotor)));
         } else {
             await saveValue({ key: 'consumption', value: 0, stateType: 'number', adapter });
             await saveValue({ key: 'rotor', value: 0, stateType: 'number', adapter });
         }
-
-        const setTempCandidates = ['Set_Temp', 'R02', 'R03', 'R01'];
-        let setTempValue = 0;
-        for (const code of setTempCandidates) {
-            setTempValue = parseNumberOrNull(findCodeVal(responseValue, code));
-            if (setTempValue !== null) {
-                if (code !== 'Set_Temp') {
-                    adapter.log.debug(`Set-temp fallback: ${code}=${setTempValue}`);
-                }
-                break;
-            }
-        }
-        await saveNumberIfValid(adapter, 'tempSet', setTempValue);
 
         await saveValue({
             key: 'silent',

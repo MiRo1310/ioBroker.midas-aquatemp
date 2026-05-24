@@ -36,7 +36,7 @@ async function saveNumberIfValid(adapter, key, value) {
   return true;
 }
 async function updateDeviceDetails(adapter) {
-  var _a;
+  var _a, _b;
   const store = (0, import_store.initStore)();
   try {
     const { token, device: deviceCode, product } = store;
@@ -67,15 +67,33 @@ async function updateDeviceDetails(adapter) {
     });
     const isPoolsana = product === store.AQUATEMP_POOLSANA;
     const powerOn = (0, import_utils.findCodeVal)(responseValue, "Power") === "1";
+    const mode = (0, import_utils.findCodeVal)(responseValue, "Mode");
+    const modes = {
+      1: "R02",
+      // Heiz-Modus (-> R02)
+      0: "R01",
+      // Kühl-Modus (-> R01)
+      2: "R03"
+      // Auto-Modus (-> R03)
+    };
+    const tempSetValue = (0, import_utils.findCodeVal)(responseValue, "Set_Temp");
+    const tempSetValueByMode = mode ? (0, import_utils.findCodeVal)(responseValue, modes[parseInt(mode)]) : null;
+    await (0, import_saveValue.saveValue)({
+      key: "tempSet",
+      value: (_b = tempSetValue ? parseFloat(tempSetValue) : null) != null ? _b : tempSetValueByMode ? parseFloat(tempSetValueByMode) : null,
+      stateType: "number",
+      adapter
+    });
     if (powerOn) {
       const tPower = isPoolsana ? "T07" : "T7";
       const tVoltage = "T14";
       const tSuction = isPoolsana ? "T01" : "T1";
       const tIn = isPoolsana ? "T02" : "T2";
-      const tOut = "T03";
+      const tOut = isPoolsana ? "T03" : "T3";
       const tCoil = isPoolsana ? "T04" : "T4";
       const tAmb = isPoolsana ? "T05" : "T5";
       const flowSwitch = isPoolsana ? "S03" : "S3";
+      const tRotor = "T17";
       const powerVal = (0, import_utils.parseNumberOrNull)((0, import_utils.findCodeVal)(responseValue, tPower));
       const tVoltageVal = (0, import_utils.parseNumberOrNull)((0, import_utils.findCodeVal)(responseValue, tVoltage));
       const consumptionValue = (0, import_utils.isDefined)(powerVal) && (0, import_utils.isDefined)(tVoltageVal) ? powerVal * tVoltageVal : 0;
@@ -98,23 +116,11 @@ async function updateDeviceDetails(adapter) {
         stateType: "boolean",
         adapter
       });
-      await saveNumberIfValid(adapter, "rotor", (0, import_utils.parseIntOrNull)((0, import_utils.findCodeVal)(responseValue, "T17")));
+      await saveNumberIfValid(adapter, "rotor", (0, import_utils.parseIntOrNull)((0, import_utils.findCodeVal)(responseValue, tRotor)));
     } else {
       await (0, import_saveValue.saveValue)({ key: "consumption", value: 0, stateType: "number", adapter });
       await (0, import_saveValue.saveValue)({ key: "rotor", value: 0, stateType: "number", adapter });
     }
-    const setTempCandidates = ["Set_Temp", "R02", "R03", "R01"];
-    let setTempValue = 0;
-    for (const code of setTempCandidates) {
-      setTempValue = (0, import_utils.parseNumberOrNull)((0, import_utils.findCodeVal)(responseValue, code));
-      if (setTempValue !== null) {
-        if (code !== "Set_Temp") {
-          adapter.log.debug(`Set-temp fallback: ${code}=${setTempValue}`);
-        }
-        break;
-      }
-    }
-    await saveNumberIfValid(adapter, "tempSet", setTempValue);
     await (0, import_saveValue.saveValue)({
       key: "silent",
       value: (0, import_utils.findCodeVal)(responseValue, "Manual-mute") === "1",
