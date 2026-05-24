@@ -1,8 +1,8 @@
-import type { ObjectResultResponse } from '../types/types';
+import type { IoBrokerState, ObjectResultResponse } from '../types/types';
 
 export const isDefined = <T>(value: T | undefined | null): value is T => value !== undefined && value !== null;
 
-export const isStateValue = (state?: ioBroker.State | null): boolean => isDefined(state) && isDefined(state?.val);
+export const isStateValue = (state?: IoBrokerState | null): boolean => isDefined(state) && isDefined(state?.val);
 
 export const isToken = (token?: string | null): token is string => isDefined(token) && token !== '';
 
