@@ -12,43 +12,45 @@ import type { DeviceStatus } from '../types/types';
 export async function updateDeviceStatus(adapter: MidasAquatemp): Promise<void> {
     const store = initStore();
     try {
-        const { token, device: deviceCode } = store;
-        if (token) {
-            const { sURL } = getUpdateDeviceStatusSUrl();
-
-            const { data, error } = await request<DeviceStatus>(
-                adapter,
-                sURL,
-                {
-                    device_code: deviceCode,
-                    deviceCode: deviceCode,
-                },
-                getHeaders(token),
-            );
-            if (!data || error) {
-                store.resetOnErrorHandler();
-                return;
-            }
-
-            store.reachable = (data.object_result?.[0]?.status ?? data.objectResult?.[0]?.status) == 'ONLINE';
-
-            adapter.log.debug(`DeviceStatus: ${JSON.stringify(data)}`);
-
-            if (data?.object_result?.[0]?.is_fault || data?.objectResult?.[0]?.isFault) {
-                await saveValue({ key: 'error', value: true, stateType: 'boolean', adapter: adapter });
-                await updateDeviceDetails(adapter);
-                await updateDeviceErrorMsg(adapter);
-                return;
-            }
-            // kein Fehler
-            await saveValue({ key: 'error', value: false, stateType: 'boolean', adapter: adapter });
-            await saveValue({ key: 'errorMessage', value: '', stateType: 'string', adapter: adapter });
-            await saveValue({ key: 'errorCode', value: '', stateType: 'string', adapter: adapter });
-            await saveValue({ key: 'errorLevel', value: 0, stateType: 'number', adapter: adapter });
-            await updateDeviceDetails(adapter);
+        const { token, device: deviceCode, apiLevel } = store;
+        if (!token || !deviceCode) {
             return;
         }
-    } catch (error: any) {
+
+        const { sURL } = getUpdateDeviceStatusSUrl();
+
+        const payload = apiLevel < 3 ? { device_code: deviceCode } : { deviceCode };
+
+        const { data, error } = await request<DeviceStatus>(adapter, sURL, payload, getHeaders(token));
+        if (!data || error) {
+            store.resetOnErrorHandler();
+            return;
+        }
+
+        adapter.log.debug(`DeviceStatus: ${JSON.stringify(data)}`);
+
+        const status = apiLevel < 3 ? data.object_result?.status : data.objectResult?.status;
+        store.reachable = status === 'ONLINE';
+        await saveValue({ key: 'info.connection', value: store.reachable, stateType: 'boolean', adapter });
+        if (!store.reachable) {
+            return;
+        }
+
+        const isFault =
+            apiLevel < 3 ? data.object_result?.is_fault : (data.objectResult?.is_fault ?? data.objectResult?.isFault);
+        if (isFault === true) {
+            await saveValue({ key: 'error', value: true, stateType: 'boolean', adapter });
+            await updateDeviceDetails(adapter);
+            await updateDeviceErrorMsg(adapter);
+            return;
+        }
+
+        await saveValue({ key: 'error', value: false, stateType: 'boolean', adapter });
+        await saveValue({ key: 'errorMessage', value: '', stateType: 'string', adapter });
+        await saveValue({ key: 'errorCode', value: '', stateType: 'string', adapter });
+        await saveValue({ key: 'errorLevel', value: 0, stateType: 'number', adapter });
+        await updateDeviceDetails(adapter);
+    } catch (error: unknown) {
         store.resetOnErrorHandler();
         errorLogger('Error in updateDeviceStatus', error, adapter);
     }

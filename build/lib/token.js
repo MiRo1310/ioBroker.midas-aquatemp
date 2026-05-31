@@ -18,6 +18,7 @@ var __copyProps = (to, from, except, desc) => {
 var __toCommonJS = (mod) => __copyProps(__defProp({}, "__esModule", { value: true }), mod);
 var token_exports = {};
 __export(token_exports, {
+  ensureToken: () => ensureToken,
   updateToken: () => updateToken
 });
 module.exports = __toCommonJS(token_exports);
@@ -28,6 +29,9 @@ var import_updateDeviceStatus = require("./updateDeviceStatus");
 var import_logging = require("./logging");
 var import_axios = require("./axios");
 var import_utils = require("./utils");
+async function ensureToken(adapter) {
+  await getToken(adapter);
+}
 async function getToken(adapter) {
   var _a, _b, _c, _d;
   const store = (0, import_store.initStore)();
@@ -74,6 +78,7 @@ const updateToken = async (adapter) => {
 };
 // Annotate the CommonJS export names for ESM import in node:
 0 && (module.exports = {
+  ensureToken,
   updateToken
 });
 //# sourceMappingURL=token.js.map

@@ -96,8 +96,8 @@ class MidasAquatemp extends utils.Adapter {
           await (0, import_updateDevicePower.updateDevicePower)(adapter2, store.device, mode.val);
         }
         const silent = await this.getStateAsync(`${dpRoot}.silent`);
-        if (!(silent == null ? void 0 : silent.ack) && (silent == null ? void 0 : silent.val) && store.device) {
-          await (0, import_updateDevicePower.updateDevicePower)(adapter2, store.device, silent.val);
+        if (!(silent == null ? void 0 : silent.ack) && (0, import_utils.isStateValue)(silent) && store.device) {
+          await (0, import_updateDeviceSilent.updateDeviceSilent)(adapter2, store.device, !!(silent == null ? void 0 : silent.val));
         }
       } catch (error) {
         (0, import_logging.errorLogger)("Error in updateInterval", error, adapter2);
@@ -112,22 +112,36 @@ class MidasAquatemp extends utils.Adapter {
         if (!state || state.ack) {
           return;
         }
-        if (id === `${dpRoot}.mode` && store.device) {
+        const isRelevantId = id === `${dpRoot}.mode` || id === `${dpRoot}.silent` || id === `${dpRoot}.tempSet`;
+        if (!isRelevantId || !store.device) {
+          return;
+        }
+        await (0, import_token.ensureToken)(adapter2);
+        if (id === `${dpRoot}.mode`) {
           this.log.debug(`Mode: ${JSON.stringify(state)}`);
-          if ((0, import_utils.isStateValue)(state)) {
-            const mode = parseInt(state.val);
-            await (0, import_updateDevicePower.updateDevicePower)(adapter2, store.device, mode);
+          if (!(0, import_utils.isStateValue)(state)) {
+            this.log.warn(`Ignoring invalid mode state payload for ${id}: ${JSON.stringify(state)}`);
+            return;
           }
+          const mode = Number(state.val);
+          const allowedModes = /* @__PURE__ */ new Set([-1, 0, 1, 2]);
+          if (!Number.isFinite(mode) || !Number.isInteger(mode) || !allowedModes.has(mode)) {
+            this.log.warn(
+              `Ignoring unsupported mode value for ${id}: ${JSON.stringify(state.val)} (allowed: -1, 0, 1, 2)`
+            );
+            return;
+          }
+          await (0, import_updateDevicePower.updateDevicePower)(adapter2, store.device, mode);
           await this.setState(id, { ack: true });
         }
-        if (id === `${dpRoot}.silent` && store.device) {
+        if (id === `${dpRoot}.silent`) {
           this.log.debug(`Silent: ${JSON.stringify(state)}`);
           if ((0, import_utils.isStateValue)(state)) {
             await (0, import_updateDeviceSilent.updateDeviceSilent)(adapter2, store.device, state.val);
           }
           await this.setState(id, { ack: true });
         }
-        if (id === `${dpRoot}.tempSet` && store.device) {
+        if (id === `${dpRoot}.tempSet`) {
           this.log.debug(`TempSet: ${JSON.stringify(state)}`);
           if ((0, import_utils.isStateValue)(state)) {
             await (0, import_updateDeviceSetTemp.updateDeviceSetTemp)(adapter2, store.device, state.val);

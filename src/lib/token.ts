@@ -8,6 +8,10 @@ import { request } from './axios';
 import type { RequestToken } from '../types/types';
 import { isToken } from './utils';
 
+export async function ensureToken(adapter: MidasAquatemp): Promise<void> {
+    await getToken(adapter);
+}
+
 async function getToken(adapter: MidasAquatemp): Promise<void> {
     const store = useStore();
 

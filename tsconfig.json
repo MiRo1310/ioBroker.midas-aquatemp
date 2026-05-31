@@ -4,6 +4,8 @@
 	// https://github.com/tsconfig/bases#node-18-tsconfigjson
 	"extends": "@tsconfig/node20/tsconfig.json",
 	"compilerOptions": {
+		"baseUrl": ".",
+		"ignoreDeprecations": "6.0",
 		// do not compile anything, this file is just to configure type checking
 		// the compilation is configured in tsconfig.build.json
 		"noEmit": true,
@@ -13,8 +15,10 @@
 		"checkJs": true,
 
 		"noEmitOnError": true,
+		"rootDir": ".",
 		"outDir": "./build/",
 		"removeComments": false,
+		"allowImportingTsExtensions": true,
 
 		// This is necessary for the automatic typing of the adapter config
 		"resolveJsonModule": true,

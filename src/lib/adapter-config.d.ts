@@ -10,6 +10,7 @@ declare global {
 			selectApi: number;
 			deviceMac: string;
 			useDeviceMac: boolean;
+			allowInsecureTls?: boolean;
 		}
 	}
 }
