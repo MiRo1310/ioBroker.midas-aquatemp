@@ -29,11 +29,11 @@ var import_saveValue = require("./saveValue");
 var import_logging = require("./logging");
 var import_axios = require("./axios");
 var import_utils = require("./utils");
-async function updateDevicePower(adapter, deviceCode, power) {
+async function updateDevicePower(adapter, deviceCode, mode) {
   const store = (0, import_store.initStore)();
   try {
     const token = store.token;
-    const { powerMode, powerOpt } = (0, import_getSettings.getPowerMode)(power);
+    const { powerMode, powerOpt } = (0, import_getSettings.getPowerMode)(mode);
     if (!(0, import_utils.isDefined)(powerOpt) || !(0, import_utils.isDefined)(powerMode) || !store.device || !(0, import_utils.isToken)(token)) {
       return;
     }
@@ -49,9 +49,9 @@ async function updateDevicePower(adapter, deviceCode, power) {
       return;
     }
     adapter.log.debug(`DeviceStatus: ${JSON.stringify(data)}`);
-    await (0, import_saveValue.saveValue)({ key: "mode", value: power.toString(), stateType: "string", adapter });
-    if (power >= 0) {
-      await updateDeviceMode(adapter, store.device, power);
+    await (0, import_saveValue.saveValue)({ key: "mode", value: mode.toString(), stateType: "string", adapter });
+    if (mode >= 0) {
+      await updateDeviceMode(adapter, store.device, mode.toString());
     }
   } catch (error) {
     (0, import_logging.errorLogger)("Error in updateDevicePower", error, adapter);

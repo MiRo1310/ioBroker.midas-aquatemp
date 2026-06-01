@@ -26,18 +26,13 @@ export const updateDeviceSetTemp = async (
         const sTemperature = numericTemperature.toString().replace(',', '.');
         const result = await adapter.getStateAsync(`${dpRoot}.mode`);
 
-        if (!result) {
-            adapter.log.warn(`Invalid mode: ${result}`);
-            return;
-        }
-
-        if (result.val === null || result.val === undefined) {
-            adapter.log.warn(`Invalid mode: ${result.val}`);
+        if (!result?.val) {
+            adapter.log.warn(`Invalid mode: ${result?.val}`);
             return;
         }
 
         if (String(result?.val) === '-1') {
-            adapter.log.warn(`Mode set to: ${result?.val}`);
+            adapter.log.debug(`Mode set to: ${result?.val}`);
             return;
         }
 

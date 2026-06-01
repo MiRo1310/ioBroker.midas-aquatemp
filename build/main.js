@@ -93,7 +93,7 @@ class MidasAquatemp extends utils.Adapter {
         await (0, import_token.updateToken)(adapter2);
         const mode = await this.getStateAsync(`${dpRoot}.mode`);
         if (!(mode == null ? void 0 : mode.ack) && (mode == null ? void 0 : mode.val) && store.device) {
-          await (0, import_updateDevicePower.updateDevicePower)(adapter2, store.device, mode.val);
+          await (0, import_updateDevicePower.updateDevicePower)(adapter2, store.device, parseInt(String(mode.val)));
         }
         const silent = await this.getStateAsync(`${dpRoot}.silent`);
         if (!(silent == null ? void 0 : silent.ack) && (0, import_utils.isStateValue)(silent) && store.device) {

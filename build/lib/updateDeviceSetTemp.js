@@ -40,16 +40,12 @@ const updateDeviceSetTemp = async (adapter, deviceCode, temperature) => {
     }
     const sTemperature = numericTemperature.toString().replace(",", ".");
     const result = await adapter.getStateAsync(`${dpRoot}.mode`);
-    if (!result) {
-      adapter.log.warn(`Invalid mode: ${result}`);
-      return;
-    }
-    if (result.val === null || result.val === void 0) {
-      adapter.log.warn(`Invalid mode: ${result.val}`);
+    if (!(result == null ? void 0 : result.val)) {
+      adapter.log.warn(`Invalid mode: ${result == null ? void 0 : result.val}`);
       return;
     }
     if (String(result == null ? void 0 : result.val) === "-1") {
-      adapter.log.warn(`Mode set to: ${result == null ? void 0 : result.val}`);
+      adapter.log.debug(`Mode set to: ${result == null ? void 0 : result.val}`);
       return;
     }
     if ((0, import_utils.isToken)(token)) {
