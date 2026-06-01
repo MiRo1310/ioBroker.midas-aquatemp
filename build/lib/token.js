@@ -53,6 +53,7 @@ async function getToken(adapter) {
       adapter.log.debug("Login ok! Token");
     } else {
       adapter.log.error(`Login-error: ${JSON.stringify(data)}`);
+      await store.resetOnErrorHandler();
     }
   } catch (error) {
     (0, import_logging.errorLogger)("Error in getToken", error, adapter);
@@ -63,7 +64,6 @@ const updateToken = async (adapter) => {
   try {
     await getToken(adapter);
     if (!store.token) {
-      await store.resetOnErrorHandler();
       return;
     }
     if (store.useDeviceMac) {
