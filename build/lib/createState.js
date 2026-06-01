@@ -246,7 +246,8 @@ const createObjects = async (adapter) => {
       },
       type: "boolean",
       role: "state",
-      def: false
+      def: false,
+      write: true
     },
     {
       id: `${dpRoot}.tempIn`,

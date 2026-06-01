@@ -228,6 +228,7 @@ export const createObjects = async (adapter: MidasAquatemp): Promise<void> => {
             type: 'boolean',
             role: 'state',
             def: false,
+            write: true,
         },
         {
             id: `${dpRoot}.tempIn`,

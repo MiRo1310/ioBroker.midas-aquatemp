@@ -103,7 +103,11 @@ export class MidasAquatemp extends utils.Adapter {
                     return;
                 }
 
-                const isRelevantId = id === `${dpRoot}.mode` || id === `${dpRoot}.silent` || id === `${dpRoot}.tempSet`;
+                const isRelevantId =
+                    id === `${dpRoot}.mode` ||
+                    id === `${dpRoot}.silent` ||
+                    id === `${dpRoot}.tempSet` ||
+                    id === `${dpRoot}.state`;
 
                 if (!isRelevantId || !store.device) {
                     return;
@@ -147,6 +151,20 @@ export class MidasAquatemp extends utils.Adapter {
                     }
                     await this.setState(id, { ack: true });
                 }
+
+                if (id === `${dpRoot}.state`) {
+                    this.log.debug(`State: ${JSON.stringify(state)}`);
+                    if (isStateValue(state)) {
+                        if (!state.val) {
+                            await updateDevicePower(adapter, store.device, -1);
+                        } else {
+                            const modeState = await this.getStateAsync(`${dpRoot}.mode`);
+                            const currentMode = parseInt(String(modeState?.val ?? '-1'));
+                            await updateDevicePower(adapter, store.device, currentMode >= 0 ? currentMode : 0);
+                        }
+                    }
+                    await this.setState(id, { ack: true });
+                }
             } catch (error: any) {
                 errorLogger(`Error in stateChange for ${id}`, error, adapter);
             }
@@ -155,6 +173,7 @@ export class MidasAquatemp extends utils.Adapter {
         await this.subscribeStatesAsync(`${dpRoot}.mode`);
         await this.subscribeStatesAsync(`${dpRoot}.silent`);
         await this.subscribeStatesAsync(`${dpRoot}.tempSet`);
+        await this.subscribeStatesAsync(`${dpRoot}.state`);
     }
 
     /**

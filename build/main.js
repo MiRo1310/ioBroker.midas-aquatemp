@@ -108,11 +108,12 @@ class MidasAquatemp extends utils.Adapter {
       await (0, import_token.updateToken)(adapter2);
     }, 36e5);
     this.on("stateChange", async (id, state) => {
+      var _a;
       try {
         if (!state || state.ack) {
           return;
         }
-        const isRelevantId = id === `${dpRoot}.mode` || id === `${dpRoot}.silent` || id === `${dpRoot}.tempSet`;
+        const isRelevantId = id === `${dpRoot}.mode` || id === `${dpRoot}.silent` || id === `${dpRoot}.tempSet` || id === `${dpRoot}.state`;
         if (!isRelevantId || !store.device) {
           return;
         }
@@ -148,6 +149,19 @@ class MidasAquatemp extends utils.Adapter {
           }
           await this.setState(id, { ack: true });
         }
+        if (id === `${dpRoot}.state`) {
+          this.log.debug(`State: ${JSON.stringify(state)}`);
+          if ((0, import_utils.isStateValue)(state)) {
+            if (!state.val) {
+              await (0, import_updateDevicePower.updateDevicePower)(adapter2, store.device, -1);
+            } else {
+              const modeState = await this.getStateAsync(`${dpRoot}.mode`);
+              const currentMode = parseInt(String((_a = modeState == null ? void 0 : modeState.val) != null ? _a : "-1"));
+              await (0, import_updateDevicePower.updateDevicePower)(adapter2, store.device, currentMode >= 0 ? currentMode : 0);
+            }
+          }
+          await this.setState(id, { ack: true });
+        }
       } catch (error) {
         (0, import_logging.errorLogger)(`Error in stateChange for ${id}`, error, adapter2);
       }
@@ -155,6 +169,7 @@ class MidasAquatemp extends utils.Adapter {
     await this.subscribeStatesAsync(`${dpRoot}.mode`);
     await this.subscribeStatesAsync(`${dpRoot}.silent`);
     await this.subscribeStatesAsync(`${dpRoot}.tempSet`);
+    await this.subscribeStatesAsync(`${dpRoot}.state`);
   }
   /**
    * Is called when adapter shuts down - callback has to be called under any circumstances!
