@@ -58,7 +58,7 @@ const updateDeviceSetTemp = async (adapter, deviceCode, temperature) => {
       );
       adapter.log.debug(`DeviceStatus: ${JSON.stringify(data)}`);
       if (error) {
-        store.resetOnErrorHandler();
+        await store.resetOnErrorHandler();
         return;
       }
       await (0, import_saveValue.saveValue)({ key: "tempSet", value: numericTemperature, stateType: "number", adapter });

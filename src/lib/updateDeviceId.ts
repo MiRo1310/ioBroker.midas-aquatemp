@@ -27,12 +27,12 @@ export async function updateDeviceID(adapter: MidasAquatemp): Promise<void> {
         adapter.log.debug(`UpdateDeviceID response: ${JSON.stringify(data)}, status: ${status}`);
 
         if (!data || error) {
-            store.resetOnErrorHandler(); // Login-Fehler
+            await store.resetOnErrorHandler(); // Login-Fehler
             return;
         }
 
         if (!data?.object_result?.[0]?.device_code && !data?.objectResult?.[0]?.deviceCode) {
-            store.resetOnErrorHandler();
+            await store.resetOnErrorHandler();
             adapter.log.error(
                 'No device code found. Maybe the token is not valid. Please check if there are not two usages of the same account. In the next loop the token will be refreshed.',
             );
@@ -56,7 +56,7 @@ export async function updateDeviceID(adapter: MidasAquatemp): Promise<void> {
             return;
         }
         adapter.log.debug('Device not reachable');
-        store.resetOnErrorHandler();
+        void store.resetOnErrorHandler();
     } catch (error: any) {
         errorLogger('Error in updateDeviceID', error, adapter);
 

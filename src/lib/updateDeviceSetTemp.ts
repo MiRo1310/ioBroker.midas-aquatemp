@@ -48,7 +48,7 @@ export const updateDeviceSetTemp = async (
             adapter.log.debug(`DeviceStatus: ${JSON.stringify(data)}`);
 
             if (error) {
-                store.resetOnErrorHandler();
+                await store.resetOnErrorHandler();
                 return;
             }
 

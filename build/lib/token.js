@@ -45,7 +45,7 @@ async function getToken(adapter) {
     const { data, error } = await (0, import_axios.request)(adapter, sUrl, options);
     if (error || !data) {
       adapter.log.error(`Login-error: ${JSON.stringify(data)}`);
-      store.resetOnErrorHandler();
+      await store.resetOnErrorHandler();
       return;
     }
     store.token = (_d = (_c = (_a = data == null ? void 0 : data.object_result) == null ? void 0 : _a["x-token"]) != null ? _c : (_b = data == null ? void 0 : data.objectResult) == null ? void 0 : _b["x-token"]) != null ? _d : null;
@@ -63,7 +63,7 @@ const updateToken = async (adapter) => {
   try {
     await getToken(adapter);
     if (!store.token) {
-      store.resetOnErrorHandler();
+      await store.resetOnErrorHandler();
       return;
     }
     if (store.useDeviceMac) {

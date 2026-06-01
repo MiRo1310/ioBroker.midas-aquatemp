@@ -29,7 +29,7 @@ export async function updateDeviceErrorMsg(adapter: MidasAquatemp): Promise<void
         );
 
         if (!data || error) {
-            store.resetOnErrorHandler();
+            await store.resetOnErrorHandler();
             return;
         }
 
@@ -49,7 +49,7 @@ export async function updateDeviceErrorMsg(adapter: MidasAquatemp): Promise<void
         await saveValue({
             key: 'errorLevel',
             value: data.objectResult?.[0]?.errorLevel ?? data.object_result?.[0]?.error_level,
-            stateType: 'string',
+            stateType: 'number',
             adapter,
         });
     } catch (error: any) {

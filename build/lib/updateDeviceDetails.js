@@ -51,7 +51,7 @@ async function updateDeviceDetails(adapter) {
       (0, import_axiosParameter.getHeaders)(token)
     );
     if (!data || error) {
-      store.resetOnErrorHandler();
+      await store.resetOnErrorHandler();
       return;
     }
     adapter.log.debug(`DeviceDetails: ${JSON.stringify(data)}`);
@@ -137,7 +137,7 @@ async function updateDeviceDetails(adapter) {
     await (0, import_saveValue.saveValue)({ key: "info.connection", value: true, stateType: "boolean", adapter });
   } catch (error) {
     (0, import_logging.errorLogger)("Error updateDeviceDetails", error, adapter);
-    store.resetOnErrorHandler();
+    void store.resetOnErrorHandler();
   }
 }
 // Annotate the CommonJS export names for ESM import in node:

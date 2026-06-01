@@ -62,7 +62,8 @@ const CODES_POOLSANA = [
   "T05",
   "T07",
   "T14",
-  "T17"
+  "T17",
+  "S03"
 ];
 const CODES_OTHER = [
   "Power",
@@ -93,7 +94,8 @@ const CODES_OTHER = [
   "H02",
   "T7",
   "T14",
-  "T17"
+  "T17",
+  "S3"
 ];
 const getProtocolCodes = (deviceCode, productId) => {
   const store = (0, import_store.initStore)();

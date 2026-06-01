@@ -41,7 +41,7 @@ async function updateDeviceStatus(adapter) {
     const payload = apiLevel < 3 ? { device_code: deviceCode } : { deviceCode };
     const { data, error } = await (0, import_axios.request)(adapter, sURL, payload, (0, import_axiosParameter.getHeaders)(token));
     if (!data || error) {
-      store.resetOnErrorHandler();
+      await store.resetOnErrorHandler();
       return;
     }
     adapter.log.debug(`DeviceStatus: ${JSON.stringify(data)}`);

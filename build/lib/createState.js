@@ -437,11 +437,11 @@ const createObjects = async (adapter) => {
     }
   ];
   try {
-    for (const { id, name, role, unit, type, def, write } of objects) {
+    for (const { id, name, role, unit, type, def, write, states } of objects) {
       adapter.log.debug(`Create object: ${id}`);
       await adapter.setObjectNotExistsAsync(id, {
         type: "state",
-        common: { read: true, write: write || false, type, unit, role, name, def },
+        common: { read: true, write: write || false, type, unit, role, name, def, states },
         native: {}
       });
     }

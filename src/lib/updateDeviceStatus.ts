@@ -23,7 +23,7 @@ export async function updateDeviceStatus(adapter: MidasAquatemp): Promise<void> 
 
         const { data, error } = await request<DeviceStatus>(adapter, sURL, payload, getHeaders(token));
         if (!data || error) {
-            store.resetOnErrorHandler();
+            await store.resetOnErrorHandler();
             return;
         }
 

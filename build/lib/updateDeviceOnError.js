@@ -45,7 +45,7 @@ async function updateDeviceErrorMsg(adapter) {
       (0, import_axiosParameter.getHeaders)(token)
     );
     if (!data || error) {
-      store.resetOnErrorHandler();
+      await store.resetOnErrorHandler();
       return;
     }
     await (0, import_saveValue.saveValue)({ key: "error", value: true, stateType: "boolean", adapter });
@@ -64,7 +64,7 @@ async function updateDeviceErrorMsg(adapter) {
     await (0, import_saveValue.saveValue)({
       key: "errorLevel",
       value: (_p = (_m = (_l = data.objectResult) == null ? void 0 : _l[0]) == null ? void 0 : _m.errorLevel) != null ? _p : (_o = (_n = data.object_result) == null ? void 0 : _n[0]) == null ? void 0 : _o.error_level,
-      stateType: "string",
+      stateType: "number",
       adapter
     });
   } catch (error) {

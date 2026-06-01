@@ -40,7 +40,7 @@ async function updateDeviceSilent(adapter, deviceCode, silent) {
         (0, import_axiosParameter.getHeaders)(token)
       );
       if (!data || error) {
-        store.resetOnErrorHandler();
+        await store.resetOnErrorHandler();
         return;
       }
       adapter.log.debug(`DeviceStatus: ${JSON.stringify(data)}`);

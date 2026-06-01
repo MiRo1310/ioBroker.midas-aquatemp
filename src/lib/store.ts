@@ -17,7 +17,7 @@ interface Store {
     reachable: boolean;
     useDeviceMac: boolean;
     getDpRoot: () => string;
-    resetOnErrorHandler: () => void;
+    resetOnErrorHandler: () => Promise<void>;
 }
 
 let store: Store;

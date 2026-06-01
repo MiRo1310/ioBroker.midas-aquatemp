@@ -44,6 +44,7 @@ const CODES_POOLSANA = [
     'T07',
     'T14',
     'T17',
+    'S03',
 ];
 
 const CODES_OTHER = [
@@ -76,6 +77,7 @@ const CODES_OTHER = [
     'T7',
     'T14',
     'T17',
+    'S3',
 ];
 
 export const getProtocolCodes = (

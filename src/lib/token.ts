@@ -29,7 +29,7 @@ async function getToken(adapter: MidasAquatemp): Promise<void> {
 
         if (error || !data) {
             adapter.log.error(`Login-error: ${JSON.stringify(data)}`);
-            store.resetOnErrorHandler();
+            await store.resetOnErrorHandler();
             return;
         }
         store.token = data?.object_result?.['x-token'] ?? data?.objectResult?.['x-token'] ?? null;
@@ -50,7 +50,7 @@ export const updateToken = async (adapter: MidasAquatemp): Promise<void> => {
         await getToken(adapter);
 
         if (!store.token) {
-            store.resetOnErrorHandler();
+            await store.resetOnErrorHandler();
             return;
         }
         if (store.useDeviceMac) {

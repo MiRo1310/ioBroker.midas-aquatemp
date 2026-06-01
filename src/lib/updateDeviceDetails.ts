@@ -34,7 +34,7 @@ export async function updateDeviceDetails(adapter: MidasAquatemp): Promise<void>
         );
 
         if (!data || error) {
-            store.resetOnErrorHandler();
+            await store.resetOnErrorHandler();
             return;
         }
 
@@ -135,6 +135,6 @@ export async function updateDeviceDetails(adapter: MidasAquatemp): Promise<void>
         await saveValue({ key: 'info.connection', value: true, stateType: 'boolean', adapter });
     } catch (error: unknown) {
         errorLogger('Error updateDeviceDetails', error, adapter);
-        store.resetOnErrorHandler();
+        void store.resetOnErrorHandler();
     }
 }

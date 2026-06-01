@@ -45,13 +45,14 @@ async function updateDevicePower(adapter, deviceCode, mode) {
       (0, import_axiosParameter.getHeaders)(token)
     );
     if (!data || error) {
-      store.resetOnErrorHandler();
+      await store.resetOnErrorHandler();
       return;
     }
     adapter.log.debug(`DeviceStatus: ${JSON.stringify(data)}`);
-    await (0, import_saveValue.saveValue)({ key: "mode", value: mode.toString(), stateType: "string", adapter });
     if (mode >= 0) {
       await updateDeviceMode(adapter, store.device, mode.toString());
+    } else {
+      await (0, import_saveValue.saveValue)({ key: "mode", value: mode.toString(), stateType: "string", adapter });
     }
   } catch (error) {
     (0, import_logging.errorLogger)("Error in updateDevicePower", error, adapter);
@@ -72,7 +73,7 @@ async function updateDeviceMode(adapter, deviceCode, mode) {
         }
       );
       if (!data || error) {
-        store.resetOnErrorHandler();
+        await store.resetOnErrorHandler();
         return;
       }
       adapter.log.debug(`DeviceStatus: ${JSON.stringify(data)}`);

@@ -27,14 +27,15 @@ export async function updateDevicePower(adapter: MidasAquatemp, deviceCode: stri
             getHeaders(token),
         );
         if (!data || error) {
-            store.resetOnErrorHandler();
+            await store.resetOnErrorHandler();
             return;
         }
         adapter.log.debug(`DeviceStatus: ${JSON.stringify(data)}`);
 
-        await saveValue({ key: 'mode', value: mode.toString(), stateType: 'string', adapter: adapter });
         if (mode >= 0) {
             await updateDeviceMode(adapter, store.device, mode.toString());
+        } else {
+            await saveValue({ key: 'mode', value: mode.toString(), stateType: 'string', adapter: adapter });
         }
     } catch (error: any) {
         errorLogger('Error in updateDevicePower', error, adapter);
@@ -56,7 +57,7 @@ async function updateDeviceMode(adapter: MidasAquatemp, deviceCode: string, mode
                 },
             );
             if (!data || error) {
-                store.resetOnErrorHandler();
+                await store.resetOnErrorHandler();
                 return;
             }
             adapter.log.debug(`DeviceStatus: ${JSON.stringify(data)}`);

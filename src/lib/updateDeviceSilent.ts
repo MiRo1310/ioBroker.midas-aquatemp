@@ -21,7 +21,7 @@ export async function updateDeviceSilent(adapter: MidasAquatemp, deviceCode: str
                 getHeaders(token),
             );
             if (!data || error) {
-                store.resetOnErrorHandler();
+                await store.resetOnErrorHandler();
                 return;
             }
 
