@@ -50,6 +50,7 @@ async function updateDevicePower(adapter, deviceCode, mode) {
     }
     adapter.log.debug(`DeviceStatus: ${JSON.stringify(data)}`);
     if (mode >= 0) {
+      store.setMode(mode);
       await updateDeviceMode(adapter, store.device, mode.toString());
     } else {
       await (0, import_saveValue.saveValue)({ key: "mode", value: mode.toString(), stateType: "string", adapter });

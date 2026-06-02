@@ -4,6 +4,7 @@
 
 // The adapter-core module gives you access to the core ioBroker functions
 // you need to create an
+import type { TMode } from './lib/store';
 import { initStore } from './lib/store';
 
 import * as utils from '@iobroker/adapter-core';
@@ -17,7 +18,7 @@ import { ensureToken, updateToken } from './lib/token';
 import { updateDevicePower } from './lib/updateDevicePower';
 import { updateDeviceSetTemp } from './lib/updateDeviceSetTemp';
 import { updateDeviceSilent } from './lib/updateDeviceSilent';
-import { isStateValue } from './lib/utils';
+import { isDefined, isStateValue } from './lib/utils';
 import { errorLogger } from './lib/logging';
 
 let updateInterval: ioBroker.Interval | undefined;
@@ -47,7 +48,10 @@ export class MidasAquatemp extends utils.Adapter {
 
         const dpRoot = store.getDpRoot();
         await this.setState('info.connection', false, true);
-
+        const currentMode = parseInt(String((await this.getStateAsync(`${dpRoot}.mode`))?.val));
+        if (store.isValidMode(currentMode)) {
+            store.setMode(currentMode);
+        }
         store.username = this.config.username;
         const password = this.config.password;
         store.interval = this.config.refresh;
@@ -79,8 +83,12 @@ export class MidasAquatemp extends utils.Adapter {
                 await updateToken(adapter);
                 const mode = await this.getStateAsync(`${dpRoot}.mode`);
 
-                if (!mode?.ack && mode?.val && store.device) {
-                    await updateDevicePower(adapter, store.device, parseInt(String(mode.val)));
+                if (!mode?.ack && isDefined(mode?.val) && store.device) {
+                    const modeVal = parseInt(String(mode.val));
+                    if (!store.isValidMode(modeVal)) {
+                        return;
+                    }
+                    await updateDevicePower(adapter, store.device, modeVal);
                 }
 
                 const silent = await this.getStateAsync(`${dpRoot}.silent`);
@@ -123,8 +131,8 @@ export class MidasAquatemp extends utils.Adapter {
                     }
 
                     const mode = Number(state.val);
-                    const allowedModes = new Set([-1, 0, 1, 2]);
-                    if (!Number.isFinite(mode) || !Number.isInteger(mode) || !allowedModes.has(mode)) {
+
+                    if (!Number.isFinite(mode) || !Number.isInteger(mode) || !store.isValidMode(mode)) {
                         this.log.warn(
                             `Ignoring unsupported mode value for ${id}: ${JSON.stringify(state.val)} (allowed: -1, 0, 1, 2)`,
                         );
@@ -132,6 +140,7 @@ export class MidasAquatemp extends utils.Adapter {
                     }
 
                     await updateDevicePower(adapter, store.device, mode);
+
                     await this.setState(id, { ack: true });
                 }
 
@@ -158,9 +167,12 @@ export class MidasAquatemp extends utils.Adapter {
                         if (!state.val) {
                             await updateDevicePower(adapter, store.device, -1);
                         } else {
-                            const modeState = await this.getStateAsync(`${dpRoot}.mode`);
-                            const currentMode = parseInt(String(modeState?.val ?? '-1'));
-                            await updateDevicePower(adapter, store.device, currentMode >= 0 ? currentMode : 0);
+                            const currentMode = parseInt(String(store.getMode()));
+                            await updateDevicePower(
+                                adapter,
+                                store.device,
+                                currentMode >= 0 ? (currentMode as TMode) : 0,
+                            );
                         }
                     }
                     await this.setState(id, { ack: true });

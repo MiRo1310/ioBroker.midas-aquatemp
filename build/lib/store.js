@@ -18,10 +18,12 @@ var __copyProps = (to, from, except, desc) => {
 var __toCommonJS = (mod) => __copyProps(__defProp({}, "__esModule", { value: true }), mod);
 var store_exports = {};
 __export(store_exports, {
-  initStore: () => initStore
+  initStore: () => initStore,
+  modes: () => modes
 });
 module.exports = __toCommonJS(store_exports);
 var import_saveValue = require("./saveValue");
+const modes = [-1, 0, 1, 2];
 let store;
 function initStore() {
   if (!store) {
@@ -38,6 +40,7 @@ function initStore() {
       product: void 0,
       reachable: false,
       useDeviceMac: false,
+      mode: 2,
       // ProductIDs:
       // Gruppe 1:
       // 1132174963097280512: Midas/Poolsana InverPro
@@ -53,6 +56,15 @@ function initStore() {
         this.device = "";
         this.reachable = false;
         await (0, import_saveValue.saveValue)({ key: "info.connection", value: false, stateType: "boolean", adapter: this.adapter });
+      },
+      setMode: function(mode) {
+        this.mode = mode;
+      },
+      getMode: function() {
+        return this.mode;
+      },
+      isValidMode: function(curr) {
+        return modes.includes(curr);
       }
     };
   }
@@ -60,6 +72,7 @@ function initStore() {
 }
 // Annotate the CommonJS export names for ESM import in node:
 0 && (module.exports = {
-  initStore
+  initStore,
+  modes
 });
 //# sourceMappingURL=store.js.map

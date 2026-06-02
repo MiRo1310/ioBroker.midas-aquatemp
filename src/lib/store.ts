@@ -18,7 +18,15 @@ interface Store {
     useDeviceMac: boolean;
     getDpRoot: () => string;
     resetOnErrorHandler: () => Promise<void>;
+    mode: TMode;
+    setMode: (mode: TMode) => void;
+    getMode: () => TMode;
+    isValidMode: (val: number) => val is TMode;
 }
+
+export type TMode = -1 | 0 | 1 | 2;
+
+export const modes: TMode[] = [-1, 0, 1, 2];
 
 let store: Store;
 export function initStore(): Store {
@@ -36,6 +44,7 @@ export function initStore(): Store {
             product: undefined,
             reachable: false,
             useDeviceMac: false,
+            mode: 2,
             // ProductIDs:
             // Gruppe 1:
             // 1132174963097280512: Midas/Poolsana InverPro
@@ -51,6 +60,15 @@ export function initStore(): Store {
                 this.device = '';
                 this.reachable = false;
                 await saveValue({ key: 'info.connection', value: false, stateType: 'boolean', adapter: this.adapter });
+            },
+            setMode: function (mode: TMode) {
+                this.mode = mode;
+            },
+            getMode: function (): TMode {
+                return this.mode;
+            },
+            isValidMode: function (curr: number): curr is TMode {
+                return modes.includes(curr as TMode);
             },
         };
     }

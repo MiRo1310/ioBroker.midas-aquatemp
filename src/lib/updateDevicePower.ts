@@ -1,4 +1,5 @@
 import { getPowerMode } from './getSettings';
+import type { TMode } from './store';
 import { initStore } from './store';
 import { getSUrl } from './endPoints';
 import { getAxiosUpdateDevicePowerParams, getHeaders } from './axiosParameter';
@@ -9,7 +10,7 @@ import { request } from './axios';
 import type { MidasData } from '../types/types';
 import { isDefined, isToken } from './utils';
 
-export async function updateDevicePower(adapter: MidasAquatemp, deviceCode: string, mode: number): Promise<void> {
+export async function updateDevicePower(adapter: MidasAquatemp, deviceCode: string, mode: TMode): Promise<void> {
     const store = initStore();
     try {
         const token = store.token;
@@ -33,6 +34,7 @@ export async function updateDevicePower(adapter: MidasAquatemp, deviceCode: stri
         adapter.log.debug(`DeviceStatus: ${JSON.stringify(data)}`);
 
         if (mode >= 0) {
+            store.setMode(mode);
             await updateDeviceMode(adapter, store.device, mode.toString());
         } else {
             await saveValue({ key: 'mode', value: mode.toString(), stateType: 'string', adapter: adapter });
