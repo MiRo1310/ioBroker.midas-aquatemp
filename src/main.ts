@@ -5,11 +5,10 @@
 // The adapter-core module gives you access to the core ioBroker functions
 // you need to create an
 import type { TMode } from './lib/store';
-import { initStore } from './lib/store';
+import { Store } from './lib/store';
 
 import * as utils from '@iobroker/adapter-core';
 import { createObjects } from './lib/createState';
-import { encryptPassword } from './lib/encryptPassword';
 import { setupEndpoints } from './lib/endPoints';
 import { saveValue } from './lib/saveValue';
 
@@ -41,46 +40,49 @@ export class MidasAquatemp extends utils.Adapter {
     }
 
     private async onReady(): Promise<void> {
-        const store = initStore();
         const adapter = this;
-        store.adapter = this;
-        store.instance = this.instance;
+        await this.setState('info.connection', false, true);
+        if (!isDefined(this.instance)) {
+            this.log.error('No instance found.');
+        }
+        const { username, password, refresh, selectApi, useDeviceMac, deviceMac } = this.config;
+        const store = new Store(
+            this,
+            username,
+            password,
+            this.instance as number,
+            refresh,
+            selectApi,
+            useDeviceMac,
+            deviceMac,
+        );
 
         const dpRoot = store.getDpRoot();
-        await this.setState('info.connection', false, true);
+
         const currentMode = parseInt(String((await this.getStateAsync(`${dpRoot}.mode`))?.val));
         if (store.isValidMode(currentMode)) {
             store.setMode(currentMode);
         }
-        store.username = this.config.username;
-        const password = this.config.password;
-        store.interval = this.config.refresh;
-        store.apiLevel = this.config.selectApi;
-        if (this.config.useDeviceMac) {
-            store.device = this.config.deviceMac;
-        }
 
-        store.useDeviceMac = this.config.useDeviceMac;
         this.log.debug(`API-Level: ${this.config.selectApi}`);
 
-        setupEndpoints();
+        setupEndpoints(store);
 
-        encryptPassword(password);
-        await createObjects(adapter);
+        await createObjects(store);
         this.log.info('Objects created');
         await clearValues();
-        await updateToken(adapter);
+        await updateToken(store);
 
         async function clearValues(): Promise<void> {
-            await saveValue({ key: 'error', value: true, stateType: 'boolean', adapter });
-            await saveValue({ key: 'consumption', value: 0, stateType: 'number', adapter });
-            await saveValue({ key: 'state', value: false, stateType: 'boolean', adapter });
-            await saveValue({ key: 'rawJSON', value: null, stateType: 'string', adapter });
+            await saveValue({ key: 'error', value: true, stateType: 'boolean', store });
+            await saveValue({ key: 'consumption', value: 0, stateType: 'number', store });
+            await saveValue({ key: 'state', value: false, stateType: 'boolean', store });
+            await saveValue({ key: 'rawJSON', value: null, stateType: 'string', store });
         }
 
         updateInterval = this.setInterval(async () => {
             try {
-                await updateToken(adapter);
+                await updateToken(store);
                 const mode = await this.getStateAsync(`${dpRoot}.mode`);
 
                 if (!mode?.ack && isDefined(mode?.val) && store.device) {
@@ -88,12 +90,12 @@ export class MidasAquatemp extends utils.Adapter {
                     if (!store.isValidMode(modeVal)) {
                         return;
                     }
-                    await updateDevicePower(adapter, store.device, modeVal);
+                    await updateDevicePower(store, modeVal);
                 }
 
                 const silent = await this.getStateAsync(`${dpRoot}.silent`);
                 if (!silent?.ack && isStateValue(silent) && store.device) {
-                    await updateDeviceSilent(adapter, store.device, !!silent?.val);
+                    await updateDeviceSilent(store, !!silent?.val);
                 }
             } catch (error: any) {
                 errorLogger('Error in updateInterval', error, adapter);
@@ -102,7 +104,7 @@ export class MidasAquatemp extends utils.Adapter {
 
         tokenRefreshTimer = this.setInterval(async function () {
             store.token = '';
-            await updateToken(adapter);
+            await updateToken(store);
         }, 3600000);
 
         this.on('stateChange', async (id, state) => {
@@ -120,7 +122,7 @@ export class MidasAquatemp extends utils.Adapter {
                 if (!isRelevantId || !store.device) {
                     return;
                 }
-                await ensureToken(adapter);
+                await ensureToken(store);
 
                 if (id === `${dpRoot}.mode`) {
                     this.log.debug(`Mode: ${JSON.stringify(state)}`);
@@ -139,7 +141,7 @@ export class MidasAquatemp extends utils.Adapter {
                         return;
                     }
 
-                    await updateDevicePower(adapter, store.device, mode);
+                    await updateDevicePower(store, mode);
 
                     await this.setState(id, { ack: true });
                 }
@@ -148,7 +150,7 @@ export class MidasAquatemp extends utils.Adapter {
                     this.log.debug(`Silent: ${JSON.stringify(state)}`);
 
                     if (isStateValue(state)) {
-                        await updateDeviceSilent(adapter, store.device, state.val as boolean);
+                        await updateDeviceSilent(store, state.val as boolean);
                     }
                     await this.setState(id, { ack: true });
                 }
@@ -156,7 +158,7 @@ export class MidasAquatemp extends utils.Adapter {
                 if (id === `${dpRoot}.tempSet`) {
                     this.log.debug(`TempSet: ${JSON.stringify(state)}`);
                     if (isStateValue(state)) {
-                        await updateDeviceSetTemp(adapter, store.device, state.val as number);
+                        await updateDeviceSetTemp(store, state.val as number);
                     }
                     await this.setState(id, { ack: true });
                 }
@@ -165,14 +167,10 @@ export class MidasAquatemp extends utils.Adapter {
                     this.log.debug(`State: ${JSON.stringify(state)}`);
                     if (isStateValue(state)) {
                         if (!state.val) {
-                            await updateDevicePower(adapter, store.device, -1);
+                            await updateDevicePower(store, -1);
                         } else {
                             const currentMode = parseInt(String(store.getMode()));
-                            await updateDevicePower(
-                                adapter,
-                                store.device,
-                                currentMode >= 0 ? (currentMode as TMode) : 0,
-                            );
+                            await updateDevicePower(store, currentMode >= 0 ? (currentMode as TMode) : 0);
                         }
                     }
                     await this.setState(id, { ack: true });

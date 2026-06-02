@@ -26,27 +26,19 @@ __export(endPoints_exports, {
   setupEndpoints: () => setupEndpoints
 });
 module.exports = __toCommonJS(endPoints_exports);
-var import_store = require("./store");
-function setupEndpoints() {
-  const store = (0, import_store.initStore)();
+function setupEndpoints(store) {
   const apiLevel = store.apiLevel;
   store.cloudURL = apiLevel == 3 ? "https://cloud.linked-go.com:449/crmservice/api" : "https://cloud.linked-go.com/cloudservice/api";
 }
-const getSUrl = () => {
-  const store = (0, import_store.initStore)();
-  const cloudURL = store.cloudURL;
+const getSUrl = (store) => {
+  const { cloudURL } = store;
   return store.apiLevel < 3 ? { sURL: `${cloudURL}/app/device/control.json` } : { sURL: `${cloudURL}/app/device/control` };
 };
-const getSUrlUpdateDeviceId = () => {
-  const store = (0, import_store.initStore)();
+const getSUrlUpdateDeviceId = (store) => {
   return store.apiLevel < 3 ? { sURL: `${store.cloudURL}/app/device/getDataByCode.json` } : { sURL: `${store.cloudURL}/app/device/getDataByCode` };
 };
-const getOptionsAndSUrl = () => {
-  const store = (0, import_store.initStore)();
-  const cloudURL = store.cloudURL;
-  const apiLevel = store.apiLevel;
-  const encryptedPassword = store.encryptedPassword;
-  const username = store.username;
+const getOptionsAndSUrl = (store) => {
+  const { cloudURL, apiLevel, encryptedPassword, username } = store;
   return apiLevel < 3 ? {
     sUrl: `${cloudURL}/app/user/login.json`,
     options: {
@@ -63,12 +55,10 @@ const getOptionsAndSUrl = () => {
     }
   };
 };
-const getUpdateDeviceStatusSUrl = () => {
-  const store = (0, import_store.initStore)();
+const getUpdateDeviceStatusSUrl = (store) => {
   return store.apiLevel < 3 ? { sURL: `${store.cloudURL}/app/device/getDeviceStatus.json` } : { sURL: `${store.cloudURL}/app/device/getDeviceStatus` };
 };
-const getUpdateDeviceIdSUrl = () => {
-  const store = (0, import_store.initStore)();
+const getUpdateDeviceIdSUrl = (store) => {
   return store.apiLevel < 3 ? { sURL: `${store.cloudURL}/app/device/deviceList.json` } : { sURL: `${store.cloudURL}/app/device/deviceList` };
 };
 // Annotate the CommonJS export names for ESM import in node:

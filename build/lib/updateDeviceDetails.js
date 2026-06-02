@@ -24,30 +24,29 @@ module.exports = __toCommonJS(updateDeviceDetails_exports);
 var import_axiosParameter = require("./axiosParameter");
 var import_endPoints = require("./endPoints");
 var import_saveValue = require("./saveValue");
-var import_store = require("./store");
 var import_logging = require("./logging");
 var import_axios = require("./axios");
 var import_utils = require("./utils");
-async function saveNumberIfValid(adapter, key, value) {
+async function saveNumberIfValid(store, key, value) {
   if (!Number.isFinite(value)) {
     return false;
   }
-  await (0, import_saveValue.saveValue)({ key, value, stateType: "number", adapter });
+  await (0, import_saveValue.saveValue)({ key, value, stateType: "number", store });
   return true;
 }
-async function updateDeviceDetails(adapter) {
+async function updateDeviceDetails(store) {
   var _a, _b;
-  const store = (0, import_store.initStore)();
+  const adapter = store.adapter;
   try {
     const { token, device: deviceCode, product } = store;
-    if (!token || !deviceCode) {
+    if (!token || !deviceCode || !product) {
       return;
     }
-    const { sURL } = (0, import_endPoints.getSUrlUpdateDeviceId)();
+    const { sURL } = (0, import_endPoints.getSUrlUpdateDeviceId)(store);
     const { data, error } = await (0, import_axios.request)(
       adapter,
       sURL,
-      (0, import_axiosParameter.getProtocolCodes)(deviceCode, product),
+      (0, import_axiosParameter.getProtocolCodes)(store, product),
       (0, import_axiosParameter.getHeaders)(token)
     );
     if (!data || error) {
@@ -63,7 +62,7 @@ async function updateDeviceDetails(adapter) {
       key: "rawJSON",
       value: JSON.stringify(responseValue),
       stateType: "string",
-      adapter
+      store
     });
     const isPoolsana = product === store.AQUATEMP_POOLSANA;
     const powerOn = (0, import_utils.findCodeVal)(responseValue, "Power") === "1";
@@ -82,7 +81,7 @@ async function updateDeviceDetails(adapter) {
       key: "tempSet",
       value: (_b = tempSetValue ? parseFloat(tempSetValue) : null) != null ? _b : tempSetValueByMode ? parseFloat(tempSetValueByMode) : null,
       stateType: "number",
-      adapter
+      store
     });
     if (powerOn) {
       const tPower = isPoolsana ? "T07" : "T7";
@@ -101,40 +100,40 @@ async function updateDeviceDetails(adapter) {
         key: "consumption",
         value: consumptionValue,
         stateType: "number",
-        adapter
+        store
       });
       const flowSwitchValue = (0, import_utils.findCodeVal)(responseValue, flowSwitch);
-      await saveNumberIfValid(adapter, "suctionTemp", (0, import_utils.parseNumberOrNull)((0, import_utils.findCodeVal)(responseValue, tSuction)));
-      await saveNumberIfValid(adapter, "tempIn", (0, import_utils.parseNumberOrNull)((0, import_utils.findCodeVal)(responseValue, tIn)));
-      await saveNumberIfValid(adapter, "tempOut", (0, import_utils.parseNumberOrNull)((0, import_utils.findCodeVal)(responseValue, tOut)));
-      await saveNumberIfValid(adapter, "coilTemp", (0, import_utils.parseNumberOrNull)((0, import_utils.findCodeVal)(responseValue, tCoil)));
-      await saveNumberIfValid(adapter, "ambient", (0, import_utils.parseNumberOrNull)((0, import_utils.findCodeVal)(responseValue, tAmb)));
-      await saveNumberIfValid(adapter, "voltage", tVoltageVal);
+      await saveNumberIfValid(store, "suctionTemp", (0, import_utils.parseNumberOrNull)((0, import_utils.findCodeVal)(responseValue, tSuction)));
+      await saveNumberIfValid(store, "tempIn", (0, import_utils.parseNumberOrNull)((0, import_utils.findCodeVal)(responseValue, tIn)));
+      await saveNumberIfValid(store, "tempOut", (0, import_utils.parseNumberOrNull)((0, import_utils.findCodeVal)(responseValue, tOut)));
+      await saveNumberIfValid(store, "coilTemp", (0, import_utils.parseNumberOrNull)((0, import_utils.findCodeVal)(responseValue, tCoil)));
+      await saveNumberIfValid(store, "ambient", (0, import_utils.parseNumberOrNull)((0, import_utils.findCodeVal)(responseValue, tAmb)));
+      await saveNumberIfValid(store, "voltage", tVoltageVal);
       await (0, import_saveValue.saveValue)({
         key: "flowSwitch",
         value: flowSwitchValue ? [1, "1", "true", true].includes(flowSwitchValue) : null,
         stateType: "boolean",
-        adapter
+        store
       });
-      await saveNumberIfValid(adapter, "rotor", (0, import_utils.parseIntOrNull)((0, import_utils.findCodeVal)(responseValue, tRotor)));
+      await saveNumberIfValid(store, "rotor", (0, import_utils.parseIntOrNull)((0, import_utils.findCodeVal)(responseValue, tRotor)));
     } else {
-      await (0, import_saveValue.saveValue)({ key: "consumption", value: 0, stateType: "number", adapter });
-      await (0, import_saveValue.saveValue)({ key: "rotor", value: 0, stateType: "number", adapter });
+      await (0, import_saveValue.saveValue)({ key: "consumption", value: 0, stateType: "number", store });
+      await (0, import_saveValue.saveValue)({ key: "rotor", value: 0, stateType: "number", store });
     }
     await (0, import_saveValue.saveValue)({
       key: "silent",
       value: (0, import_utils.findCodeVal)(responseValue, "Manual-mute") === "1",
       stateType: "boolean",
-      adapter
+      store
     });
-    await (0, import_saveValue.saveValue)({ key: "state", value: powerOn, stateType: "boolean", adapter });
+    await (0, import_saveValue.saveValue)({ key: "state", value: powerOn, stateType: "boolean", store });
     await (0, import_saveValue.saveValue)({
       key: "mode",
       value: powerOn ? (0, import_utils.findCodeVal)(responseValue, "Mode") : "-1",
       stateType: "string",
-      adapter
+      store
     });
-    await (0, import_saveValue.saveValue)({ key: "info.connection", value: true, stateType: "boolean", adapter });
+    await (0, import_saveValue.saveValue)({ key: "info.connection", value: true, stateType: "boolean", store });
   } catch (error) {
     (0, import_logging.errorLogger)("Error updateDeviceDetails", error, adapter);
     void store.resetOnErrorHandler();

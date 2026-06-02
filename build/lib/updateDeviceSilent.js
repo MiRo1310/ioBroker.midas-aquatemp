@@ -24,19 +24,18 @@ module.exports = __toCommonJS(updateDeviceSilent_exports);
 var import_axiosParameter = require("./axiosParameter");
 var import_endPoints = require("./endPoints");
 var import_saveValue = require("./saveValue");
-var import_store = require("./store");
 var import_logging = require("./logging");
 var import_axios = require("./axios");
-async function updateDeviceSilent(adapter, deviceCode, silent) {
-  const store = (0, import_store.initStore)();
+async function updateDeviceSilent(store, silent) {
+  const { adapter, device } = store;
   try {
     const token = store.token;
     const silentMode = silent ? "1" : "0";
-    if (token && token != "") {
+    if (token && token != "" && device) {
       const { data, error } = await (0, import_axios.request)(
         adapter,
-        (0, import_endPoints.getSUrl)().sURL,
-        (0, import_axiosParameter.getAxiosUpdateDevicePowerParams)({ deviceCode, value: silentMode, protocolCode: "Manual-mute" }),
+        (0, import_endPoints.getSUrl)(store).sURL,
+        (0, import_axiosParameter.getAxiosUpdateDevicePowerParams)(store, device, silentMode, "Manual-mute"),
         (0, import_axiosParameter.getHeaders)(token)
       );
       if (!data || error) {
@@ -44,7 +43,7 @@ async function updateDeviceSilent(adapter, deviceCode, silent) {
         return;
       }
       adapter.log.debug(`DeviceStatus: ${JSON.stringify(data)}`);
-      await (0, import_saveValue.saveValue)({ key: "silent", value: silent, stateType: "boolean", adapter });
+      await (0, import_saveValue.saveValue)({ key: "silent", value: silent, stateType: "boolean", store });
     }
   } catch (error) {
     (0, import_logging.errorLogger)("Error in updateDeviceSilent", error, adapter);

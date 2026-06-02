@@ -23,25 +23,23 @@ __export(token_exports, {
 });
 module.exports = __toCommonJS(token_exports);
 var import_endPoints = require("./endPoints");
-var import_store = require("./store");
 var import_updateDeviceId = require("./updateDeviceId");
 var import_updateDeviceStatus = require("./updateDeviceStatus");
 var import_logging = require("./logging");
 var import_axios = require("./axios");
 var import_utils = require("./utils");
-async function ensureToken(adapter) {
-  await getToken(adapter);
+async function ensureToken(store) {
+  await getToken(store);
 }
-async function getToken(adapter) {
+async function getToken(store) {
   var _a, _b, _c, _d;
-  const store = (0, import_store.initStore)();
+  const { token, adapter } = store;
   try {
-    const { token } = store;
     if ((0, import_utils.isToken)(token)) {
       return;
     }
     adapter.log.debug("Request token");
-    const { sUrl, options } = (0, import_endPoints.getOptionsAndSUrl)();
+    const { sUrl, options } = (0, import_endPoints.getOptionsAndSUrl)(store);
     const { data, error } = await (0, import_axios.request)(adapter, sUrl, options);
     if (error || !data) {
       adapter.log.error(`Login-error: ${JSON.stringify(data)}`);
@@ -59,18 +57,18 @@ async function getToken(adapter) {
     (0, import_logging.errorLogger)("Error in getToken", error, adapter);
   }
 }
-const updateToken = async (adapter) => {
-  const store = (0, import_store.initStore)();
+const updateToken = async (store) => {
+  const { adapter } = store;
   try {
-    await getToken(adapter);
+    await getToken(store);
     if (!store.token) {
       return;
     }
     if (store.useDeviceMac) {
-      await (0, import_updateDeviceStatus.updateDeviceStatus)(adapter);
+      await (0, import_updateDeviceStatus.updateDeviceStatus)(store);
       return;
     }
-    await (0, import_updateDeviceId.updateDeviceID)(adapter);
+    await (0, import_updateDeviceId.updateDeviceID)(store);
     return;
   } catch (error) {
     (0, import_logging.errorLogger)("Error in updateToken", error, adapter);

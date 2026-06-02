@@ -21,15 +21,14 @@ __export(saveValue_exports, {
   saveValue: () => saveValue
 });
 module.exports = __toCommonJS(saveValue_exports);
-var import_store = require("./store");
 var import_logging = require("./logging");
 const saveValue = async ({
   key,
   value,
   stateType,
-  adapter
+  store
 }) => {
-  const store = (0, import_store.initStore)();
+  const { adapter } = store;
   const dpRoot = store.getDpRoot();
   try {
     const dp = `${dpRoot}.${key}`;

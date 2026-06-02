@@ -1,23 +1,22 @@
 import { getAxiosUpdateDevicePowerParams, getHeaders } from './axiosParameter';
 import { getSUrl } from './endPoints';
 import { saveValue } from './saveValue';
-import { initStore } from './store';
 import { errorLogger } from './logging';
-import type { MidasAquatemp } from '../main';
 import { request } from './axios';
 import type { MidasData } from '../types/types';
+import type { Store } from './store.ts';
 
-export async function updateDeviceSilent(adapter: MidasAquatemp, deviceCode: string, silent: boolean): Promise<void> {
-    const store = initStore();
+export async function updateDeviceSilent(store: Store, silent: boolean): Promise<void> {
+    const { adapter, device } = store;
     try {
         const token = store.token;
         const silentMode = silent ? '1' : '0';
 
-        if (token && token != '') {
+        if (token && token != '' && device) {
             const { data, error } = await request<MidasData>(
                 adapter,
-                getSUrl().sURL,
-                getAxiosUpdateDevicePowerParams({ deviceCode, value: silentMode, protocolCode: 'Manual-mute' }),
+                getSUrl(store).sURL,
+                getAxiosUpdateDevicePowerParams(store, device, silentMode, 'Manual-mute'),
                 getHeaders(token),
             );
             if (!data || error) {
@@ -27,7 +26,7 @@ export async function updateDeviceSilent(adapter: MidasAquatemp, deviceCode: str
 
             adapter.log.debug(`DeviceStatus: ${JSON.stringify(data)}`);
 
-            await saveValue({ key: 'silent', value: silent, stateType: 'boolean', adapter: adapter });
+            await saveValue({ key: 'silent', value: silent, stateType: 'boolean', store });
         }
     } catch (error: any) {
         errorLogger('Error in updateDeviceSilent', error, adapter);

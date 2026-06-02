@@ -23,21 +23,20 @@ __export(updateDeviceStatus_exports, {
 module.exports = __toCommonJS(updateDeviceStatus_exports);
 var import_endPoints = require("./endPoints");
 var import_saveValue = require("./saveValue");
-var import_store = require("./store");
 var import_updateDeviceDetails = require("./updateDeviceDetails");
 var import_updateDeviceOnError = require("./updateDeviceOnError");
 var import_logging = require("./logging");
 var import_axios = require("./axios");
 var import_axiosParameter = require("./axiosParameter");
-async function updateDeviceStatus(adapter) {
+async function updateDeviceStatus(store) {
   var _a, _b, _c, _d, _e, _f;
-  const store = (0, import_store.initStore)();
+  const { adapter } = store;
   try {
     const { token, device: deviceCode, apiLevel } = store;
     if (!token || !deviceCode) {
       return;
     }
-    const { sURL } = (0, import_endPoints.getUpdateDeviceStatusSUrl)();
+    const { sURL } = (0, import_endPoints.getUpdateDeviceStatusSUrl)(store);
     const payload = apiLevel < 3 ? { device_code: deviceCode } : { deviceCode };
     const { data, error } = await (0, import_axios.request)(adapter, sURL, payload, (0, import_axiosParameter.getHeaders)(token));
     if (!data || error) {
@@ -47,24 +46,24 @@ async function updateDeviceStatus(adapter) {
     adapter.log.debug(`DeviceStatus: ${JSON.stringify(data)}`);
     const status = apiLevel < 3 ? (_a = data.object_result) == null ? void 0 : _a.status : (_b = data.objectResult) == null ? void 0 : _b.status;
     store.reachable = status === "ONLINE";
-    await (0, import_saveValue.saveValue)({ key: "info.connection", value: store.reachable, stateType: "boolean", adapter });
+    await (0, import_saveValue.saveValue)({ key: "info.connection", value: store.reachable, stateType: "boolean", store });
     if (!store.reachable) {
       return;
     }
     const isFault = apiLevel < 3 ? (_c = data.object_result) == null ? void 0 : _c.is_fault : (_f = (_d = data.objectResult) == null ? void 0 : _d.is_fault) != null ? _f : (_e = data.objectResult) == null ? void 0 : _e.isFault;
     if (isFault === true) {
-      await (0, import_saveValue.saveValue)({ key: "error", value: true, stateType: "boolean", adapter });
-      await (0, import_updateDeviceDetails.updateDeviceDetails)(adapter);
-      await (0, import_updateDeviceOnError.updateDeviceErrorMsg)(adapter);
+      await (0, import_saveValue.saveValue)({ key: "error", value: true, stateType: "boolean", store });
+      await (0, import_updateDeviceDetails.updateDeviceDetails)(store);
+      await (0, import_updateDeviceOnError.updateDeviceErrorMsg)(store);
       return;
     }
-    await (0, import_saveValue.saveValue)({ key: "error", value: false, stateType: "boolean", adapter });
-    await (0, import_saveValue.saveValue)({ key: "errorMessage", value: "", stateType: "string", adapter });
-    await (0, import_saveValue.saveValue)({ key: "errorCode", value: "", stateType: "string", adapter });
-    await (0, import_saveValue.saveValue)({ key: "errorLevel", value: 0, stateType: "number", adapter });
-    await (0, import_updateDeviceDetails.updateDeviceDetails)(adapter);
+    await (0, import_saveValue.saveValue)({ key: "error", value: false, stateType: "boolean", store });
+    await (0, import_saveValue.saveValue)({ key: "errorMessage", value: "", stateType: "string", store });
+    await (0, import_saveValue.saveValue)({ key: "errorCode", value: "", stateType: "string", store });
+    await (0, import_saveValue.saveValue)({ key: "errorLevel", value: 0, stateType: "number", store });
+    await (0, import_updateDeviceDetails.updateDeviceDetails)(store);
   } catch (error) {
-    store.resetOnErrorHandler();
+    await store.resetOnErrorHandler();
     (0, import_logging.errorLogger)("Error in updateDeviceStatus", error, adapter);
   }
 }

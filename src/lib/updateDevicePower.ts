@@ -1,30 +1,27 @@
 import { getPowerMode } from './getSettings';
-import type { TMode } from './store';
-import { initStore } from './store';
+import type { Store, TMode } from './store';
 import { getSUrl } from './endPoints';
 import { getAxiosUpdateDevicePowerParams, getHeaders } from './axiosParameter';
 import { saveValue } from './saveValue';
 import { errorLogger } from './logging';
-import type { MidasAquatemp } from '../main';
 import { request } from './axios';
 import type { MidasData } from '../types/types';
 import { isDefined, isToken } from './utils';
 
-export async function updateDevicePower(adapter: MidasAquatemp, deviceCode: string, mode: TMode): Promise<void> {
-    const store = initStore();
+export async function updateDevicePower(store: Store, mode: TMode): Promise<void> {
+    const { token, adapter, device } = store;
     try {
-        const token = store.token;
         const { powerMode, powerOpt } = getPowerMode(mode);
 
-        if (!isDefined(powerOpt) || !isDefined(powerMode) || !store.device || !isToken(token)) {
+        if (!isDefined(powerOpt) || !isDefined(powerMode) || !store.device || !isToken(token) || !device) {
             return;
         }
 
-        const { sURL } = getSUrl();
+        const { sURL } = getSUrl(store);
         const { data, error } = await request<MidasData>(
             adapter,
             sURL,
-            getAxiosUpdateDevicePowerParams({ deviceCode, value: powerOpt, protocolCode: 'Power' }),
+            getAxiosUpdateDevicePowerParams(store, device, powerOpt, 'Power'),
             getHeaders(token),
         );
         if (!data || error) {
@@ -35,25 +32,25 @@ export async function updateDevicePower(adapter: MidasAquatemp, deviceCode: stri
 
         if (mode >= 0) {
             store.setMode(mode);
-            await updateDeviceMode(adapter, store.device, mode.toString());
+            await updateDeviceMode(store, mode.toString());
         } else {
-            await saveValue({ key: 'mode', value: mode.toString(), stateType: 'string', adapter: adapter });
+            await saveValue({ key: 'mode', value: mode.toString(), stateType: 'string', store });
         }
     } catch (error: any) {
         errorLogger('Error in updateDevicePower', error, adapter);
     }
 }
 
-async function updateDeviceMode(adapter: MidasAquatemp, deviceCode: string, mode: string): Promise<void> {
-    const store = initStore();
+async function updateDeviceMode(store: Store, mode: string): Promise<void> {
     const token = store.token;
+    const { adapter, device } = store;
     try {
-        if (token && token != '') {
-            const { sURL } = getSUrl();
+        if (token && token != '' && device) {
+            const { sURL } = getSUrl(store);
             const { data, error } = await request<MidasData>(
                 adapter,
                 sURL,
-                getAxiosUpdateDevicePowerParams({ deviceCode: deviceCode, value: mode, protocolCode: 'Mode' }),
+                getAxiosUpdateDevicePowerParams(store, device, mode, 'Mode'),
                 {
                     headers: { 'x-token': token },
                 },
@@ -64,7 +61,7 @@ async function updateDeviceMode(adapter: MidasAquatemp, deviceCode: string, mode
             }
             adapter.log.debug(`DeviceStatus: ${JSON.stringify(data)}`);
 
-            await saveValue({ key: 'mode', value: mode, stateType: 'string', adapter: adapter });
+            await saveValue({ key: 'mode', value: mode, stateType: 'string', store });
         }
     } catch (error: any) {
         errorLogger('Error in updateDeviceMode', error, adapter);

@@ -1,7 +1,6 @@
-import { initStore } from './store';
+import type { Store } from './store';
 
-export function setupEndpoints(): void {
-    const store = initStore();
+export function setupEndpoints(store: Store): void {
     const apiLevel = store.apiLevel;
 
     store.cloudURL =
@@ -10,24 +9,26 @@ export function setupEndpoints(): void {
             : 'https://cloud.linked-go.com/cloudservice/api';
 }
 
-export const getSUrl = (): {
+export const getSUrl = (
+    store: Store,
+): {
     sURL: string;
 } => {
-    const store = initStore();
-    const cloudURL = store.cloudURL;
+    const { cloudURL } = store;
     return store.apiLevel < 3
         ? { sURL: `${cloudURL}/app/device/control.json` }
         : { sURL: `${cloudURL}/app/device/control` };
 };
 
-export const getSUrlUpdateDeviceId = (): { sURL: string } => {
-    const store = initStore();
+export const getSUrlUpdateDeviceId = (store: Store): { sURL: string } => {
     return store.apiLevel < 3
         ? { sURL: `${store.cloudURL}/app/device/getDataByCode.json` }
         : { sURL: `${store.cloudURL}/app/device/getDataByCode` };
 };
 
-export const getOptionsAndSUrl = (): {
+export const getOptionsAndSUrl = (
+    store: Store,
+): {
     sUrl: string;
     options: {
         userName?: string;
@@ -36,11 +37,8 @@ export const getOptionsAndSUrl = (): {
         type: string;
     };
 } => {
-    const store = initStore();
-    const cloudURL = store.cloudURL;
-    const apiLevel = store.apiLevel;
-    const encryptedPassword = store.encryptedPassword;
-    const username = store.username;
+    const { cloudURL, apiLevel, encryptedPassword, username } = store;
+
     return apiLevel < 3
         ? {
               sUrl: `${cloudURL}/app/user/login.json`,
@@ -60,15 +58,13 @@ export const getOptionsAndSUrl = (): {
           };
 };
 
-export const getUpdateDeviceStatusSUrl = (): { sURL: string } => {
-    const store = initStore();
+export const getUpdateDeviceStatusSUrl = (store: Store): { sURL: string } => {
     return store.apiLevel < 3
         ? { sURL: `${store.cloudURL}/app/device/getDeviceStatus.json` }
         : { sURL: `${store.cloudURL}/app/device/getDeviceStatus` };
 };
 
-export const getUpdateDeviceIdSUrl = (): { sURL: string } => {
-    const store = initStore();
+export const getUpdateDeviceIdSUrl = (store: Store): { sURL: string } => {
     return store.apiLevel < 3
         ? { sURL: `${store.cloudURL}/app/device/deviceList.json` }
         : { sURL: `${store.cloudURL}/app/device/deviceList` };

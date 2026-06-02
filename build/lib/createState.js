@@ -21,10 +21,9 @@ __export(createState_exports, {
   createObjects: () => createObjects
 });
 module.exports = __toCommonJS(createState_exports);
-var import_store = require("./store");
 var import_logging = require("./logging");
-const createObjects = async (adapter) => {
-  const store = (0, import_store.initStore)();
+const createObjects = async (store) => {
+  const { adapter } = store;
   const dpRoot = store.getDpRoot();
   const objects = [
     {

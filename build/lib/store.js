@@ -18,61 +18,67 @@ var __copyProps = (to, from, except, desc) => {
 var __toCommonJS = (mod) => __copyProps(__defProp({}, "__esModule", { value: true }), mod);
 var store_exports = {};
 __export(store_exports, {
-  initStore: () => initStore,
+  Store: () => Store,
   modes: () => modes
 });
 module.exports = __toCommonJS(store_exports);
 var import_saveValue = require("./saveValue");
+var import_crypto = require("crypto");
 const modes = [-1, 0, 1, 2];
-let store;
-function initStore() {
-  if (!store) {
-    store = {
-      adapter: "",
-      token: null,
-      instance: null,
-      username: "",
-      encryptedPassword: "",
-      cloudURL: "",
-      apiLevel: 3,
-      interval: 6e4,
-      device: void 0,
-      product: void 0,
-      reachable: false,
-      useDeviceMac: false,
-      mode: 2,
-      // ProductIDs:
-      // Gruppe 1:
-      // 1132174963097280512: Midas/Poolsana InverPro
-      AQUATEMP_POOLSANA: "1132174963097280512",
-      // Gruppe 2:
-      // 1442284873216843776:
-      AQUATEMP_OTHER1: "1442284873216843776",
-      getDpRoot: function() {
-        return `midas-aquatemp.${this.instance}`;
-      },
-      resetOnErrorHandler: async function() {
-        this.token = null;
-        this.device = "";
-        this.reachable = false;
-        await (0, import_saveValue.saveValue)({ key: "info.connection", value: false, stateType: "boolean", adapter: this.adapter });
-      },
-      setMode: function(mode) {
-        this.mode = mode;
-      },
-      getMode: function() {
-        return this.mode;
-      },
-      isValidMode: function(curr) {
-        return modes.includes(curr);
-      }
-    };
+class Store {
+  adapter;
+  instance;
+  username;
+  encryptedPassword;
+  interval = 6e4;
+  token = null;
+  cloudURL = null;
+  apiLevel = 3;
+  device;
+  product = null;
+  reachable = false;
+  useDeviceMac = false;
+  mode = 2;
+  AQUATEMP_POOLSANA = "1132174963097280512";
+  //Midas/Poolsana InverPro
+  AQUATEMP_OTHER1 = "1442284873216843776";
+  constructor(adapter, username, password, instance, interval, apiLevel, useDeviceMac, deviceMac) {
+    this.adapter = adapter;
+    this.username = username;
+    this.encryptedPassword = this.encryptPassword(password);
+    this.instance = instance;
+    this.interval = interval != null ? interval : this.interval;
+    this.apiLevel = apiLevel != null ? apiLevel : this.apiLevel;
+    this.useDeviceMac = useDeviceMac != null ? useDeviceMac : this.useDeviceMac;
+    if (useDeviceMac) {
+      this.device = deviceMac != null ? deviceMac : this.device;
+    }
   }
-  return store;
+  getDpRoot() {
+    return `midas-aquatemp.${this.instance}`;
+  }
+  async resetOnErrorHandler() {
+    this.token = null;
+    this.device = "";
+    this.reachable = false;
+    await (0, import_saveValue.saveValue)({ key: "info.connection", value: false, stateType: "boolean", store: this });
+  }
+  setMode(mode) {
+    this.mode = mode;
+  }
+  getMode() {
+    return this.mode;
+  }
+  isValidMode(curr) {
+    return modes.includes(curr);
+  }
+  encryptPassword(password) {
+    return (0, import_crypto.createHash)("md5").update(password).digest("hex");
+  }
 }
 // Annotate the CommonJS export names for ESM import in node:
 0 && (module.exports = {
-  initStore,
+  Store,
   modes
 });
 //# sourceMappingURL=store.js.map

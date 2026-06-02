@@ -20,14 +20,3 @@ export interface AxiosUpdateDeviceParam {
     protocolCode?: string;
     value: number | string;
 }
-
-export interface InputGetAxiosUpdateDevicePowerParams {
-    deviceCode: string;
-    value: number | string;
-    protocolCode: string;
-}
-
-export interface InputGetAxiosUpdateDeviceSetTempParams {
-    deviceCode: string;
-    sTemperature: string;
-}

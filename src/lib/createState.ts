@@ -1,10 +1,9 @@
 import type { CreateObjects } from '../types';
-import { initStore } from './store';
 import { errorLogger } from './logging';
-import type { MidasAquatemp } from '../main';
+import type { Store } from './store.ts';
 
-export const createObjects = async (adapter: MidasAquatemp): Promise<void> => {
-    const store = initStore();
+export const createObjects = async (store: Store): Promise<void> => {
+    const { adapter } = store;
     const dpRoot = store.getDpRoot();
 
     const objects: CreateObjects[] = [

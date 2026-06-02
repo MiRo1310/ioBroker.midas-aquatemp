@@ -1,16 +1,15 @@
-import type { MidasAquatemp } from '../main';
 import { getAxiosUpdateDeviceIdParams, getHeaders } from './axiosParameter';
 import { getUpdateDeviceIdSUrl } from './endPoints';
 import { saveValue } from './saveValue';
-import { initStore } from './store';
 import { updateDeviceStatus } from './updateDeviceStatus';
 import { errorLogger } from './logging';
 import { request } from './axios';
 import type { UpdateDeviceId } from '../types/types';
 import { isToken } from './utils';
+import type { Store } from './store.ts';
 
-export async function updateDeviceID(adapter: MidasAquatemp): Promise<void> {
-    const store = initStore();
+export async function updateDeviceID(store: Store): Promise<void> {
+    const { adapter } = store;
     try {
         const { token } = store;
         if (!isToken(token)) {
@@ -19,8 +18,8 @@ export async function updateDeviceID(adapter: MidasAquatemp): Promise<void> {
 
         const { data, status, error } = await request<UpdateDeviceId>(
             adapter,
-            getUpdateDeviceIdSUrl().sURL,
-            getAxiosUpdateDeviceIdParams(),
+            getUpdateDeviceIdSUrl(store).sURL,
+            getAxiosUpdateDeviceIdParams(store),
             getHeaders(token),
         );
 
@@ -40,18 +39,18 @@ export async function updateDeviceID(adapter: MidasAquatemp): Promise<void> {
         }
 
         store.device = data.object_result?.[0].device_code ?? data.objectResult?.[0]?.deviceCode;
-        store.product = data.object_result?.[0]?.product_id ?? data.objectResult?.[0]?.productId;
+        store.product = data.object_result?.[0]?.product_id ?? data.objectResult?.[0]?.productId ?? null;
         store.reachable = (data.object_result?.[0]?.device_status ?? data.objectResult?.[0]?.deviceStatus) == 'ONLINE';
 
         adapter.log.debug(`device: ${store.device}, product: ${store.product}, reachable: ${store.reachable}`);
 
-        await saveValue({ key: 'DeviceCode', value: store.device, stateType: 'string', adapter: adapter });
-        await saveValue({ key: 'ProductCode', value: store.product, stateType: 'string', adapter: adapter });
+        await saveValue({ key: 'DeviceCode', value: store.device, stateType: 'string', store });
+        await saveValue({ key: 'ProductCode', value: store.product, stateType: 'string', store });
 
         if (store.reachable && store.device) {
-            await saveValue({ key: 'info.connection', value: true, stateType: 'boolean', adapter: adapter });
+            await saveValue({ key: 'info.connection', value: true, stateType: 'boolean', store });
             if (store.device != '' && store.product) {
-                await updateDeviceStatus(adapter);
+                await updateDeviceStatus(store);
             }
             return;
         }

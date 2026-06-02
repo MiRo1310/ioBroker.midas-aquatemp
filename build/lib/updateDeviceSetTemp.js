@@ -24,12 +24,11 @@ module.exports = __toCommonJS(updateDeviceSetTemp_exports);
 var import_axiosParameter = require("./axiosParameter");
 var import_endPoints = require("./endPoints");
 var import_saveValue = require("./saveValue");
-var import_store = require("./store");
 var import_logging = require("./logging");
 var import_axios = require("./axios");
 var import_utils = require("./utils");
-const updateDeviceSetTemp = async (adapter, deviceCode, temperature) => {
-  const store = (0, import_store.initStore)();
+const updateDeviceSetTemp = async (store, temperature) => {
+  const { adapter, device } = store;
   const dpRoot = store.getDpRoot();
   try {
     const token = store.token;
@@ -48,12 +47,12 @@ const updateDeviceSetTemp = async (adapter, deviceCode, temperature) => {
       adapter.log.debug(`Mode set to: ${result == null ? void 0 : result.val}`);
       return;
     }
-    if ((0, import_utils.isToken)(token)) {
-      const { sURL } = (0, import_endPoints.getSUrl)();
+    if ((0, import_utils.isToken)(token) && device) {
+      const { sURL } = (0, import_endPoints.getSUrl)(store);
       const { data, error } = await (0, import_axios.request)(
         adapter,
         sURL,
-        (0, import_axiosParameter.getAxiosUpdateDeviceSetTempParams)({ deviceCode, sTemperature }),
+        (0, import_axiosParameter.getAxiosUpdateDeviceSetTempParams)(device, sTemperature, store),
         (0, import_axiosParameter.getHeaders)(token)
       );
       adapter.log.debug(`DeviceStatus: ${JSON.stringify(data)}`);
@@ -61,7 +60,7 @@ const updateDeviceSetTemp = async (adapter, deviceCode, temperature) => {
         await store.resetOnErrorHandler();
         return;
       }
-      await (0, import_saveValue.saveValue)({ key: "tempSet", value: numericTemperature, stateType: "number", adapter });
+      await (0, import_saveValue.saveValue)({ key: "tempSet", value: numericTemperature, stateType: "number", store });
     }
   } catch (error) {
     (0, import_logging.errorLogger)("Error in updateDeviceSetTemp", error, adapter);

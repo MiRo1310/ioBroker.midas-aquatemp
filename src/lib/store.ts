@@ -1,76 +1,70 @@
 import type { MidasAquatemp } from '../main';
 import { saveValue } from './saveValue';
-
-interface Store {
-    adapter: MidasAquatemp;
-    token: string | null;
-    instance: number | undefined | null;
-    username: string;
-    encryptedPassword: string;
-    cloudURL: string;
-    AQUATEMP_POOLSANA: string;
-    AQUATEMP_OTHER1: string;
-    apiLevel: number;
-    interval: number;
-    device?: string;
-    product?: string;
-    reachable: boolean;
-    useDeviceMac: boolean;
-    getDpRoot: () => string;
-    resetOnErrorHandler: () => Promise<void>;
-    mode: TMode;
-    setMode: (mode: TMode) => void;
-    getMode: () => TMode;
-    isValidMode: (val: number) => val is TMode;
-}
+import { createHash } from 'crypto';
 
 export type TMode = -1 | 0 | 1 | 2;
 
 export const modes: TMode[] = [-1, 0, 1, 2];
 
-let store: Store;
-export function initStore(): Store {
-    if (!store) {
-        store = {
-            adapter: '' as unknown as MidasAquatemp,
-            token: null,
-            instance: null,
-            username: '',
-            encryptedPassword: '',
-            cloudURL: '',
-            apiLevel: 3,
-            interval: 60000,
-            device: undefined,
-            product: undefined,
-            reachable: false,
-            useDeviceMac: false,
-            mode: 2,
-            // ProductIDs:
-            // Gruppe 1:
-            // 1132174963097280512: Midas/Poolsana InverPro
-            AQUATEMP_POOLSANA: '1132174963097280512',
-            // Gruppe 2:
-            // 1442284873216843776:
-            AQUATEMP_OTHER1: '1442284873216843776',
-            getDpRoot: function () {
-                return `midas-aquatemp.${this.instance}`;
-            },
-            resetOnErrorHandler: async function () {
-                this.token = null;
-                this.device = '';
-                this.reachable = false;
-                await saveValue({ key: 'info.connection', value: false, stateType: 'boolean', adapter: this.adapter });
-            },
-            setMode: function (mode: TMode) {
-                this.mode = mode;
-            },
-            getMode: function (): TMode {
-                return this.mode;
-            },
-            isValidMode: function (curr: number): curr is TMode {
-                return modes.includes(curr as TMode);
-            },
-        };
+export class Store {
+    public readonly adapter: MidasAquatemp;
+    public readonly instance: number;
+    public readonly username: string;
+    public readonly encryptedPassword: string;
+    public readonly interval: number = 60000;
+    public token: string | null = null;
+    public cloudURL: string | null = null;
+    public apiLevel = 3;
+    public device?: string;
+    public product: string | null = null;
+    public reachable = false;
+    public useDeviceMac = false;
+    private mode: TMode = 2;
+    public AQUATEMP_POOLSANA = '1132174963097280512'; //Midas/Poolsana InverPro
+    public AQUATEMP_OTHER1 = '1442284873216843776';
+
+    constructor(
+        adapter: MidasAquatemp,
+        username: string,
+        password: string,
+        instance: number,
+        interval?: number,
+        apiLevel?: number,
+        useDeviceMac?: boolean,
+        deviceMac?: string,
+    ) {
+        this.adapter = adapter;
+        this.username = username;
+        this.encryptedPassword = this.encryptPassword(password);
+        this.instance = instance;
+        this.interval = interval ?? this.interval;
+        this.apiLevel = apiLevel ?? this.apiLevel;
+        this.useDeviceMac = useDeviceMac ?? this.useDeviceMac;
+        if (useDeviceMac) {
+            this.device = deviceMac ?? this.device;
+        }
     }
-    return store;
+
+    public getDpRoot(): string {
+        return `midas-aquatemp.${this.instance}`;
+    }
+
+    public async resetOnErrorHandler(): Promise<void> {
+        this.token = null;
+        this.device = '';
+        this.reachable = false;
+        await saveValue({ key: 'info.connection', value: false, stateType: 'boolean', store: this });
+    }
+    public setMode(mode: TMode): void {
+        this.mode = mode;
+    }
+    public getMode(): TMode {
+        return this.mode;
+    }
+    public isValidMode(curr: number): curr is TMode {
+        return modes.includes(curr as TMode);
+    }
+    private encryptPassword(password: string): string {
+        return createHash('md5').update(password).digest('hex');
+    }
 }

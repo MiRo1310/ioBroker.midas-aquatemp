@@ -25,7 +25,6 @@ __export(axiosParameter_exports, {
   getProtocolCodes: () => getProtocolCodes
 });
 module.exports = __toCommonJS(axiosParameter_exports);
-var import_store = require("./store");
 const PRODUCT_IDS = [
   "1132174963097280512",
   "1186904563333062656",
@@ -97,34 +96,24 @@ const CODES_OTHER = [
   "T17",
   "S3"
 ];
-const getProtocolCodes = (deviceCode, productId) => {
-  const store = (0, import_store.initStore)();
+const getProtocolCodes = (store, productId) => {
   const codes = productId === store.AQUATEMP_POOLSANA ? CODES_POOLSANA : CODES_OTHER;
-  return store.apiLevel < 3 ? { device_code: deviceCode, protocal_codes: codes } : { deviceCode, protocalCodes: codes };
+  return store.apiLevel < 3 ? { device_code: store.device, protocal_codes: codes } : { deviceCode: store.device, protocalCodes: codes };
 };
-const getAxiosUpdateDeviceIdParams = () => {
-  const store = (0, import_store.initStore)();
+const getAxiosUpdateDeviceIdParams = (store) => {
   return store.apiLevel < 3 ? { product_ids: PRODUCT_IDS } : { productIds: PRODUCT_IDS };
 };
-const controlParam = (deviceCode, protocolCode, value) => {
-  const store = (0, import_store.initStore)();
+const controlParam = (store, deviceCode, protocolCode, value) => {
   return store.apiLevel < 3 ? { device_code: deviceCode, protocol_code: protocolCode, value } : { deviceCode, protocolCode, value };
 };
-const getAxiosUpdateDevicePowerParams = ({
-  deviceCode,
-  value,
-  protocolCode
-}) => {
+const getAxiosUpdateDevicePowerParams = (store, deviceCode, value, protocolCode) => {
   return {
-    param: [controlParam(deviceCode, protocolCode, value)]
+    param: [controlParam(store, deviceCode, protocolCode, value)]
   };
 };
-const getAxiosUpdateDeviceSetTempParams = ({
-  deviceCode,
-  sTemperature
-}) => {
+const getAxiosUpdateDeviceSetTempParams = (deviceCode, sTemperature, store) => {
   return {
-    param: ["R01", "R02", "R03", "Set_Temp"].map((code) => controlParam(deviceCode, code, sTemperature))
+    param: ["R01", "R02", "R03", "Set_Temp"].map((code) => controlParam(store, deviceCode, code, sTemperature))
   };
 };
 const getHeaders = (token) => {

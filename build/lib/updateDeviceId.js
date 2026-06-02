@@ -24,14 +24,13 @@ module.exports = __toCommonJS(updateDeviceId_exports);
 var import_axiosParameter = require("./axiosParameter");
 var import_endPoints = require("./endPoints");
 var import_saveValue = require("./saveValue");
-var import_store = require("./store");
 var import_updateDeviceStatus = require("./updateDeviceStatus");
 var import_logging = require("./logging");
 var import_axios = require("./axios");
 var import_utils = require("./utils");
-async function updateDeviceID(adapter) {
-  var _a, _b, _c, _d, _e, _f, _g, _h, _i, _j, _k, _l, _m, _n, _o, _p, _q, _r;
-  const store = (0, import_store.initStore)();
+async function updateDeviceID(store) {
+  var _a, _b, _c, _d, _e, _f, _g, _h, _i, _j, _k, _l, _m, _n, _o, _p, _q, _r, _s;
+  const { adapter } = store;
   try {
     const { token } = store;
     if (!(0, import_utils.isToken)(token)) {
@@ -39,8 +38,8 @@ async function updateDeviceID(adapter) {
     }
     const { data, status, error } = await (0, import_axios.request)(
       adapter,
-      (0, import_endPoints.getUpdateDeviceIdSUrl)().sURL,
-      (0, import_axiosParameter.getAxiosUpdateDeviceIdParams)(),
+      (0, import_endPoints.getUpdateDeviceIdSUrl)(store).sURL,
+      (0, import_axiosParameter.getAxiosUpdateDeviceIdParams)(store),
       (0, import_axiosParameter.getHeaders)(token)
     );
     adapter.log.debug(`UpdateDeviceID response: ${JSON.stringify(data)}, status: ${status}`);
@@ -56,15 +55,15 @@ async function updateDeviceID(adapter) {
       return;
     }
     store.device = (_h = (_e = data.object_result) == null ? void 0 : _e[0].device_code) != null ? _h : (_g = (_f = data.objectResult) == null ? void 0 : _f[0]) == null ? void 0 : _g.deviceCode;
-    store.product = (_m = (_j = (_i = data.object_result) == null ? void 0 : _i[0]) == null ? void 0 : _j.product_id) != null ? _m : (_l = (_k = data.objectResult) == null ? void 0 : _k[0]) == null ? void 0 : _l.productId;
-    store.reachable = ((_r = (_o = (_n = data.object_result) == null ? void 0 : _n[0]) == null ? void 0 : _o.device_status) != null ? _r : (_q = (_p = data.objectResult) == null ? void 0 : _p[0]) == null ? void 0 : _q.deviceStatus) == "ONLINE";
+    store.product = (_n = (_m = (_j = (_i = data.object_result) == null ? void 0 : _i[0]) == null ? void 0 : _j.product_id) != null ? _m : (_l = (_k = data.objectResult) == null ? void 0 : _k[0]) == null ? void 0 : _l.productId) != null ? _n : null;
+    store.reachable = ((_s = (_p = (_o = data.object_result) == null ? void 0 : _o[0]) == null ? void 0 : _p.device_status) != null ? _s : (_r = (_q = data.objectResult) == null ? void 0 : _q[0]) == null ? void 0 : _r.deviceStatus) == "ONLINE";
     adapter.log.debug(`device: ${store.device}, product: ${store.product}, reachable: ${store.reachable}`);
-    await (0, import_saveValue.saveValue)({ key: "DeviceCode", value: store.device, stateType: "string", adapter });
-    await (0, import_saveValue.saveValue)({ key: "ProductCode", value: store.product, stateType: "string", adapter });
+    await (0, import_saveValue.saveValue)({ key: "DeviceCode", value: store.device, stateType: "string", store });
+    await (0, import_saveValue.saveValue)({ key: "ProductCode", value: store.product, stateType: "string", store });
     if (store.reachable && store.device) {
-      await (0, import_saveValue.saveValue)({ key: "info.connection", value: true, stateType: "boolean", adapter });
+      await (0, import_saveValue.saveValue)({ key: "info.connection", value: true, stateType: "boolean", store });
       if (store.device != "" && store.product) {
-        await (0, import_updateDeviceStatus.updateDeviceStatus)(adapter);
+        await (0, import_updateDeviceStatus.updateDeviceStatus)(store);
       }
       return;
     }

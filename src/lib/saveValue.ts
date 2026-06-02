@@ -1,19 +1,18 @@
-import type { MidasAquatemp } from '../main';
-import { initStore } from './store';
 import { errorLogger } from './logging';
+import type { Store } from './store';
 
 export const saveValue = async ({
     key,
     value,
     stateType,
-    adapter,
+    store,
 }: {
     key: string;
     value?: ioBroker.StateValue;
     stateType: ioBroker.CommonType;
-    adapter: MidasAquatemp;
+    store: Store;
 }): Promise<void> => {
-    const store = initStore();
+    const { adapter } = store;
     const dpRoot = store.getDpRoot();
     try {
         const dp = `${dpRoot}.${key}`;

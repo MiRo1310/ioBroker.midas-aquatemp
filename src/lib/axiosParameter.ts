@@ -1,10 +1,5 @@
-import type {
-    InputGetAxiosUpdateDevicePowerParams,
-    InputGetAxiosUpdateDeviceSetTempParams,
-    AxiosUpdateDeviceParams,
-    AxiosUpdateDeviceParam,
-} from '../types';
-import { initStore } from './store';
+import type { AxiosUpdateDeviceParam, AxiosUpdateDeviceParams } from '../types';
+import type { Store } from './store';
 
 const PRODUCT_IDS = [
     '1132174963097280512',
@@ -81,45 +76,49 @@ const CODES_OTHER = [
 ];
 
 export const getProtocolCodes = (
-    deviceCode: string,
+    store: Store,
     productId?: string,
 ): { device_code?: string; deviceCode?: string; protocal_codes?: string[]; protocalCodes?: string[] } => {
-    const store = initStore();
     const codes = productId === store.AQUATEMP_POOLSANA ? CODES_POOLSANA : CODES_OTHER;
 
     return store.apiLevel < 3
-        ? { device_code: deviceCode, protocal_codes: codes }
-        : { deviceCode, protocalCodes: codes };
+        ? { device_code: store.device, protocal_codes: codes }
+        : { deviceCode: store.device, protocalCodes: codes };
 };
 
-export const getAxiosUpdateDeviceIdParams = (): { product_ids?: string[]; productIds?: string[] } => {
-    const store = initStore();
+export const getAxiosUpdateDeviceIdParams = (store: Store): { product_ids?: string[]; productIds?: string[] } => {
     return store.apiLevel < 3 ? { product_ids: PRODUCT_IDS } : { productIds: PRODUCT_IDS };
 };
 
-const controlParam = (deviceCode: string, protocolCode: string, value: string | number): AxiosUpdateDeviceParam => {
-    const store = initStore();
+const controlParam = (
+    store: Store,
+    deviceCode: string,
+    protocolCode: string,
+    value: string | number,
+): AxiosUpdateDeviceParam => {
     return store.apiLevel < 3
         ? { device_code: deviceCode, protocol_code: protocolCode, value }
         : { deviceCode, protocolCode, value };
 };
 
-export const getAxiosUpdateDevicePowerParams = ({
-    deviceCode,
-    value,
-    protocolCode,
-}: InputGetAxiosUpdateDevicePowerParams): AxiosUpdateDeviceParams => {
+export const getAxiosUpdateDevicePowerParams = (
+    store: Store,
+    deviceCode: string,
+    value: number | string,
+    protocolCode: string,
+): AxiosUpdateDeviceParams => {
     return {
-        param: [controlParam(deviceCode, protocolCode, value)],
+        param: [controlParam(store, deviceCode, protocolCode, value)],
     };
 };
 
-export const getAxiosUpdateDeviceSetTempParams = ({
-    deviceCode,
-    sTemperature,
-}: InputGetAxiosUpdateDeviceSetTempParams): AxiosUpdateDeviceParams => {
+export const getAxiosUpdateDeviceSetTempParams = (
+    deviceCode: string,
+    sTemperature: string,
+    store: Store,
+): AxiosUpdateDeviceParams => {
     return {
-        param: ['R01', 'R02', 'R03', 'Set_Temp'].map(code => controlParam(deviceCode, code, sTemperature)),
+        param: ['R01', 'R02', 'R03', 'Set_Temp'].map(code => controlParam(store, deviceCode, code, sTemperature)),
     };
 };
 
