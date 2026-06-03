@@ -37,11 +37,9 @@ var utils = __toESM(require("@iobroker/adapter-core"));
 var import_createState = require("./lib/createState");
 var import_endPoints = require("./lib/endPoints");
 var import_token = require("./lib/token");
-var import_updateDevicePower = require("./lib/updateDevicePower");
-var import_updateDeviceSetTemp = require("./lib/updateDeviceSetTemp");
-var import_updateDeviceSilent = require("./lib/updateDeviceSilent");
 var import_utils = require("./lib/utils");
 var import_logging = require("./lib/logging");
+var import_deviceController = require("./lib/deviceController");
 let updateInterval;
 let tokenRefreshTimer;
 class MidasAquatemp extends utils.Adapter {
@@ -64,18 +62,11 @@ class MidasAquatemp extends utils.Adapter {
     await this.setState("info.connection", false, true);
     if (!(0, import_utils.isDefined)(this.instance)) {
       this.log.error("No instance found.");
+      return;
     }
     const { username, password, refresh, selectApi, useDeviceMac, deviceMac } = this.config;
-    const store = new import_store.Store(
-      this,
-      username,
-      password,
-      this.instance,
-      refresh,
-      selectApi,
-      useDeviceMac,
-      deviceMac
-    );
+    const store = new import_store.Store(this, username, password, this.instance, refresh, selectApi, useDeviceMac, deviceMac);
+    const deviceController = new import_deviceController.DeviceController(store);
     const dpRoot = store.getDpRoot();
     const currentMode = parseInt(String((_a = await this.getStateAsync(`${dpRoot}.mode`)) == null ? void 0 : _a.val));
     if (store.isValidMode(currentMode)) {
@@ -86,7 +77,7 @@ class MidasAquatemp extends utils.Adapter {
     await (0, import_createState.createObjects)(store);
     this.log.info("Objects created");
     await clearValues();
-    await (0, import_token.updateToken)(store);
+    await (0, import_token.updateToken)(store, deviceController);
     async function clearValues() {
       await store.saveValue("error", true);
       await store.saveValue("consumption", 0);
@@ -95,18 +86,18 @@ class MidasAquatemp extends utils.Adapter {
     }
     updateInterval = this.setInterval(async () => {
       try {
-        await (0, import_token.updateToken)(store);
+        await (0, import_token.updateToken)(store, deviceController);
         const mode = await this.getStateAsync(`${dpRoot}.mode`);
         if (!(mode == null ? void 0 : mode.ack) && (0, import_utils.isDefined)(mode == null ? void 0 : mode.val) && store.device) {
           const modeVal = parseInt(String(mode.val));
           if (!store.isValidMode(modeVal)) {
             return;
           }
-          await (0, import_updateDevicePower.updateDevicePower)(store, modeVal);
+          await deviceController.updateDevicePower(modeVal);
         }
         const silent = await this.getStateAsync(`${dpRoot}.silent`);
         if (!(silent == null ? void 0 : silent.ack) && (0, import_utils.isStateValue)(silent) && store.device) {
-          await (0, import_updateDeviceSilent.updateDeviceSilent)(store, !!(silent == null ? void 0 : silent.val));
+          await deviceController.updateDeviceSilent(!!(silent == null ? void 0 : silent.val));
         }
       } catch (error) {
         (0, import_logging.errorLogger)("Error in updateInterval", error, adapter2);
@@ -114,7 +105,7 @@ class MidasAquatemp extends utils.Adapter {
     }, store.interval * 1e3);
     tokenRefreshTimer = this.setInterval(async function() {
       store.token = "";
-      await (0, import_token.updateToken)(store);
+      await (0, import_token.updateToken)(store, deviceController);
     }, 36e5);
     this.on("stateChange", async (id, state) => {
       try {
@@ -139,20 +130,20 @@ class MidasAquatemp extends utils.Adapter {
             );
             return;
           }
-          await (0, import_updateDevicePower.updateDevicePower)(store, mode);
+          await deviceController.updateDevicePower(mode);
           await this.setState(id, { ack: true });
         }
         if (id === `${dpRoot}.silent`) {
           this.log.debug(`Silent: ${JSON.stringify(state)}`);
           if ((0, import_utils.isStateValue)(state)) {
-            await (0, import_updateDeviceSilent.updateDeviceSilent)(store, state.val);
+            await deviceController.updateDeviceSilent(state.val);
           }
           await this.setState(id, { ack: true });
         }
         if (id === `${dpRoot}.tempSet`) {
           this.log.debug(`TempSet: ${JSON.stringify(state)}`);
           if ((0, import_utils.isStateValue)(state)) {
-            await (0, import_updateDeviceSetTemp.updateDeviceSetTemp)(store, state.val);
+            await deviceController.updateDeviceSetTemp(state.val);
           }
           await this.setState(id, { ack: true });
         }
@@ -160,10 +151,10 @@ class MidasAquatemp extends utils.Adapter {
           this.log.debug(`State: ${JSON.stringify(state)}`);
           if ((0, import_utils.isStateValue)(state)) {
             if (!state.val) {
-              await (0, import_updateDevicePower.updateDevicePower)(store, -1);
+              await deviceController.updateDevicePower(-1);
             } else {
               const currentMode2 = parseInt(String(store.getMode()));
-              await (0, import_updateDevicePower.updateDevicePower)(store, currentMode2 >= 0 ? currentMode2 : 0);
+              await deviceController.updateDevicePower(currentMode2 >= 0 ? currentMode2 : 0);
             }
           }
           await this.setState(id, { ack: true });

@@ -1,11 +1,10 @@
 import { getOptionsAndSUrl } from './endPoints';
 import type { Store } from './store';
-import { updateDeviceID } from './updateDeviceId';
-import { updateDeviceStatus } from './updateDeviceStatus';
 import { errorLogger } from './logging';
 import { request } from './axios';
 import type { RequestToken } from '../types/types';
 import { isToken } from './utils';
+import type { DeviceController } from './deviceController';
 
 export async function ensureToken(store: Store): Promise<void> {
     await getToken(store);
@@ -41,7 +40,7 @@ async function getToken(store: Store): Promise<void> {
     }
 }
 
-export const updateToken = async (store: Store): Promise<void> => {
+export const updateToken = async (store: Store, deviceController: DeviceController): Promise<void> => {
     const { adapter } = store;
     try {
         await getToken(store);
@@ -50,10 +49,10 @@ export const updateToken = async (store: Store): Promise<void> => {
             return;
         }
         if (store.useDeviceMac) {
-            await updateDeviceStatus(store);
+            await deviceController.updateDeviceStatus();
             return;
         }
-        await updateDeviceID(store);
+        await deviceController.updateDeviceID();
         return;
     } catch (error: any) {
         errorLogger('Error in updateToken', error, adapter);

@@ -23,8 +23,6 @@ __export(token_exports, {
 });
 module.exports = __toCommonJS(token_exports);
 var import_endPoints = require("./endPoints");
-var import_updateDeviceId = require("./updateDeviceId");
-var import_updateDeviceStatus = require("./updateDeviceStatus");
 var import_logging = require("./logging");
 var import_axios = require("./axios");
 var import_utils = require("./utils");
@@ -57,7 +55,7 @@ async function getToken(store) {
     (0, import_logging.errorLogger)("Error in getToken", error, adapter);
   }
 }
-const updateToken = async (store) => {
+const updateToken = async (store, deviceController) => {
   const { adapter } = store;
   try {
     await getToken(store);
@@ -65,10 +63,10 @@ const updateToken = async (store) => {
       return;
     }
     if (store.useDeviceMac) {
-      await (0, import_updateDeviceStatus.updateDeviceStatus)(store);
+      await deviceController.updateDeviceStatus();
       return;
     }
-    await (0, import_updateDeviceId.updateDeviceID)(store);
+    await deviceController.updateDeviceID();
     return;
   } catch (error) {
     (0, import_logging.errorLogger)("Error in updateToken", error, adapter);
