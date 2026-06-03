@@ -46,17 +46,8 @@ const parseIntOrNull = (value) => {
   return Number.isFinite(num) ? num : 0;
 };
 function findCodeVal(result, code) {
-  var _a, _b, _c;
-  if (!Array.isArray(code)) {
-    return (_b = (_a = result.find((item) => item.code === code)) == null ? void 0 : _a.value) != null ? _b : null;
-  }
-  for (let i = 0; i < code.length; i++) {
-    const val = (_c = result.find((item) => item.code === code[i])) == null ? void 0 : _c.value;
-    if (isDefined(val) && val !== "") {
-      return val;
-    }
-  }
-  return null;
+  var _a, _b;
+  return (_b = (_a = result.find((item) => item.code === code)) == null ? void 0 : _a.value) != null ? _b : null;
 }
 // Annotate the CommonJS export names for ESM import in node:
 0 && (module.exports = {

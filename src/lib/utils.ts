@@ -25,15 +25,6 @@ export const parseIntOrNull = (value: string | null): number => {
     return Number.isFinite(num) ? num : 0;
 };
 
-export function findCodeVal(result: ObjectResultResponse, code: string | string[]): string | null {
-    if (!Array.isArray(code)) {
-        return result.find(item => item.code === code)?.value ?? null;
-    }
-    for (let i = 0; i < code.length; i++) {
-        const val = result.find(item => item.code === code[i])?.value;
-        if (isDefined(val) && val !== '') {
-            return val;
-        }
-    }
-    return null;
+export function findCodeVal(result: ObjectResultResponse, code: string): string | null {
+    return result.find(item => item.code === code)?.value ?? null;
 }

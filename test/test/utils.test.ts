@@ -68,7 +68,7 @@ describe('utils.ts', () => {
     });
 
     describe('parseNumberOrNull', () => {
-        it('returns null for empty input', () => {
+        it('returns 0 for empty input', () => {
             expect(parseNumberOrNull('')).to.equal(0);
         });
 
@@ -78,13 +78,13 @@ describe('utils.ts', () => {
             expect(parseNumberOrNull('-2,75')).to.equal(-2.75);
         });
 
-        it('returns null for invalid numeric values', () => {
+        it('returns 0 for invalid numeric values', () => {
             expect(parseNumberOrNull('abc')).to.equal(0);
         });
     });
 
     describe('parseIntOrNull', () => {
-        it('returns null for empty input', () => {
+        it('returns 0 for empty input', () => {
             expect(parseIntOrNull('')).to.equal(0);
         });
 
@@ -93,7 +93,7 @@ describe('utils.ts', () => {
             expect(parseIntOrNull('-3')).to.equal(-3);
         });
 
-        it('returns null for invalid values', () => {
+        it('returns 0 for invalid values', () => {
             expect(parseIntOrNull('abc')).to.equal(0);
         });
     });
@@ -109,13 +109,8 @@ describe('utils.ts', () => {
             expect(findCodeVal(response, 'B')).to.equal('second');
         });
 
-        it('returns first non-empty value for code list', () => {
-            expect(findCodeVal(response, ['A', 'B', 'C'])).to.equal('second');
-        });
-
-        it('returns empty string when no value is found', () => {
-            expect(findCodeVal(response, 'UNKNOWN')).to.equal(null);
-            expect(findCodeVal(response, ['A', 'UNKNOWN'])).to.equal(null);
+        it('returns null when code is not found', () => {
+            expect(findCodeVal(response, 'UNKNOWN')).to.be.null;
         });
     });
 });

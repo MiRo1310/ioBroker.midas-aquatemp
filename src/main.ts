@@ -40,18 +40,10 @@ export class MidasAquatemp extends utils.Adapter {
         await this.setState('info.connection', false, true);
         if (!isDefined(this.instance)) {
             this.log.error('No instance found.');
+            return;
         }
         const { username, password, refresh, selectApi, useDeviceMac, deviceMac } = this.config;
-        const store = new Store(
-            this,
-            username,
-            password,
-            this.instance as number,
-            refresh,
-            selectApi,
-            useDeviceMac,
-            deviceMac,
-        );
+        const store = new Store(this, username, password, this.instance, refresh, selectApi, useDeviceMac, deviceMac);
 
         const dpRoot = store.getDpRoot();
 
