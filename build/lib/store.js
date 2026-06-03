@@ -50,8 +50,6 @@ class Store {
   constructor(adapter, username, password, instance, interval, apiLevel, useDeviceMac, deviceMac) {
     this.adapter = adapter;
     this.username = username;
-    this.adapter = adapter;
-    this.username = username;
     this.encryptedPassword = this.encryptPassword(password);
     this.instance = instance;
     this.interval = interval != null ? interval : this.interval;
@@ -116,6 +114,12 @@ class Store {
     } catch (err) {
       (0, import_logging.errorLogger)("Error in saveValue", err, this.adapter);
     }
+  }
+  async clearStateValues() {
+    await this.saveValue("error", true);
+    await this.saveValue("consumption", 0);
+    await this.saveValue("state", false);
+    await this.saveValue("rawJSON", null);
   }
   encryptPassword(password) {
     return (0, import_crypto.createHash)("md5").update(password).digest("hex");

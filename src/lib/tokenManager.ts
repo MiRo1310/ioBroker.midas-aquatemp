@@ -7,10 +7,15 @@ import { isDefined } from './utils';
 import type { DeviceController } from './deviceController';
 
 export class TokenManager {
-    token: string | null = null;
+    private token: string | null = null;
+    private deviceController?: DeviceController;
 
     constructor(private store: Store) {
         store.setTokenManager(this);
+    }
+
+    public setDeviceController(deviceController: DeviceController): void {
+        this.deviceController = deviceController;
     }
 
     public async fetchToken(): Promise<void> {
@@ -45,19 +50,23 @@ export class TokenManager {
         }
     }
 
-    public updateToken = async (deviceController: DeviceController): Promise<void> => {
+    public updateToken = async (): Promise<void> => {
         const { adapter, useDeviceMac } = this.store;
         try {
             await this.fetchToken();
 
-            if (!this.token) {
+            if (!this.isValidToken()) {
+                return;
+            }
+            if (!this.deviceController) {
+                this.store.adapter.log.debug('DeviceController not set');
                 return;
             }
             if (useDeviceMac) {
-                await deviceController.updateDeviceStatus();
+                await this.deviceController.updateDeviceStatus();
                 return;
             }
-            await deviceController.updateDeviceID();
+            await this.deviceController.updateDeviceID();
         } catch (error: any) {
             errorLogger('Error in updateToken', error, adapter);
         }
@@ -71,6 +80,7 @@ export class TokenManager {
         if (this.isValidToken()) {
             return this.token;
         }
+        this.store.adapter.log.debug('No valid token available');
         return null;
     };
 

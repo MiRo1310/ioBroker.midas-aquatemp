@@ -77,8 +77,6 @@ export class Store {
         useDeviceMac?: boolean,
         deviceMac?: string,
     ) {
-        this.adapter = adapter;
-        this.username = username;
         this.encryptedPassword = this.encryptPassword(password);
         this.instance = instance;
         this.interval = interval ?? this.interval;
@@ -136,6 +134,13 @@ export class Store {
         } catch (err: any) {
             errorLogger('Error in saveValue', err, this.adapter);
         }
+    }
+
+    public async clearStateValues(): Promise<void> {
+        await this.saveValue('error', true);
+        await this.saveValue('consumption', 0);
+        await this.saveValue('state', false);
+        await this.saveValue('rawJSON', null);
     }
 
     private encryptPassword(password: string): string {
