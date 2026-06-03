@@ -40,10 +40,10 @@ var import_utils = require("./lib/utils");
 var import_logging = require("./lib/logging");
 var import_deviceController = require("./lib/deviceController");
 var import_tokenManager = require("./lib/tokenManager");
-let updateInterval;
-let tokenRefreshTimer;
 class MidasAquatemp extends utils.Adapter {
   static instance;
+  updateInterval;
+  tokenRefreshTimer;
   constructor(options = {}) {
     super({
       ...options,
@@ -79,7 +79,7 @@ class MidasAquatemp extends utils.Adapter {
     this.log.info("Objects created");
     await store.clearStateValues();
     await tokenManager.updateToken();
-    updateInterval = this.setInterval(async () => {
+    this.updateInterval = this.setInterval(async () => {
       try {
         await tokenManager.updateToken();
         const mode = await this.getStateAsync(`${dpRoot}.mode`);
@@ -98,7 +98,7 @@ class MidasAquatemp extends utils.Adapter {
         (0, import_logging.errorLogger)("Error in updateInterval", error, this);
       }
     }, store.interval * 1e3);
-    tokenRefreshTimer = this.setInterval(async function() {
+    this.tokenRefreshTimer = this.setInterval(async function() {
       tokenManager.resetToken();
       await tokenManager.updateToken();
     }, 36e5);
@@ -170,8 +170,8 @@ class MidasAquatemp extends utils.Adapter {
    */
   onUnload(callback) {
     try {
-      this.clearInterval(updateInterval);
-      this.clearInterval(tokenRefreshTimer);
+      this.clearInterval(this.updateInterval);
+      this.clearInterval(this.tokenRefreshTimer);
       callback();
     } catch (e) {
       callback();

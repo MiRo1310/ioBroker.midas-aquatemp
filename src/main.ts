@@ -14,11 +14,10 @@ import { errorLogger } from './lib/logging';
 import { DeviceController } from './lib/deviceController';
 import { TokenManager } from './lib/tokenManager';
 
-let updateInterval: ioBroker.Interval | undefined;
-let tokenRefreshTimer: ioBroker.Interval | undefined;
-
 export class MidasAquatemp extends utils.Adapter {
     private static instance: MidasAquatemp;
+    private updateInterval?: ioBroker.Interval;
+    private tokenRefreshTimer?: ioBroker.Interval;
 
     public constructor(options: Partial<utils.AdapterOptions> = {}) {
         super({
@@ -62,7 +61,7 @@ export class MidasAquatemp extends utils.Adapter {
         await store.clearStateValues();
         await tokenManager.updateToken();
 
-        updateInterval = this.setInterval(async () => {
+        this.updateInterval = this.setInterval(async () => {
             try {
                 await tokenManager.updateToken();
                 const mode = await this.getStateAsync(`${dpRoot}.mode`);
@@ -84,7 +83,7 @@ export class MidasAquatemp extends utils.Adapter {
             }
         }, store.interval * 1000);
 
-        tokenRefreshTimer = this.setInterval(async function () {
+        this.tokenRefreshTimer = this.setInterval(async function () {
             tokenManager.resetToken();
             await tokenManager.updateToken();
         }, 3600000);
@@ -175,8 +174,8 @@ export class MidasAquatemp extends utils.Adapter {
      */
     private onUnload(callback: () => void): void {
         try {
-            this.clearInterval(updateInterval);
-            this.clearInterval(tokenRefreshTimer);
+            this.clearInterval(this.updateInterval);
+            this.clearInterval(this.tokenRefreshTimer);
 
             callback();
         } catch (e: any) {

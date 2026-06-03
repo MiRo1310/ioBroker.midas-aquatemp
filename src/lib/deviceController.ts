@@ -11,7 +11,6 @@ import {
 } from './axiosParameter';
 import { findCodeVal, isDefined, parseIntOrNull, parseNumberOrNull } from './utils';
 import { errorLogger } from './logging';
-import { getPowerMode } from './getSettings';
 import type { TokenManager } from './tokenManager';
 
 export class DeviceController {
@@ -227,10 +226,11 @@ export class DeviceController {
     public async updateDevicePower(mode: TMode): Promise<void> {
         const { adapter, device, resetOnErrorHandler, setMode, saveValue } = this.store;
         try {
-            const { powerMode, powerOpt } = getPowerMode(mode);
+            const { powerMode, powerOpt } = DeviceController.getPowerMode(mode);
 
             const token = this.tokenManager.getValidTokenOrNull();
             if (!isDefined(powerOpt) || !isDefined(powerMode) || !token || !device) {
+                this.store.adapter.log.warn(`Invalid value(s) : ${mode}, ${token}, ${device}`);
                 return;
             }
 
@@ -402,5 +402,35 @@ export class DeviceController {
         }
         await this.store.saveValue(key, value);
         return true;
+    }
+
+    private static getPowerMode(mode: TMode): {
+        powerOpt: number | null;
+        powerMode: number | null;
+    } {
+        switch (mode) {
+            case -1: // aus
+                return {
+                    powerOpt: 0,
+                    powerMode: -1,
+                };
+            case 0: // an und kühlen
+                return {
+                    powerOpt: 1,
+                    powerMode: 0,
+                };
+            case 1: // an und heizen
+                return {
+                    powerOpt: 1,
+                    powerMode: 1,
+                };
+            case 2: // an und auto
+                return {
+                    powerOpt: 1,
+                    powerMode: 2,
+                };
+            default:
+                return { powerOpt: null, powerMode: null };
+        }
     }
 }

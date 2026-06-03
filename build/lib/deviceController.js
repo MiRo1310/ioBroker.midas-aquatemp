@@ -27,7 +27,6 @@ var import_axios = require("./axios");
 var import_axiosParameter = require("./axiosParameter");
 var import_utils = require("./utils");
 var import_logging = require("./logging");
-var import_getSettings = require("./getSettings");
 class DeviceController {
   constructor(store, tokenManager) {
     this.store = store;
@@ -206,9 +205,10 @@ class DeviceController {
   async updateDevicePower(mode) {
     const { adapter, device, resetOnErrorHandler, setMode, saveValue } = this.store;
     try {
-      const { powerMode, powerOpt } = (0, import_getSettings.getPowerMode)(mode);
+      const { powerMode, powerOpt } = DeviceController.getPowerMode(mode);
       const token = this.tokenManager.getValidTokenOrNull();
       if (!(0, import_utils.isDefined)(powerOpt) || !(0, import_utils.isDefined)(powerMode) || !token || !device) {
+        this.store.adapter.log.warn(`Invalid value(s) : ${mode}, ${token}, ${device}`);
         return;
       }
       const { sURL } = (0, import_endPoints.getSUrl)(this.store);
@@ -358,6 +358,32 @@ class DeviceController {
     }
     await this.store.saveValue(key, value);
     return true;
+  }
+  static getPowerMode(mode) {
+    switch (mode) {
+      case -1:
+        return {
+          powerOpt: 0,
+          powerMode: -1
+        };
+      case 0:
+        return {
+          powerOpt: 1,
+          powerMode: 0
+        };
+      case 1:
+        return {
+          powerOpt: 1,
+          powerMode: 1
+        };
+      case 2:
+        return {
+          powerOpt: 1,
+          powerMode: 2
+        };
+      default:
+        return { powerOpt: null, powerMode: null };
+    }
   }
 }
 // Annotate the CommonJS export names for ESM import in node:

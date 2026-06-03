@@ -1,7 +1,0 @@
-{
-  "version": 3,
-  "sources": ["../../src/lib/getSettings.ts"],
-  "sourcesContent": ["export const getPowerMode = (\n    power: number,\n): {\n    powerOpt: number | null;\n    powerMode: number | null;\n} => {\n    switch (power) {\n        case -1:\n            // aus\n            return {\n                powerOpt: 0,\n                powerMode: -1,\n            };\n        case 0:\n            // an und k\u00FChlen\n            return {\n                powerOpt: 1,\n                powerMode: 0,\n            };\n        case 1:\n            // an und heizen\n            return {\n                powerOpt: 1,\n                powerMode: 1,\n            };\n        case 2:\n            // an und auto\n            return {\n                powerOpt: 1,\n                powerMode: 2,\n            };\n        default:\n            // log(\"ung\u00FClter Zustand!\");\n            return { powerOpt: null, powerMode: null };\n    }\n};\n"],
-  "mappings": ";;;;;;;;;;;;;;;;;;AAAA;AAAA;AAAA;AAAA;AAAA;AAAO,MAAM,eAAe,CACxB,UAIC;AACD,UAAQ,OAAO;AAAA,IACX,KAAK;AAED,aAAO;AAAA,QACH,UAAU;AAAA,QACV,WAAW;AAAA,MACf;AAAA,IACJ,KAAK;AAED,aAAO;AAAA,QACH,UAAU;AAAA,QACV,WAAW;AAAA,MACf;AAAA,IACJ,KAAK;AAED,aAAO;AAAA,QACH,UAAU;AAAA,QACV,WAAW;AAAA,MACf;AAAA,IACJ,KAAK;AAED,aAAO;AAAA,QACH,UAAU;AAAA,QACV,WAAW;AAAA,MACf;AAAA,IACJ;AAEI,aAAO,EAAE,UAAU,MAAM,WAAW,KAAK;AAAA,EACjD;AACJ;",
-  "names": []
-}
