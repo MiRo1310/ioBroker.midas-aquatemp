@@ -1,6 +1,7 @@
 import type { MidasAquatemp } from '../main';
 import { createHash } from 'crypto';
 import { errorLogger } from './logging';
+import type { TokenManager } from './tokenManager';
 
 export type TMode = -1 | 0 | 1 | 2;
 
@@ -55,12 +56,8 @@ export class Store {
     static readonly modes: TMode[] = [-1, 0, 1, 2];
     public static readonly AQUATEMP_POOLSANA = '1132174963097280512'; //Midas/Poolsana InverPro
     public static readonly AQUATEMP_OTHER1 = '1442284873216843776';
-    public readonly adapter: MidasAquatemp;
     public readonly instance: number;
-    public readonly username: string;
-    public readonly encryptedPassword: string;
     public readonly interval: number = 60000;
-    public token: string | null = null;
     public cloudURL: string | null = null;
     public apiLevel = 3;
     public device?: string;
@@ -68,10 +65,11 @@ export class Store {
     public reachable = false;
     public useDeviceMac = false;
     private mode: TMode = 2;
-
+    public readonly encryptedPassword: string;
+    private tokenManager?: TokenManager;
     constructor(
-        adapter: MidasAquatemp,
-        username: string,
+        public readonly adapter: MidasAquatemp,
+        public readonly username: string,
         password: string,
         instance: number,
         interval?: number,
@@ -91,12 +89,16 @@ export class Store {
         }
     }
 
+    public setTokenManager(tokenManager: TokenManager): void {
+        this.tokenManager = tokenManager;
+    }
+
     public getDpRoot(): string {
         return `midas-aquatemp.${this.instance}`;
     }
 
     public async resetOnErrorHandler(): Promise<void> {
-        this.token = null;
+        this.tokenManager?.resetToken();
         this.device = '';
         this.reachable = false;
         await this.saveValue('info.connection', false);

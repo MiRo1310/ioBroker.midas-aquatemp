@@ -9,19 +9,21 @@ import {
     getHeaders,
     getProtocolCodes,
 } from './axiosParameter';
-import { findCodeVal, isDefined, isToken, parseIntOrNull, parseNumberOrNull } from './utils';
+import { findCodeVal, isDefined, parseIntOrNull, parseNumberOrNull } from './utils';
 import { errorLogger } from './logging';
 import { getPowerMode } from './getSettings';
+import type { TokenManager } from './tokenManager';
 
 export class DeviceController {
-    private readonly store: Store;
-    constructor(store: Store) {
-        this.store = store;
-    }
+    constructor(
+        private readonly store: Store,
+        private readonly tokenManager: TokenManager,
+    ) {}
 
     public async updateDeviceStatus(): Promise<void> {
-        const { token, device: deviceCode, apiLevel, adapter, saveValue, resetOnErrorHandler } = this.store;
+        const { device: deviceCode, apiLevel, adapter, saveValue, resetOnErrorHandler } = this.store;
         try {
+            const token = this.tokenManager.getValidTokenOrNull();
             if (!token || !deviceCode) {
                 return;
             }
@@ -70,8 +72,9 @@ export class DeviceController {
     }
 
     public async updateDeviceDetails(): Promise<void> {
-        const { token, device: deviceCode, product, resetOnErrorHandler, saveValue, adapter } = this.store;
+        const { device: deviceCode, product, resetOnErrorHandler, saveValue, adapter } = this.store;
         try {
+            const token = this.tokenManager.getValidTokenOrNull();
             if (!token || !deviceCode || !product) {
                 return;
             }
@@ -165,9 +168,10 @@ export class DeviceController {
     }
 
     public async updateDeviceID(): Promise<void> {
-        const { adapter, token, resetOnErrorHandler, saveValue } = this.store;
+        const { adapter, resetOnErrorHandler, saveValue } = this.store;
         try {
-            if (!isToken(token)) {
+            const token = this.tokenManager.getValidTokenOrNull();
+            if (!token) {
                 return;
             }
 
@@ -221,11 +225,12 @@ export class DeviceController {
     }
 
     public async updateDevicePower(mode: TMode): Promise<void> {
-        const { token, adapter, device, resetOnErrorHandler, setMode, saveValue } = this.store;
+        const { adapter, device, resetOnErrorHandler, setMode, saveValue } = this.store;
         try {
             const { powerMode, powerOpt } = getPowerMode(mode);
 
-            if (!isDefined(powerOpt) || !isDefined(powerMode) || !isToken(token) || !device) {
+            const token = this.tokenManager.getValidTokenOrNull();
+            if (!isDefined(powerOpt) || !isDefined(powerMode) || !token || !device) {
                 return;
             }
 
@@ -254,7 +259,7 @@ export class DeviceController {
     }
 
     public async updateDeviceSetTemp(temperature: number): Promise<void> {
-        const { adapter, device, token, getDpRoot, resetOnErrorHandler, saveValue } = this.store;
+        const { adapter, device, getDpRoot, resetOnErrorHandler, saveValue } = this.store;
         try {
             const numericTemperature =
                 typeof temperature === 'number' ? temperature : parseFloat(String(temperature).replace(',', '.'));
@@ -274,8 +279,8 @@ export class DeviceController {
                 adapter.log.debug(`Mode set to: ${result?.val}`);
                 return;
             }
-
-            if (isToken(token) && device) {
+            const token = this.tokenManager.getValidTokenOrNull();
+            if (token && device) {
                 const { sURL } = getSUrl(this.store);
 
                 const { data, error } = await request<MidasData>(
@@ -299,11 +304,11 @@ export class DeviceController {
     }
 
     public async updateDeviceSilent(silent: boolean): Promise<void> {
-        const { adapter, device, token, resetOnErrorHandler, saveValue } = this.store;
+        const { adapter, device, resetOnErrorHandler, saveValue } = this.store;
         try {
             const silentMode = silent ? '1' : '0';
-
-            if (isToken(token) && device) {
+            const token = this.tokenManager.getValidTokenOrNull();
+            if (token && device) {
                 const { data, error } = await request<MidasData>(
                     adapter,
                     getSUrl(this.store).sURL,
@@ -325,8 +330,9 @@ export class DeviceController {
     }
 
     private async updateDeviceErrorMsg(): Promise<void> {
-        const { adapter, token, apiLevel, cloudURL, device: deviceCode, resetOnErrorHandler, saveValue } = this.store;
+        const { adapter, apiLevel, cloudURL, device: deviceCode, resetOnErrorHandler, saveValue } = this.store;
         try {
+            const token = this.tokenManager.getValidTokenOrNull();
             if (!token) {
                 return;
             }
@@ -363,10 +369,11 @@ export class DeviceController {
     }
 
     private async updateDeviceMode(mode: TMode): Promise<void> {
-        const { token, adapter, device, resetOnErrorHandler, saveValue } = this.store;
+        const { adapter, device, resetOnErrorHandler, saveValue } = this.store;
 
         try {
-            if (isToken(token) && device) {
+            const token = this.tokenManager.getValidTokenOrNull();
+            if (token && device) {
                 const { sURL } = getSUrl(this.store);
                 const { data, error } = await request<MidasData>(
                     adapter,

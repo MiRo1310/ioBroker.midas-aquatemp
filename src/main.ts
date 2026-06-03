@@ -9,10 +9,10 @@ import { Store } from './lib/store';
 import * as utils from '@iobroker/adapter-core';
 import { createObjects } from './lib/createState';
 import { setupEndpoints } from './lib/endPoints';
-import { ensureToken, updateToken } from './lib/token';
 import { isDefined, isStateValue } from './lib/utils';
 import { errorLogger } from './lib/logging';
 import { DeviceController } from './lib/deviceController';
+import { TokenManager } from './lib/tokenManager';
 
 let updateInterval: ioBroker.Interval | undefined;
 let tokenRefreshTimer: ioBroker.Interval | undefined;
@@ -42,7 +42,8 @@ export class MidasAquatemp extends utils.Adapter {
         }
         const { username, password, refresh, selectApi, useDeviceMac, deviceMac } = this.config;
         const store = new Store(this, username, password, this.instance, refresh, selectApi, useDeviceMac, deviceMac);
-        const deviceController = new DeviceController(store);
+        const tokenManager = new TokenManager(store);
+        const deviceController = new DeviceController(store, tokenManager);
 
         const dpRoot = store.getDpRoot();
 
@@ -58,7 +59,7 @@ export class MidasAquatemp extends utils.Adapter {
         await createObjects(store);
         this.log.info('Objects created');
         await clearValues();
-        await updateToken(store, deviceController);
+        await tokenManager.updateToken(deviceController);
 
         async function clearValues(): Promise<void> {
             await store.saveValue('error', true);
@@ -69,7 +70,7 @@ export class MidasAquatemp extends utils.Adapter {
 
         updateInterval = this.setInterval(async () => {
             try {
-                await updateToken(store, deviceController);
+                await tokenManager.updateToken(deviceController);
                 const mode = await this.getStateAsync(`${dpRoot}.mode`);
 
                 if (!mode?.ack && isDefined(mode?.val) && store.device) {
@@ -90,8 +91,8 @@ export class MidasAquatemp extends utils.Adapter {
         }, store.interval * 1000);
 
         tokenRefreshTimer = this.setInterval(async function () {
-            store.token = '';
-            await updateToken(store, deviceController);
+            tokenManager.resetToken();
+            await tokenManager.updateToken(deviceController);
         }, 3600000);
 
         this.on('stateChange', async (id, state) => {
@@ -109,7 +110,7 @@ export class MidasAquatemp extends utils.Adapter {
                 if (!isRelevantId || !store.device) {
                     return;
                 }
-                await ensureToken(store);
+                await tokenManager.fetchToken();
 
                 if (id === `${dpRoot}.mode`) {
                     this.log.debug(`Mode: ${JSON.stringify(state)}`);

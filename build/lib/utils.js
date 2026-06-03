@@ -22,14 +22,12 @@ __export(utils_exports, {
   isApiSuccess: () => isApiSuccess,
   isDefined: () => isDefined,
   isStateValue: () => isStateValue,
-  isToken: () => isToken,
   parseIntOrNull: () => parseIntOrNull,
   parseNumberOrNull: () => parseNumberOrNull
 });
 module.exports = __toCommonJS(utils_exports);
 const isDefined = (value) => value !== void 0 && value !== null;
 const isStateValue = (state) => isDefined(state) && isDefined(state == null ? void 0 : state.val);
-const isToken = (token) => isDefined(token) && token !== "";
 const isApiSuccess = (errorCode) => errorCode === void 0 || errorCode === null || parseInt(String(errorCode), 10) === 0;
 const parseNumberOrNull = (value) => {
   if (value === "" || !isDefined(value)) {
@@ -55,7 +53,6 @@ function findCodeVal(result, code) {
   isApiSuccess,
   isDefined,
   isStateValue,
-  isToken,
   parseIntOrNull,
   parseNumberOrNull
 });

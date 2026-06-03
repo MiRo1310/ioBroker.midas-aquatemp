@@ -47,24 +47,9 @@ const states = {
   flowSwitch: "boolean"
 };
 class Store {
-  static modes = [-1, 0, 1, 2];
-  static AQUATEMP_POOLSANA = "1132174963097280512";
-  //Midas/Poolsana InverPro
-  static AQUATEMP_OTHER1 = "1442284873216843776";
-  adapter;
-  instance;
-  username;
-  encryptedPassword;
-  interval = 6e4;
-  token = null;
-  cloudURL = null;
-  apiLevel = 3;
-  device;
-  product = null;
-  reachable = false;
-  useDeviceMac = false;
-  mode = 2;
   constructor(adapter, username, password, instance, interval, apiLevel, useDeviceMac, deviceMac) {
+    this.adapter = adapter;
+    this.username = username;
     this.adapter = adapter;
     this.username = username;
     this.encryptedPassword = this.encryptPassword(password);
@@ -76,11 +61,30 @@ class Store {
       this.device = deviceMac != null ? deviceMac : this.device;
     }
   }
+  static modes = [-1, 0, 1, 2];
+  static AQUATEMP_POOLSANA = "1132174963097280512";
+  //Midas/Poolsana InverPro
+  static AQUATEMP_OTHER1 = "1442284873216843776";
+  instance;
+  interval = 6e4;
+  cloudURL = null;
+  apiLevel = 3;
+  device;
+  product = null;
+  reachable = false;
+  useDeviceMac = false;
+  mode = 2;
+  encryptedPassword;
+  tokenManager;
+  setTokenManager(tokenManager) {
+    this.tokenManager = tokenManager;
+  }
   getDpRoot() {
     return `midas-aquatemp.${this.instance}`;
   }
   async resetOnErrorHandler() {
-    this.token = null;
+    var _a;
+    (_a = this.tokenManager) == null ? void 0 : _a.resetToken();
     this.device = "";
     this.reachable = false;
     await this.saveValue("info.connection", false);

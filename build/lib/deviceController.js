@@ -29,14 +29,15 @@ var import_utils = require("./utils");
 var import_logging = require("./logging");
 var import_getSettings = require("./getSettings");
 class DeviceController {
-  store;
-  constructor(store) {
+  constructor(store, tokenManager) {
     this.store = store;
+    this.tokenManager = tokenManager;
   }
   async updateDeviceStatus() {
     var _a, _b, _c, _d, _e, _f;
-    const { token, device: deviceCode, apiLevel, adapter, saveValue, resetOnErrorHandler } = this.store;
+    const { device: deviceCode, apiLevel, adapter, saveValue, resetOnErrorHandler } = this.store;
     try {
+      const token = this.tokenManager.getValidTokenOrNull();
       if (!token || !deviceCode) {
         return;
       }
@@ -74,8 +75,9 @@ class DeviceController {
   }
   async updateDeviceDetails() {
     var _a, _b;
-    const { token, device: deviceCode, product, resetOnErrorHandler, saveValue, adapter } = this.store;
+    const { device: deviceCode, product, resetOnErrorHandler, saveValue, adapter } = this.store;
     try {
+      const token = this.tokenManager.getValidTokenOrNull();
       if (!token || !deviceCode || !product) {
         return;
       }
@@ -154,9 +156,10 @@ class DeviceController {
   }
   async updateDeviceID() {
     var _a, _b, _c, _d, _e, _f, _g, _h, _i, _j, _k, _l, _m, _n, _o, _p, _q, _r, _s;
-    const { adapter, token, resetOnErrorHandler, saveValue } = this.store;
+    const { adapter, resetOnErrorHandler, saveValue } = this.store;
     try {
-      if (!(0, import_utils.isToken)(token)) {
+      const token = this.tokenManager.getValidTokenOrNull();
+      if (!token) {
         return;
       }
       const { data, status, error } = await (0, import_axios.request)(
@@ -201,10 +204,11 @@ class DeviceController {
     }
   }
   async updateDevicePower(mode) {
-    const { token, adapter, device, resetOnErrorHandler, setMode, saveValue } = this.store;
+    const { adapter, device, resetOnErrorHandler, setMode, saveValue } = this.store;
     try {
       const { powerMode, powerOpt } = (0, import_getSettings.getPowerMode)(mode);
-      if (!(0, import_utils.isDefined)(powerOpt) || !(0, import_utils.isDefined)(powerMode) || !(0, import_utils.isToken)(token) || !device) {
+      const token = this.tokenManager.getValidTokenOrNull();
+      if (!(0, import_utils.isDefined)(powerOpt) || !(0, import_utils.isDefined)(powerMode) || !token || !device) {
         return;
       }
       const { sURL } = (0, import_endPoints.getSUrl)(this.store);
@@ -230,7 +234,7 @@ class DeviceController {
     }
   }
   async updateDeviceSetTemp(temperature) {
-    const { adapter, device, token, getDpRoot, resetOnErrorHandler, saveValue } = this.store;
+    const { adapter, device, getDpRoot, resetOnErrorHandler, saveValue } = this.store;
     try {
       const numericTemperature = typeof temperature === "number" ? temperature : parseFloat(String(temperature).replace(",", "."));
       if (!Number.isFinite(numericTemperature)) {
@@ -247,7 +251,8 @@ class DeviceController {
         adapter.log.debug(`Mode set to: ${result == null ? void 0 : result.val}`);
         return;
       }
-      if ((0, import_utils.isToken)(token) && device) {
+      const token = this.tokenManager.getValidTokenOrNull();
+      if (token && device) {
         const { sURL } = (0, import_endPoints.getSUrl)(this.store);
         const { data, error } = await (0, import_axios.request)(
           adapter,
@@ -267,10 +272,11 @@ class DeviceController {
     }
   }
   async updateDeviceSilent(silent) {
-    const { adapter, device, token, resetOnErrorHandler, saveValue } = this.store;
+    const { adapter, device, resetOnErrorHandler, saveValue } = this.store;
     try {
       const silentMode = silent ? "1" : "0";
-      if ((0, import_utils.isToken)(token) && device) {
+      const token = this.tokenManager.getValidTokenOrNull();
+      if (token && device) {
         const { data, error } = await (0, import_axios.request)(
           adapter,
           (0, import_endPoints.getSUrl)(this.store).sURL,
@@ -290,8 +296,9 @@ class DeviceController {
   }
   async updateDeviceErrorMsg() {
     var _a, _b, _c, _d, _e, _f, _g, _h, _i, _j, _k, _l, _m, _n, _o, _p;
-    const { adapter, token, apiLevel, cloudURL, device: deviceCode, resetOnErrorHandler, saveValue } = this.store;
+    const { adapter, apiLevel, cloudURL, device: deviceCode, resetOnErrorHandler, saveValue } = this.store;
     try {
+      const token = this.tokenManager.getValidTokenOrNull();
       if (!token) {
         return;
       }
@@ -321,9 +328,10 @@ class DeviceController {
     }
   }
   async updateDeviceMode(mode) {
-    const { token, adapter, device, resetOnErrorHandler, saveValue } = this.store;
+    const { adapter, device, resetOnErrorHandler, saveValue } = this.store;
     try {
-      if ((0, import_utils.isToken)(token) && device) {
+      const token = this.tokenManager.getValidTokenOrNull();
+      if (token && device) {
         const { sURL } = (0, import_endPoints.getSUrl)(this.store);
         const { data, error } = await (0, import_axios.request)(
           adapter,
