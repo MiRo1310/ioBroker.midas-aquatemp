@@ -13,6 +13,7 @@ import { isDefined, isStateValue } from './lib/utils';
 import { errorLogger } from './lib/logging';
 import { DeviceController } from './lib/deviceController';
 import { TokenManager } from './lib/tokenManager';
+import { ApiClient } from './lib/axios';
 
 export class MidasAquatemp extends utils.Adapter {
     private static instance: MidasAquatemp;
@@ -40,8 +41,9 @@ export class MidasAquatemp extends utils.Adapter {
         }
         const { username, password, refresh, selectApi, useDeviceMac, deviceMac } = this.config;
         const store = new Store(this, username, password, this.instance, refresh, selectApi, useDeviceMac, deviceMac);
-        const tokenManager = new TokenManager(store);
-        const deviceController = new DeviceController(store, tokenManager);
+        const apiClient = new ApiClient(store);
+        const tokenManager = new TokenManager(store, apiClient);
+        const deviceController = new DeviceController(store, tokenManager, apiClient);
         tokenManager.setDeviceController(deviceController);
 
         const dpRoot = store.getDpRoot();

@@ -23,14 +23,14 @@ __export(deviceController_exports, {
 module.exports = __toCommonJS(deviceController_exports);
 var import_store = require("./store");
 var import_endPoints = require("./endPoints");
-var import_axios = require("./axios");
 var import_axiosParameter = require("./axiosParameter");
 var import_utils = require("./utils");
 var import_logging = require("./logging");
 class DeviceController {
-  constructor(store, tokenManager) {
+  constructor(store, tokenManager, apiClient) {
     this.store = store;
     this.tokenManager = tokenManager;
+    this.apiClient = apiClient;
   }
   async updateDeviceStatus() {
     var _a, _b, _c, _d, _e, _f;
@@ -42,7 +42,7 @@ class DeviceController {
       }
       const { sURL } = (0, import_endPoints.getUpdateDeviceStatusSUrl)(this.store);
       const payload = apiLevel < 3 ? { device_code: deviceCode } : { deviceCode };
-      const { data, error } = await (0, import_axios.request)(adapter, sURL, payload, (0, import_axiosParameter.getHeaders)(token));
+      const { data, error } = await this.apiClient.request(sURL, payload, (0, import_axiosParameter.getHeaders)(token));
       if (!data || error) {
         await this.store.resetOnErrorHandler();
         return;
@@ -81,8 +81,7 @@ class DeviceController {
         return;
       }
       const { sURL } = (0, import_endPoints.getSUrlUpdateDeviceId)(this.store);
-      const { data, error } = await (0, import_axios.request)(
-        adapter,
+      const { data, error } = await this.apiClient.request(
         sURL,
         (0, import_axiosParameter.getProtocolCodes)(this.store, product),
         (0, import_axiosParameter.getHeaders)(token)
@@ -161,8 +160,7 @@ class DeviceController {
       if (!token) {
         return;
       }
-      const { data, status, error } = await (0, import_axios.request)(
-        adapter,
+      const { data, status, error } = await this.apiClient.request(
         (0, import_endPoints.getUpdateDeviceIdSUrl)(this.store).sURL,
         (0, import_axiosParameter.getAxiosUpdateDeviceIdParams)(this.store),
         (0, import_axiosParameter.getHeaders)(token)
@@ -212,8 +210,7 @@ class DeviceController {
         return;
       }
       const { sURL } = (0, import_endPoints.getSUrl)(this.store);
-      const { data, error } = await (0, import_axios.request)(
-        adapter,
+      const { data, error } = await this.apiClient.request(
         sURL,
         (0, import_axiosParameter.getAxiosUpdateDevicePowerParams)(this.store, device, powerOpt, "Power"),
         (0, import_axiosParameter.getHeaders)(token)
@@ -254,8 +251,7 @@ class DeviceController {
       const token = this.tokenManager.getValidTokenOrNull();
       if (token && device) {
         const { sURL } = (0, import_endPoints.getSUrl)(this.store);
-        const { data, error } = await (0, import_axios.request)(
-          adapter,
+        const { data, error } = await this.apiClient.request(
           sURL,
           (0, import_axiosParameter.getAxiosUpdateDeviceSetTempParams)(device, sTemperature, this.store),
           (0, import_axiosParameter.getHeaders)(token)
@@ -277,8 +273,7 @@ class DeviceController {
       const silentMode = silent ? "1" : "0";
       const token = this.tokenManager.getValidTokenOrNull();
       if (token && device) {
-        const { data, error } = await (0, import_axios.request)(
-          adapter,
+        const { data, error } = await this.apiClient.request(
           (0, import_endPoints.getSUrl)(this.store).sURL,
           (0, import_axiosParameter.getAxiosUpdateDevicePowerParams)(this.store, device, silentMode, "Manual-mute"),
           (0, import_axiosParameter.getHeaders)(token)
@@ -303,8 +298,7 @@ class DeviceController {
         return;
       }
       const sURL = apiLevel < 3 ? `${cloudURL}/app/device/getFaultDataByDeviceCode.json` : `${cloudURL}/app/device/getFaultDataByDeviceCode`;
-      const { data, error } = await (0, import_axios.request)(
-        adapter,
+      const { data, error } = await this.apiClient.request(
         sURL,
         {
           device_code: deviceCode,
@@ -333,8 +327,7 @@ class DeviceController {
       const token = this.tokenManager.getValidTokenOrNull();
       if (token && device) {
         const { sURL } = (0, import_endPoints.getSUrl)(this.store);
-        const { data, error } = await (0, import_axios.request)(
-          adapter,
+        const { data, error } = await this.apiClient.request(
           sURL,
           (0, import_axiosParameter.getAxiosUpdateDevicePowerParams)(this.store, device, mode, "Mode"),
           {

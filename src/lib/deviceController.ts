@@ -1,6 +1,5 @@
 import { type StateKey, Store, type TMode } from './store';
 import { getSUrl, getSUrlUpdateDeviceId, getUpdateDeviceIdSUrl, getUpdateDeviceStatusSUrl } from './endPoints';
-import { request } from './axios';
 import type { DeviceDetails, DeviceStatus, MidasData, UpdateDeviceId } from '../types/types';
 import {
     getAxiosUpdateDeviceIdParams,
@@ -12,11 +11,13 @@ import {
 import { findCodeVal, isDefined, parseIntOrNull, parseNumberOrNull } from './utils';
 import { errorLogger } from './logging';
 import type { TokenManager } from './tokenManager';
+import type { ApiClient } from './axios';
 
 export class DeviceController {
     constructor(
         private readonly store: Store,
         private readonly tokenManager: TokenManager,
+        private readonly apiClient: ApiClient,
     ) {}
 
     public async updateDeviceStatus(): Promise<void> {
@@ -31,7 +32,7 @@ export class DeviceController {
 
             const payload = apiLevel < 3 ? { device_code: deviceCode } : { deviceCode };
 
-            const { data, error } = await request<DeviceStatus>(adapter, sURL, payload, getHeaders(token));
+            const { data, error } = await this.apiClient.request<DeviceStatus>(sURL, payload, getHeaders(token));
             if (!data || error) {
                 await this.store.resetOnErrorHandler();
                 return;
@@ -80,8 +81,7 @@ export class DeviceController {
 
             const { sURL } = getSUrlUpdateDeviceId(this.store);
 
-            const { data, error } = await request<DeviceDetails>(
-                adapter,
+            const { data, error } = await this.apiClient.request<DeviceDetails>(
                 sURL,
                 getProtocolCodes(this.store, product),
                 getHeaders(token),
@@ -174,8 +174,7 @@ export class DeviceController {
                 return;
             }
 
-            const { data, status, error } = await request<UpdateDeviceId>(
-                adapter,
+            const { data, status, error } = await this.apiClient.request<UpdateDeviceId>(
                 getUpdateDeviceIdSUrl(this.store).sURL,
                 getAxiosUpdateDeviceIdParams(this.store),
                 getHeaders(token),
@@ -235,8 +234,7 @@ export class DeviceController {
             }
 
             const { sURL } = getSUrl(this.store);
-            const { data, error } = await request<MidasData>(
-                adapter,
+            const { data, error } = await this.apiClient.request<MidasData>(
                 sURL,
                 getAxiosUpdateDevicePowerParams(this.store, device, powerOpt, 'Power'),
                 getHeaders(token),
@@ -283,8 +281,7 @@ export class DeviceController {
             if (token && device) {
                 const { sURL } = getSUrl(this.store);
 
-                const { data, error } = await request<MidasData>(
-                    adapter,
+                const { data, error } = await this.apiClient.request<MidasData>(
                     sURL,
                     getAxiosUpdateDeviceSetTempParams(device, sTemperature, this.store),
                     getHeaders(token),
@@ -309,8 +306,7 @@ export class DeviceController {
             const silentMode = silent ? '1' : '0';
             const token = this.tokenManager.getValidTokenOrNull();
             if (token && device) {
-                const { data, error } = await request<MidasData>(
-                    adapter,
+                const { data, error } = await this.apiClient.request<MidasData>(
                     getSUrl(this.store).sURL,
                     getAxiosUpdateDevicePowerParams(this.store, device, silentMode, 'Manual-mute'),
                     getHeaders(token),
@@ -341,8 +337,7 @@ export class DeviceController {
                     ? `${cloudURL}/app/device/getFaultDataByDeviceCode.json`
                     : `${cloudURL}/app/device/getFaultDataByDeviceCode`;
 
-            const { data, error } = await request<MidasData>(
-                adapter,
+            const { data, error } = await this.apiClient.request<MidasData>(
                 sURL,
                 {
                     device_code: deviceCode,
@@ -375,8 +370,7 @@ export class DeviceController {
             const token = this.tokenManager.getValidTokenOrNull();
             if (token && device) {
                 const { sURL } = getSUrl(this.store);
-                const { data, error } = await request<MidasData>(
-                    adapter,
+                const { data, error } = await this.apiClient.request<MidasData>(
                     sURL,
                     getAxiosUpdateDevicePowerParams(this.store, device, mode, 'Mode'),
                     {

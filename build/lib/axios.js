@@ -28,74 +28,82 @@ var __toESM = (mod, isNodeMode, target) => (target = mod != null ? __create(__ge
 var __toCommonJS = (mod) => __copyProps(__defProp({}, "__esModule", { value: true }), mod);
 var axios_exports = {};
 __export(axios_exports, {
-  request: () => request
+  ApiClient: () => ApiClient
 });
 module.exports = __toCommonJS(axios_exports);
 var import_axios = __toESM(require("axios"));
 var import_https = __toESM(require("https"));
 var import_logging = require("./logging");
-var import_utils = require("./utils");
-const insecureHttpsAgent = new import_https.default.Agent({ rejectUnauthorized: false });
-let insecureTlsWarningShown = false;
-const parseBooleanEnv = (value) => value === "1" || value === "true" || value === "yes" || value === "on";
-const getInsecureTlsHostAllowlist = () => {
-  var _a;
-  return ((_a = process.env.MIDAS_AQUATEMP_INSECURE_TLS_HOSTS) != null ? _a : "").split(",").map((host) => host.trim().toLowerCase()).filter(Boolean);
-};
-const isInsecureTlsEnabled = (adapter) => adapter.config.allowInsecureTls === true || parseBooleanEnv(process.env.MIDAS_AQUATEMP_INSECURE_TLS);
-const canUseInsecureTlsForUrl = (url) => {
-  const allowlist = getInsecureTlsHostAllowlist();
-  if (allowlist.length === 0) {
-    return true;
+class ApiClient {
+  constructor(store) {
+    this.store = store;
   }
-  try {
-    const { hostname } = new URL(url);
-    return allowlist.includes(hostname.toLowerCase());
-  } catch {
-    return false;
+  static insecureHttpsAgent = new import_https.default.Agent({ rejectUnauthorized: false });
+  insecureTlsWarningShown = false;
+  parseBooleanEnv(value) {
+    return value === "1" || value === "true" || value === "yes" || value === "on";
   }
-};
-const getHttpsAgent = (adapter, url) => {
-  if (!isInsecureTlsEnabled(adapter)) {
-    return void 0;
+  getInsecureTlsHostAllowlist() {
+    var _a;
+    return ((_a = process.env.MIDAS_AQUATEMP_INSECURE_TLS_HOSTS) != null ? _a : "").split(",").map((host) => host.trim().toLowerCase()).filter(Boolean);
   }
-  if (!canUseInsecureTlsForUrl(url)) {
-    return void 0;
+  isInsecureTlsEnabled() {
+    return this.store.adapter.config.allowInsecureTls === true || this.parseBooleanEnv(process.env.MIDAS_AQUATEMP_INSECURE_TLS);
   }
-  if (!insecureTlsWarningShown) {
-    adapter.log.warn(
-      "Insecure TLS mode is enabled (certificate verification disabled). Use only for trusted endpoints."
-    );
-    insecureTlsWarningShown = true;
-  }
-  return insecureHttpsAgent;
-};
-const request = async (adapter, url, options, header = {}) => {
-  var _a;
-  try {
-    const result = await import_axios.default.post(url, options, {
-      ...header,
-      headers: {
-        "Content-Type": "application/json",
-        ...header.headers
-      },
-      httpsAgent: getHttpsAgent(adapter, url)
-    });
-    if (result.status !== 200) {
-      return { error: true, status: result.status, data: result.data };
+  canUseInsecureTlsForUrl(url) {
+    const allowlist = this.getInsecureTlsHostAllowlist();
+    if (allowlist.length === 0) {
+      return true;
     }
-    if (!(0, import_utils.isApiSuccess)((_a = result.data) == null ? void 0 : _a.error_code)) {
-      adapter.log.debug(`API error for ${url}: ${JSON.stringify(result.data)}`);
-      return { error: true, status: result.status, data: result.data };
+    try {
+      const { hostname } = new URL(url);
+      return allowlist.includes(hostname.toLowerCase());
+    } catch {
+      return false;
     }
-    return { error: false, status: result.status, data: result.data };
-  } catch (e) {
-    (0, import_logging.errorLogger)("Axios request error", e, adapter);
-    return { status: 500, data: void 0, error: true };
   }
-};
+  getHttpsAgent(url) {
+    if (!this.isInsecureTlsEnabled() || !this.canUseInsecureTlsForUrl(url)) {
+      return;
+    }
+    if (!this.insecureTlsWarningShown) {
+      this.store.adapter.log.warn(
+        "Insecure TLS mode is enabled (certificate verification disabled). Use only for trusted endpoints."
+      );
+      this.insecureTlsWarningShown = true;
+    }
+    return ApiClient.insecureHttpsAgent;
+  }
+  async request(url, options, header = {}) {
+    var _a;
+    try {
+      const result = await import_axios.default.post(url, options, {
+        ...header,
+        headers: {
+          "Content-Type": "application/json",
+          ...header.headers
+        },
+        httpsAgent: this.getHttpsAgent(url)
+      });
+      if (result.status !== 200) {
+        return { error: true, status: result.status, data: result.data };
+      }
+      if (!ApiClient.isApiSuccess((_a = result.data) == null ? void 0 : _a.error_code)) {
+        this.store.adapter.log.debug(`API error for ${url}: ${JSON.stringify(result.data)}`);
+        return { error: true, status: result.status, data: result.data };
+      }
+      return { error: false, status: result.status, data: result.data };
+    } catch (e) {
+      (0, import_logging.errorLogger)("Axios request error", e, this.store.adapter);
+      return { status: 500, data: void 0, error: true };
+    }
+  }
+  static isApiSuccess(errorCode) {
+    return errorCode === void 0 || errorCode === null || parseInt(String(errorCode), 10) === 0;
+  }
+}
 // Annotate the CommonJS export names for ESM import in node:
 0 && (module.exports = {
-  request
+  ApiClient
 });
 //# sourceMappingURL=axios.js.map

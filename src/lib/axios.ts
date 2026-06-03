@@ -1,85 +1,92 @@
 import axios from 'axios';
 import https from 'https';
 import { errorLogger } from './logging';
-import type { MidasAquatemp } from '../main';
-import { isApiSuccess } from './utils';
+import type { Store } from './store';
 
-const insecureHttpsAgent = new https.Agent({ rejectUnauthorized: false });
-let insecureTlsWarningShown = false;
+export class ApiClient {
+    private static insecureHttpsAgent = new https.Agent({ rejectUnauthorized: false });
+    private insecureTlsWarningShown = false;
+    constructor(private readonly store: Store) {}
 
-const parseBooleanEnv = (value: string | undefined): boolean =>
-    value === '1' || value === 'true' || value === 'yes' || value === 'on';
-
-const getInsecureTlsHostAllowlist = (): string[] =>
-    (process.env.MIDAS_AQUATEMP_INSECURE_TLS_HOSTS ?? '')
-        .split(',')
-        .map(host => host.trim().toLowerCase())
-        .filter(Boolean);
-
-const isInsecureTlsEnabled = (adapter: MidasAquatemp): boolean =>
-    adapter.config.allowInsecureTls === true || parseBooleanEnv(process.env.MIDAS_AQUATEMP_INSECURE_TLS);
-
-const canUseInsecureTlsForUrl = (url: string): boolean => {
-    const allowlist = getInsecureTlsHostAllowlist();
-    if (allowlist.length === 0) {
-        return true;
+    private parseBooleanEnv(value?: string): boolean {
+        return value === '1' || value === 'true' || value === 'yes' || value === 'on';
     }
 
-    try {
-        const { hostname } = new URL(url);
-        return allowlist.includes(hostname.toLowerCase());
-    } catch {
-        return false;
-    }
-};
-
-const getHttpsAgent = (adapter: MidasAquatemp, url: string): https.Agent | undefined => {
-    if (!isInsecureTlsEnabled(adapter)) {
-        return undefined;
+    private getInsecureTlsHostAllowlist(): string[] {
+        return (process.env.MIDAS_AQUATEMP_INSECURE_TLS_HOSTS ?? '')
+            .split(',')
+            .map(host => host.trim().toLowerCase())
+            .filter(Boolean);
     }
 
-    if (!canUseInsecureTlsForUrl(url)) {
-        return undefined;
-    }
-
-    if (!insecureTlsWarningShown) {
-        adapter.log.warn(
-            'Insecure TLS mode is enabled (certificate verification disabled). Use only for trusted endpoints.',
+    private isInsecureTlsEnabled(): boolean {
+        return (
+            this.store.adapter.config.allowInsecureTls === true ||
+            this.parseBooleanEnv(process.env.MIDAS_AQUATEMP_INSECURE_TLS)
         );
-        insecureTlsWarningShown = true;
     }
 
-    return insecureHttpsAgent;
-};
-
-export const request = async <T extends { error_code?: string | number }>(
-    adapter: MidasAquatemp,
-    url: string,
-    options: unknown,
-    header: { headers?: Record<string, string> } = {},
-): Promise<{ status?: number; data: T | undefined; error: boolean }> => {
-    try {
-        const result = await axios.post<T>(url, options, {
-            ...header,
-            headers: {
-                'Content-Type': 'application/json',
-                ...header.headers,
-            },
-            httpsAgent: getHttpsAgent(adapter, url),
-        });
-
-        if (result.status !== 200) {
-            return { error: true, status: result.status, data: result.data };
+    private canUseInsecureTlsForUrl(url: string): boolean {
+        const allowlist = this.getInsecureTlsHostAllowlist();
+        if (allowlist.length === 0) {
+            return true;
         }
 
-        if (!isApiSuccess(result.data?.error_code)) {
-            adapter.log.debug(`API error for ${url}: ${JSON.stringify(result.data)}`);
-            return { error: true, status: result.status, data: result.data };
+        try {
+            const { hostname } = new URL(url);
+            return allowlist.includes(hostname.toLowerCase());
+        } catch {
+            return false;
         }
-
-        return { error: false, status: result.status, data: result.data };
-    } catch (e) {
-        errorLogger('Axios request error', e, adapter);
-        return { status: 500, data: undefined, error: true };
     }
-};
+
+    private getHttpsAgent(url: string): https.Agent | undefined {
+        if (!this.isInsecureTlsEnabled() || !this.canUseInsecureTlsForUrl(url)) {
+            return;
+        }
+
+        if (!this.insecureTlsWarningShown) {
+            this.store.adapter.log.warn(
+                'Insecure TLS mode is enabled (certificate verification disabled). Use only for trusted endpoints.',
+            );
+            this.insecureTlsWarningShown = true;
+        }
+
+        return ApiClient.insecureHttpsAgent;
+    }
+
+    public async request<T extends { error_code?: string | number }>(
+        url: string,
+        options: unknown,
+        header: { headers?: Record<string, string> } = {},
+    ): Promise<{ status?: number; data: T | undefined; error: boolean }> {
+        try {
+            const result = await axios.post<T>(url, options, {
+                ...header,
+                headers: {
+                    'Content-Type': 'application/json',
+                    ...header.headers,
+                },
+                httpsAgent: this.getHttpsAgent(url),
+            });
+
+            if (result.status !== 200) {
+                return { error: true, status: result.status, data: result.data };
+            }
+
+            if (!ApiClient.isApiSuccess(result.data?.error_code)) {
+                this.store.adapter.log.debug(`API error for ${url}: ${JSON.stringify(result.data)}`);
+                return { error: true, status: result.status, data: result.data };
+            }
+
+            return { error: false, status: result.status, data: result.data };
+        } catch (e) {
+            errorLogger('Axios request error', e, this.store.adapter);
+            return { status: 500, data: undefined, error: true };
+        }
+    }
+
+    public static isApiSuccess(errorCode?: string | number): boolean {
+        return errorCode === undefined || errorCode === null || parseInt(String(errorCode), 10) === 0;
+    }
+}

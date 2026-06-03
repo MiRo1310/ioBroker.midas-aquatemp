@@ -8,7 +8,7 @@
 - [x] **`getSettings.ts` eliminieren**
   `getPowerMode` als `private static`-Methode direkt in `DeviceController` verschieben, Datei löschen
 
-- [ ] **`axios.ts` → `ApiClient`-Klasse**
+- [x] **`axios.ts` → `ApiClient`-Klasse**
   `request()` bekommt `adapter` bei jedem Aufruf als erstes Argument. Klasse mit `Store` im Konstruktor bauen — entfernt
   den Parameter aus allen ~8 `request()`-Aufrufen in `DeviceController`
 

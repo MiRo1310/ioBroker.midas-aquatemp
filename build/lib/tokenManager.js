@@ -23,11 +23,11 @@ __export(tokenManager_exports, {
 module.exports = __toCommonJS(tokenManager_exports);
 var import_endPoints = require("./endPoints");
 var import_logging = require("./logging");
-var import_axios = require("./axios");
 var import_utils = require("./utils");
 class TokenManager {
-  constructor(store) {
+  constructor(store, apiClient) {
     this.store = store;
+    this.apiClient = apiClient;
     store.setTokenManager(this);
   }
   token = null;
@@ -44,7 +44,7 @@ class TokenManager {
       }
       adapter.log.debug("Request token");
       const { sUrl, options } = (0, import_endPoints.getOptionsAndSUrl)(this.store);
-      const { data, error } = await (0, import_axios.request)(adapter, sUrl, options);
+      const { data, error } = await this.apiClient.request(sUrl, options);
       if (error || !data) {
         adapter.log.error(`Login-error: ${JSON.stringify(data)}`);
         await resetOnErrorHandler();

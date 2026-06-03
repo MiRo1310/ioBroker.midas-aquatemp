@@ -1,16 +1,19 @@
 import { getOptionsAndSUrl } from './endPoints';
 import type { Store } from './store';
 import { errorLogger } from './logging';
-import { request } from './axios';
 import type { RequestToken } from '../types/types';
 import { isDefined } from './utils';
 import type { DeviceController } from './deviceController';
+import type { ApiClient } from './axios';
 
 export class TokenManager {
     private token: string | null = null;
     private deviceController?: DeviceController;
 
-    constructor(private store: Store) {
+    constructor(
+        private store: Store,
+        private apiClient: ApiClient,
+    ) {
         store.setTokenManager(this);
     }
 
@@ -28,7 +31,7 @@ export class TokenManager {
             adapter.log.debug('Request token');
             const { sUrl, options } = getOptionsAndSUrl(this.store);
 
-            const { data, error } = await request<RequestToken>(adapter, sUrl, options);
+            const { data, error } = await this.apiClient.request<RequestToken>(sUrl, options);
 
             if (error || !data) {
                 adapter.log.error(`Login-error: ${JSON.stringify(data)}`);

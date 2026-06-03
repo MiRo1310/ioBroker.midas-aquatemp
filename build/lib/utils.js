@@ -19,7 +19,6 @@ var __toCommonJS = (mod) => __copyProps(__defProp({}, "__esModule", { value: tru
 var utils_exports = {};
 __export(utils_exports, {
   findCodeVal: () => findCodeVal,
-  isApiSuccess: () => isApiSuccess,
   isDefined: () => isDefined,
   isStateValue: () => isStateValue,
   parseIntOrNull: () => parseIntOrNull,
@@ -28,7 +27,6 @@ __export(utils_exports, {
 module.exports = __toCommonJS(utils_exports);
 const isDefined = (value) => value !== void 0 && value !== null;
 const isStateValue = (state) => isDefined(state) && isDefined(state == null ? void 0 : state.val);
-const isApiSuccess = (errorCode) => errorCode === void 0 || errorCode === null || parseInt(String(errorCode), 10) === 0;
 const parseNumberOrNull = (value) => {
   if (value === "" || !isDefined(value)) {
     return 0;
@@ -50,7 +48,6 @@ function findCodeVal(result, code) {
 // Annotate the CommonJS export names for ESM import in node:
 0 && (module.exports = {
   findCodeVal,
-  isApiSuccess,
   isDefined,
   isStateValue,
   parseIntOrNull,
