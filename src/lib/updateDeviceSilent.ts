@@ -1,10 +1,9 @@
 import { getAxiosUpdateDevicePowerParams, getHeaders } from './axiosParameter';
 import { getSUrl } from './endPoints';
-import { saveValue } from './saveValue';
 import { errorLogger } from './logging';
 import { request } from './axios';
 import type { MidasData } from '../types/types';
-import type { Store } from './store.ts';
+import type { Store } from './store';
 
 export async function updateDeviceSilent(store: Store, silent: boolean): Promise<void> {
     const { adapter, device } = store;
@@ -26,7 +25,7 @@ export async function updateDeviceSilent(store: Store, silent: boolean): Promise
 
             adapter.log.debug(`DeviceStatus: ${JSON.stringify(data)}`);
 
-            await saveValue({ key: 'silent', value: silent, stateType: 'boolean', store });
+            await store.saveValue('silent', silent);
         }
     } catch (error: any) {
         errorLogger('Error in updateDeviceSilent', error, adapter);

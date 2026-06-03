@@ -1,6 +1,5 @@
 import { getAxiosUpdateDeviceSetTempParams, getHeaders } from './axiosParameter';
 import { getSUrl } from './endPoints';
-import { saveValue } from './saveValue';
 import { errorLogger } from './logging';
 import { request } from './axios';
 import type { MidasData } from '../types/types';
@@ -47,7 +46,7 @@ export const updateDeviceSetTemp = async (store: Store, temperature: number): Pr
                 return;
             }
 
-            await saveValue({ key: 'tempSet', value: numericTemperature, stateType: 'number', store });
+            await store.saveValue('tempSet', numericTemperature);
         }
     } catch (error: any) {
         errorLogger('Error in updateDeviceSetTemp', error, adapter);

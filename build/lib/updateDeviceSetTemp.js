@@ -23,7 +23,6 @@ __export(updateDeviceSetTemp_exports, {
 module.exports = __toCommonJS(updateDeviceSetTemp_exports);
 var import_axiosParameter = require("./axiosParameter");
 var import_endPoints = require("./endPoints");
-var import_saveValue = require("./saveValue");
 var import_logging = require("./logging");
 var import_axios = require("./axios");
 var import_utils = require("./utils");
@@ -60,7 +59,7 @@ const updateDeviceSetTemp = async (store, temperature) => {
         await store.resetOnErrorHandler();
         return;
       }
-      await (0, import_saveValue.saveValue)({ key: "tempSet", value: numericTemperature, stateType: "number", store });
+      await store.saveValue("tempSet", numericTemperature);
     }
   } catch (error) {
     (0, import_logging.errorLogger)("Error in updateDeviceSetTemp", error, adapter);

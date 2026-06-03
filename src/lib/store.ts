@@ -1,12 +1,60 @@
 import type { MidasAquatemp } from '../main';
-import { saveValue } from './saveValue';
 import { createHash } from 'crypto';
+import { errorLogger } from './logging';
 
 export type TMode = -1 | 0 | 1 | 2;
 
-export const modes: TMode[] = [-1, 0, 1, 2];
+export type StateKey =
+    | 'error'
+    | 'mode'
+    | 'info.connection'
+    | 'errorLevel'
+    | 'errorCode'
+    | 'errorMessage'
+    | 'DeviceCode'
+    | 'ProductCode'
+    | 'rawJSON'
+    | 'consumption'
+    | 'suctionTemp'
+    | 'tempIn'
+    | 'tempOut'
+    | 'coilTemp'
+    | 'ambient'
+    | 'voltage'
+    | 'rotor'
+    | 'tempSet'
+    | 'silent'
+    | 'flowSwitch'
+    | 'state';
+
+const states: Record<StateKey, ioBroker.CommonType> = {
+    error: 'boolean',
+    mode: 'number',
+    errorLevel: 'number',
+    errorCode: 'string',
+    errorMessage: 'string',
+    DeviceCode: 'string',
+    ProductCode: 'string',
+    rawJSON: 'string',
+    'info.connection': 'boolean',
+    consumption: 'number',
+    state: 'boolean',
+    suctionTemp: 'number',
+    tempIn: 'number',
+    tempOut: 'number',
+    tempSet: 'number',
+    coilTemp: 'number',
+    ambient: 'number',
+    voltage: 'number',
+    rotor: 'number',
+    silent: 'boolean',
+    flowSwitch: 'boolean',
+};
 
 export class Store {
+    static readonly modes: TMode[] = [-1, 0, 1, 2];
+    public static readonly AQUATEMP_POOLSANA = '1132174963097280512'; //Midas/Poolsana InverPro
+    public static readonly AQUATEMP_OTHER1 = '1442284873216843776';
     public readonly adapter: MidasAquatemp;
     public readonly instance: number;
     public readonly username: string;
@@ -20,8 +68,6 @@ export class Store {
     public reachable = false;
     public useDeviceMac = false;
     private mode: TMode = 2;
-    public AQUATEMP_POOLSANA = '1132174963097280512'; //Midas/Poolsana InverPro
-    public AQUATEMP_OTHER1 = '1442284873216843776';
 
     constructor(
         adapter: MidasAquatemp,
@@ -53,17 +99,43 @@ export class Store {
         this.token = null;
         this.device = '';
         this.reachable = false;
-        await saveValue({ key: 'info.connection', value: false, stateType: 'boolean', store: this });
+        await this.saveValue('info.connection', false);
     }
+
     public setMode(mode: TMode): void {
         this.mode = mode;
     }
+
     public getMode(): TMode {
         return this.mode;
     }
+
     public isValidMode(curr: number): curr is TMode {
-        return modes.includes(curr as TMode);
+        return Store.modes.includes(curr as TMode);
     }
+
+    public async saveValue(key: StateKey, value?: ioBroker.StateValue): Promise<void> {
+        try {
+            const dp = `${this.getDpRoot()}.${key}`;
+
+            await this.adapter.setObjectNotExists(dp, {
+                type: 'state',
+                common: {
+                    name: key,
+                    type: states[key],
+                    role: 'value',
+                    read: true,
+                    write: false,
+                },
+                native: {},
+            });
+
+            await this.adapter.setState(dp, value ?? null, true);
+        } catch (err: any) {
+            errorLogger('Error in saveValue', err, this.adapter);
+        }
+    }
+
     private encryptPassword(password: string): string {
         return createHash('md5').update(password).digest('hex');
     }

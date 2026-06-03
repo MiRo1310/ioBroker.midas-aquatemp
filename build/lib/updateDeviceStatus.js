@@ -22,7 +22,6 @@ __export(updateDeviceStatus_exports, {
 });
 module.exports = __toCommonJS(updateDeviceStatus_exports);
 var import_endPoints = require("./endPoints");
-var import_saveValue = require("./saveValue");
 var import_updateDeviceDetails = require("./updateDeviceDetails");
 var import_updateDeviceOnError = require("./updateDeviceOnError");
 var import_logging = require("./logging");
@@ -46,21 +45,21 @@ async function updateDeviceStatus(store) {
     adapter.log.debug(`DeviceStatus: ${JSON.stringify(data)}`);
     const status = apiLevel < 3 ? (_a = data.object_result) == null ? void 0 : _a.status : (_b = data.objectResult) == null ? void 0 : _b.status;
     store.reachable = status === "ONLINE";
-    await (0, import_saveValue.saveValue)({ key: "info.connection", value: store.reachable, stateType: "boolean", store });
+    await store.saveValue("info.connection", store.reachable);
     if (!store.reachable) {
       return;
     }
     const isFault = apiLevel < 3 ? (_c = data.object_result) == null ? void 0 : _c.is_fault : (_f = (_d = data.objectResult) == null ? void 0 : _d.is_fault) != null ? _f : (_e = data.objectResult) == null ? void 0 : _e.isFault;
     if (isFault === true) {
-      await (0, import_saveValue.saveValue)({ key: "error", value: true, stateType: "boolean", store });
+      await store.saveValue("error", true);
       await (0, import_updateDeviceDetails.updateDeviceDetails)(store);
       await (0, import_updateDeviceOnError.updateDeviceErrorMsg)(store);
       return;
     }
-    await (0, import_saveValue.saveValue)({ key: "error", value: false, stateType: "boolean", store });
-    await (0, import_saveValue.saveValue)({ key: "errorMessage", value: "", stateType: "string", store });
-    await (0, import_saveValue.saveValue)({ key: "errorCode", value: "", stateType: "string", store });
-    await (0, import_saveValue.saveValue)({ key: "errorLevel", value: 0, stateType: "number", store });
+    await store.saveValue("error", false);
+    await store.saveValue("errorMessage", "");
+    await store.saveValue("errorCode", "");
+    await store.saveValue("errorLevel", 0);
     await (0, import_updateDeviceDetails.updateDeviceDetails)(store);
   } catch (error) {
     await store.resetOnErrorHandler();

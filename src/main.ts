@@ -6,14 +6,10 @@
 // you need to create an
 import type { TMode } from './lib/store';
 import { Store } from './lib/store';
-
 import * as utils from '@iobroker/adapter-core';
 import { createObjects } from './lib/createState';
 import { setupEndpoints } from './lib/endPoints';
-import { saveValue } from './lib/saveValue';
-
 import { ensureToken, updateToken } from './lib/token';
-
 import { updateDevicePower } from './lib/updateDevicePower';
 import { updateDeviceSetTemp } from './lib/updateDeviceSetTemp';
 import { updateDeviceSilent } from './lib/updateDeviceSilent';
@@ -74,10 +70,10 @@ export class MidasAquatemp extends utils.Adapter {
         await updateToken(store);
 
         async function clearValues(): Promise<void> {
-            await saveValue({ key: 'error', value: true, stateType: 'boolean', store });
-            await saveValue({ key: 'consumption', value: 0, stateType: 'number', store });
-            await saveValue({ key: 'state', value: false, stateType: 'boolean', store });
-            await saveValue({ key: 'rawJSON', value: null, stateType: 'string', store });
+            await store.saveValue('error', true);
+            await store.saveValue('consumption', 0);
+            await store.saveValue('state', false);
+            await store.saveValue('rawJSON', null);
         }
 
         updateInterval = this.setInterval(async () => {

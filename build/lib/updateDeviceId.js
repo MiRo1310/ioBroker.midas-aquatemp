@@ -23,7 +23,6 @@ __export(updateDeviceId_exports, {
 module.exports = __toCommonJS(updateDeviceId_exports);
 var import_axiosParameter = require("./axiosParameter");
 var import_endPoints = require("./endPoints");
-var import_saveValue = require("./saveValue");
 var import_updateDeviceStatus = require("./updateDeviceStatus");
 var import_logging = require("./logging");
 var import_axios = require("./axios");
@@ -58,10 +57,10 @@ async function updateDeviceID(store) {
     store.product = (_n = (_m = (_j = (_i = data.object_result) == null ? void 0 : _i[0]) == null ? void 0 : _j.product_id) != null ? _m : (_l = (_k = data.objectResult) == null ? void 0 : _k[0]) == null ? void 0 : _l.productId) != null ? _n : null;
     store.reachable = ((_s = (_p = (_o = data.object_result) == null ? void 0 : _o[0]) == null ? void 0 : _p.device_status) != null ? _s : (_r = (_q = data.objectResult) == null ? void 0 : _q[0]) == null ? void 0 : _r.deviceStatus) == "ONLINE";
     adapter.log.debug(`device: ${store.device}, product: ${store.product}, reachable: ${store.reachable}`);
-    await (0, import_saveValue.saveValue)({ key: "DeviceCode", value: store.device, stateType: "string", store });
-    await (0, import_saveValue.saveValue)({ key: "ProductCode", value: store.product, stateType: "string", store });
+    await store.saveValue("DeviceCode", store.device);
+    await store.saveValue("ProductCode", store.product);
     if (store.reachable && store.device) {
-      await (0, import_saveValue.saveValue)({ key: "info.connection", value: true, stateType: "boolean", store });
+      await store.saveValue("info.connection", true);
       if (store.device != "" && store.product) {
         await (0, import_updateDeviceStatus.updateDeviceStatus)(store);
       }

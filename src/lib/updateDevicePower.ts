@@ -2,7 +2,6 @@ import { getPowerMode } from './getSettings';
 import type { Store, TMode } from './store';
 import { getSUrl } from './endPoints';
 import { getAxiosUpdateDevicePowerParams, getHeaders } from './axiosParameter';
-import { saveValue } from './saveValue';
 import { errorLogger } from './logging';
 import { request } from './axios';
 import type { MidasData } from '../types/types';
@@ -32,16 +31,16 @@ export async function updateDevicePower(store: Store, mode: TMode): Promise<void
 
         if (mode >= 0) {
             store.setMode(mode);
-            await updateDeviceMode(store, mode.toString());
+            await updateDeviceMode(store, mode);
         } else {
-            await saveValue({ key: 'mode', value: mode.toString(), stateType: 'string', store });
+            await store.saveValue('mode', mode);
         }
     } catch (error: any) {
         errorLogger('Error in updateDevicePower', error, adapter);
     }
 }
 
-async function updateDeviceMode(store: Store, mode: string): Promise<void> {
+async function updateDeviceMode(store: Store, mode: TMode): Promise<void> {
     const token = store.token;
     const { adapter, device } = store;
     try {
@@ -61,7 +60,7 @@ async function updateDeviceMode(store: Store, mode: string): Promise<void> {
             }
             adapter.log.debug(`DeviceStatus: ${JSON.stringify(data)}`);
 
-            await saveValue({ key: 'mode', value: mode, stateType: 'string', store });
+            await store.saveValue('mode', mode);
         }
     } catch (error: any) {
         errorLogger('Error in updateDeviceMode', error, adapter);

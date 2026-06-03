@@ -1,12 +1,11 @@
 import { getAxiosUpdateDeviceIdParams, getHeaders } from './axiosParameter';
 import { getUpdateDeviceIdSUrl } from './endPoints';
-import { saveValue } from './saveValue';
 import { updateDeviceStatus } from './updateDeviceStatus';
 import { errorLogger } from './logging';
 import { request } from './axios';
 import type { UpdateDeviceId } from '../types/types';
 import { isToken } from './utils';
-import type { Store } from './store.ts';
+import type { Store } from './store';
 
 export async function updateDeviceID(store: Store): Promise<void> {
     const { adapter } = store;
@@ -44,11 +43,11 @@ export async function updateDeviceID(store: Store): Promise<void> {
 
         adapter.log.debug(`device: ${store.device}, product: ${store.product}, reachable: ${store.reachable}`);
 
-        await saveValue({ key: 'DeviceCode', value: store.device, stateType: 'string', store });
-        await saveValue({ key: 'ProductCode', value: store.product, stateType: 'string', store });
+        await store.saveValue('DeviceCode', store.device);
+        await store.saveValue('ProductCode', store.product);
 
         if (store.reachable && store.device) {
-            await saveValue({ key: 'info.connection', value: true, stateType: 'boolean', store });
+            await store.saveValue('info.connection', true);
             if (store.device != '' && store.product) {
                 await updateDeviceStatus(store);
             }

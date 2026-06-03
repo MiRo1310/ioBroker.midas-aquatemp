@@ -36,7 +36,6 @@ var import_store = require("./lib/store");
 var utils = __toESM(require("@iobroker/adapter-core"));
 var import_createState = require("./lib/createState");
 var import_endPoints = require("./lib/endPoints");
-var import_saveValue = require("./lib/saveValue");
 var import_token = require("./lib/token");
 var import_updateDevicePower = require("./lib/updateDevicePower");
 var import_updateDeviceSetTemp = require("./lib/updateDeviceSetTemp");
@@ -89,10 +88,10 @@ class MidasAquatemp extends utils.Adapter {
     await clearValues();
     await (0, import_token.updateToken)(store);
     async function clearValues() {
-      await (0, import_saveValue.saveValue)({ key: "error", value: true, stateType: "boolean", store });
-      await (0, import_saveValue.saveValue)({ key: "consumption", value: 0, stateType: "number", store });
-      await (0, import_saveValue.saveValue)({ key: "state", value: false, stateType: "boolean", store });
-      await (0, import_saveValue.saveValue)({ key: "rawJSON", value: null, stateType: "string", store });
+      await store.saveValue("error", true);
+      await store.saveValue("consumption", 0);
+      await store.saveValue("state", false);
+      await store.saveValue("rawJSON", null);
     }
     updateInterval = this.setInterval(async () => {
       try {

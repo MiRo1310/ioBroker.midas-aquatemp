@@ -18,14 +18,39 @@ var __copyProps = (to, from, except, desc) => {
 var __toCommonJS = (mod) => __copyProps(__defProp({}, "__esModule", { value: true }), mod);
 var store_exports = {};
 __export(store_exports, {
-  Store: () => Store,
-  modes: () => modes
+  Store: () => Store
 });
 module.exports = __toCommonJS(store_exports);
-var import_saveValue = require("./saveValue");
 var import_crypto = require("crypto");
-const modes = [-1, 0, 1, 2];
+var import_logging = require("./logging");
+const states = {
+  error: "boolean",
+  mode: "number",
+  errorLevel: "number",
+  errorCode: "string",
+  errorMessage: "string",
+  DeviceCode: "string",
+  ProductCode: "string",
+  rawJSON: "string",
+  "info.connection": "boolean",
+  consumption: "number",
+  state: "boolean",
+  suctionTemp: "number",
+  tempIn: "number",
+  tempOut: "number",
+  tempSet: "number",
+  coilTemp: "number",
+  ambient: "number",
+  voltage: "number",
+  rotor: "number",
+  silent: "boolean",
+  flowSwitch: "boolean"
+};
 class Store {
+  static modes = [-1, 0, 1, 2];
+  static AQUATEMP_POOLSANA = "1132174963097280512";
+  //Midas/Poolsana InverPro
+  static AQUATEMP_OTHER1 = "1442284873216843776";
   adapter;
   instance;
   username;
@@ -39,9 +64,6 @@ class Store {
   reachable = false;
   useDeviceMac = false;
   mode = 2;
-  AQUATEMP_POOLSANA = "1132174963097280512";
-  //Midas/Poolsana InverPro
-  AQUATEMP_OTHER1 = "1442284873216843776";
   constructor(adapter, username, password, instance, interval, apiLevel, useDeviceMac, deviceMac) {
     this.adapter = adapter;
     this.username = username;
@@ -61,7 +83,7 @@ class Store {
     this.token = null;
     this.device = "";
     this.reachable = false;
-    await (0, import_saveValue.saveValue)({ key: "info.connection", value: false, stateType: "boolean", store: this });
+    await this.saveValue("info.connection", false);
   }
   setMode(mode) {
     this.mode = mode;
@@ -70,7 +92,26 @@ class Store {
     return this.mode;
   }
   isValidMode(curr) {
-    return modes.includes(curr);
+    return Store.modes.includes(curr);
+  }
+  async saveValue(key, value) {
+    try {
+      const dp = `${this.getDpRoot()}.${key}`;
+      await this.adapter.setObjectNotExists(dp, {
+        type: "state",
+        common: {
+          name: key,
+          type: states[key],
+          role: "value",
+          read: true,
+          write: false
+        },
+        native: {}
+      });
+      await this.adapter.setState(dp, value != null ? value : null, true);
+    } catch (err) {
+      (0, import_logging.errorLogger)("Error in saveValue", err, this.adapter);
+    }
   }
   encryptPassword(password) {
     return (0, import_crypto.createHash)("md5").update(password).digest("hex");
@@ -78,7 +119,6 @@ class Store {
 }
 // Annotate the CommonJS export names for ESM import in node:
 0 && (module.exports = {
-  Store,
-  modes
+  Store
 });
 //# sourceMappingURL=store.js.map

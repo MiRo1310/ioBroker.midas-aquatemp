@@ -21,7 +21,6 @@ __export(updateDeviceOnError_exports, {
   updateDeviceErrorMsg: () => updateDeviceErrorMsg
 });
 module.exports = __toCommonJS(updateDeviceOnError_exports);
-var import_saveValue = require("./saveValue");
 var import_logging = require("./logging");
 var import_axios = require("./axios");
 var import_axiosParameter = require("./axiosParameter");
@@ -47,25 +46,13 @@ async function updateDeviceErrorMsg(store) {
       await store.resetOnErrorHandler();
       return;
     }
-    await (0, import_saveValue.saveValue)({ key: "error", value: true, stateType: "boolean", store });
-    await (0, import_saveValue.saveValue)({
-      key: "errorMessage",
-      value: (_f = (_e = (_b = (_a = data.objectResult) == null ? void 0 : _a[0]) == null ? void 0 : _b.description) != null ? _e : (_d = (_c = data.object_result) == null ? void 0 : _c[0]) == null ? void 0 : _d.description) != null ? _f : "",
-      stateType: "string",
-      store
-    });
-    await (0, import_saveValue.saveValue)({
-      key: "errorCode",
-      value: (_k = (_h = (_g = data.objectResult) == null ? void 0 : _g[0]) == null ? void 0 : _h.faultCode) != null ? _k : (_j = (_i = data.object_result) == null ? void 0 : _i[0]) == null ? void 0 : _j.fault_code,
-      stateType: "string",
-      store
-    });
-    await (0, import_saveValue.saveValue)({
-      key: "errorLevel",
-      value: (_p = (_m = (_l = data.objectResult) == null ? void 0 : _l[0]) == null ? void 0 : _m.errorLevel) != null ? _p : (_o = (_n = data.object_result) == null ? void 0 : _n[0]) == null ? void 0 : _o.error_level,
-      stateType: "number",
-      store
-    });
+    await store.saveValue("error", true);
+    await store.saveValue(
+      "errorMessage",
+      (_f = (_e = (_b = (_a = data.objectResult) == null ? void 0 : _a[0]) == null ? void 0 : _b.description) != null ? _e : (_d = (_c = data.object_result) == null ? void 0 : _c[0]) == null ? void 0 : _d.description) != null ? _f : ""
+    );
+    await store.saveValue("errorCode", (_k = (_h = (_g = data.objectResult) == null ? void 0 : _g[0]) == null ? void 0 : _h.faultCode) != null ? _k : (_j = (_i = data.object_result) == null ? void 0 : _i[0]) == null ? void 0 : _j.fault_code);
+    await store.saveValue("errorLevel", (_p = (_m = (_l = data.objectResult) == null ? void 0 : _l[0]) == null ? void 0 : _m.errorLevel) != null ? _p : (_o = (_n = data.object_result) == null ? void 0 : _n[0]) == null ? void 0 : _o.error_level);
   } catch (error) {
     (0, import_logging.errorLogger)("Error in updateDeviceErrorMsg", error, adapter);
   }

@@ -1,5 +1,4 @@
 import { getUpdateDeviceStatusSUrl } from './endPoints';
-import { saveValue } from './saveValue';
 import type { Store } from './store';
 import { updateDeviceDetails } from './updateDeviceDetails';
 import { updateDeviceErrorMsg } from './updateDeviceOnError';
@@ -30,7 +29,7 @@ export async function updateDeviceStatus(store: Store): Promise<void> {
 
         const status = apiLevel < 3 ? data.object_result?.status : data.objectResult?.status;
         store.reachable = status === 'ONLINE';
-        await saveValue({ key: 'info.connection', value: store.reachable, stateType: 'boolean', store });
+        await store.saveValue('info.connection', store.reachable);
         if (!store.reachable) {
             return;
         }
@@ -38,16 +37,16 @@ export async function updateDeviceStatus(store: Store): Promise<void> {
         const isFault =
             apiLevel < 3 ? data.object_result?.is_fault : (data.objectResult?.is_fault ?? data.objectResult?.isFault);
         if (isFault === true) {
-            await saveValue({ key: 'error', value: true, stateType: 'boolean', store });
+            await store.saveValue('error', true);
             await updateDeviceDetails(store);
             await updateDeviceErrorMsg(store);
             return;
         }
 
-        await saveValue({ key: 'error', value: false, stateType: 'boolean', store });
-        await saveValue({ key: 'errorMessage', value: '', stateType: 'string', store });
-        await saveValue({ key: 'errorCode', value: '', stateType: 'string', store });
-        await saveValue({ key: 'errorLevel', value: 0, stateType: 'number', store });
+        await store.saveValue('error', false);
+        await store.saveValue('errorMessage', '');
+        await store.saveValue('errorCode', '');
+        await store.saveValue('errorLevel', 0);
         await updateDeviceDetails(store);
     } catch (error: unknown) {
         await store.resetOnErrorHandler();

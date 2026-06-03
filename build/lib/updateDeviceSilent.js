@@ -23,7 +23,6 @@ __export(updateDeviceSilent_exports, {
 module.exports = __toCommonJS(updateDeviceSilent_exports);
 var import_axiosParameter = require("./axiosParameter");
 var import_endPoints = require("./endPoints");
-var import_saveValue = require("./saveValue");
 var import_logging = require("./logging");
 var import_axios = require("./axios");
 async function updateDeviceSilent(store, silent) {
@@ -43,7 +42,7 @@ async function updateDeviceSilent(store, silent) {
         return;
       }
       adapter.log.debug(`DeviceStatus: ${JSON.stringify(data)}`);
-      await (0, import_saveValue.saveValue)({ key: "silent", value: silent, stateType: "boolean", store });
+      await store.saveValue("silent", silent);
     }
   } catch (error) {
     (0, import_logging.errorLogger)("Error in updateDeviceSilent", error, adapter);

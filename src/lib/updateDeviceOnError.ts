@@ -1,9 +1,8 @@
-import { saveValue } from './saveValue';
 import { errorLogger } from './logging';
 import { request } from './axios';
 import { getHeaders } from './axiosParameter';
 import type { MidasData } from '../types/types';
-import type { Store } from './store.ts';
+import type { Store } from './store';
 
 export async function updateDeviceErrorMsg(store: Store): Promise<void> {
     const { adapter } = store;
@@ -32,25 +31,13 @@ export async function updateDeviceErrorMsg(store: Store): Promise<void> {
             return;
         }
 
-        await saveValue({ key: 'error', value: true, stateType: 'boolean', store });
-        await saveValue({
-            key: 'errorMessage',
-            value: data.objectResult?.[0]?.description ?? data.object_result?.[0]?.description ?? '',
-            stateType: 'string',
-            store,
-        });
-        await saveValue({
-            key: 'errorCode',
-            value: data.objectResult?.[0]?.faultCode ?? data.object_result?.[0]?.fault_code,
-            stateType: 'string',
-            store,
-        });
-        await saveValue({
-            key: 'errorLevel',
-            value: data.objectResult?.[0]?.errorLevel ?? data.object_result?.[0]?.error_level,
-            stateType: 'number',
-            store,
-        });
+        await store.saveValue('error', true);
+        await store.saveValue(
+            'errorMessage',
+            data.objectResult?.[0]?.description ?? data.object_result?.[0]?.description ?? '',
+        );
+        await store.saveValue('errorCode', data.objectResult?.[0]?.faultCode ?? data.object_result?.[0]?.fault_code);
+        await store.saveValue('errorLevel', data.objectResult?.[0]?.errorLevel ?? data.object_result?.[0]?.error_level);
     } catch (error: any) {
         errorLogger('Error in updateDeviceErrorMsg', error, adapter);
     }

@@ -23,15 +23,15 @@ __export(updateDeviceDetails_exports, {
 module.exports = __toCommonJS(updateDeviceDetails_exports);
 var import_axiosParameter = require("./axiosParameter");
 var import_endPoints = require("./endPoints");
-var import_saveValue = require("./saveValue");
 var import_logging = require("./logging");
 var import_axios = require("./axios");
 var import_utils = require("./utils");
+var import_store = require("./store");
 async function saveNumberIfValid(store, key, value) {
   if (!Number.isFinite(value)) {
     return false;
   }
-  await (0, import_saveValue.saveValue)({ key, value, stateType: "number", store });
+  await store.saveValue(key, value);
   return true;
 }
 async function updateDeviceDetails(store) {
@@ -58,13 +58,8 @@ async function updateDeviceDetails(store) {
     if (!responseValue || responseValue.length === 0) {
       return;
     }
-    await (0, import_saveValue.saveValue)({
-      key: "rawJSON",
-      value: JSON.stringify(responseValue),
-      stateType: "string",
-      store
-    });
-    const isPoolsana = product === store.AQUATEMP_POOLSANA;
+    await store.saveValue("rawJSON", JSON.stringify(responseValue));
+    const isPoolsana = product === import_store.Store.AQUATEMP_POOLSANA;
     const powerOn = (0, import_utils.findCodeVal)(responseValue, "Power") === "1";
     const mode = (0, import_utils.findCodeVal)(responseValue, "Mode");
     const modes = {
@@ -77,12 +72,10 @@ async function updateDeviceDetails(store) {
     };
     const tempSetValue = (0, import_utils.findCodeVal)(responseValue, "Set_Temp");
     const tempSetValueByMode = mode ? (0, import_utils.findCodeVal)(responseValue, modes[parseInt(mode)]) : null;
-    await (0, import_saveValue.saveValue)({
-      key: "tempSet",
-      value: (_b = tempSetValue ? parseFloat(tempSetValue) : null) != null ? _b : tempSetValueByMode ? parseFloat(tempSetValueByMode) : null,
-      stateType: "number",
-      store
-    });
+    await store.saveValue(
+      "tempSet",
+      (_b = tempSetValue ? parseFloat(tempSetValue) : null) != null ? _b : tempSetValueByMode ? parseFloat(tempSetValueByMode) : null
+    );
     if (powerOn) {
       const tPower = isPoolsana ? "T07" : "T7";
       const tVoltage = "T14";
@@ -96,12 +89,7 @@ async function updateDeviceDetails(store) {
       const powerVal = (0, import_utils.parseNumberOrNull)((0, import_utils.findCodeVal)(responseValue, tPower));
       const tVoltageVal = (0, import_utils.parseNumberOrNull)((0, import_utils.findCodeVal)(responseValue, tVoltage));
       const consumptionValue = (0, import_utils.isDefined)(powerVal) && (0, import_utils.isDefined)(tVoltageVal) ? powerVal * tVoltageVal : 0;
-      await (0, import_saveValue.saveValue)({
-        key: "consumption",
-        value: consumptionValue,
-        stateType: "number",
-        store
-      });
+      await store.saveValue("consumption", consumptionValue);
       const flowSwitchValue = (0, import_utils.findCodeVal)(responseValue, flowSwitch);
       await saveNumberIfValid(store, "suctionTemp", (0, import_utils.parseNumberOrNull)((0, import_utils.findCodeVal)(responseValue, tSuction)));
       await saveNumberIfValid(store, "tempIn", (0, import_utils.parseNumberOrNull)((0, import_utils.findCodeVal)(responseValue, tIn)));
@@ -109,31 +97,19 @@ async function updateDeviceDetails(store) {
       await saveNumberIfValid(store, "coilTemp", (0, import_utils.parseNumberOrNull)((0, import_utils.findCodeVal)(responseValue, tCoil)));
       await saveNumberIfValid(store, "ambient", (0, import_utils.parseNumberOrNull)((0, import_utils.findCodeVal)(responseValue, tAmb)));
       await saveNumberIfValid(store, "voltage", tVoltageVal);
-      await (0, import_saveValue.saveValue)({
-        key: "flowSwitch",
-        value: flowSwitchValue ? [1, "1", "true", true].includes(flowSwitchValue) : null,
-        stateType: "boolean",
-        store
-      });
+      await store.saveValue(
+        "flowSwitch",
+        flowSwitchValue ? [1, "1", "true", true].includes(flowSwitchValue) : null
+      );
       await saveNumberIfValid(store, "rotor", (0, import_utils.parseIntOrNull)((0, import_utils.findCodeVal)(responseValue, tRotor)));
     } else {
-      await (0, import_saveValue.saveValue)({ key: "consumption", value: 0, stateType: "number", store });
-      await (0, import_saveValue.saveValue)({ key: "rotor", value: 0, stateType: "number", store });
+      await store.saveValue("consumption", 0);
+      await store.saveValue("rotor", 0);
     }
-    await (0, import_saveValue.saveValue)({
-      key: "silent",
-      value: (0, import_utils.findCodeVal)(responseValue, "Manual-mute") === "1",
-      stateType: "boolean",
-      store
-    });
-    await (0, import_saveValue.saveValue)({ key: "state", value: powerOn, stateType: "boolean", store });
-    await (0, import_saveValue.saveValue)({
-      key: "mode",
-      value: powerOn ? (0, import_utils.findCodeVal)(responseValue, "Mode") : "-1",
-      stateType: "string",
-      store
-    });
-    await (0, import_saveValue.saveValue)({ key: "info.connection", value: true, stateType: "boolean", store });
+    await store.saveValue("silent", (0, import_utils.findCodeVal)(responseValue, "Manual-mute") === "1");
+    await store.saveValue("state", powerOn);
+    await store.saveValue("mode", powerOn && mode ? parseInt(mode) : -1);
+    await store.saveValue("info.connection", true);
   } catch (error) {
     (0, import_logging.errorLogger)("Error updateDeviceDetails", error, adapter);
     void store.resetOnErrorHandler();

@@ -1,5 +1,5 @@
 import type { AxiosUpdateDeviceParam, AxiosUpdateDeviceParams } from '../types';
-import type { Store } from './store';
+import { Store } from './store';
 
 const PRODUCT_IDS = [
     '1132174963097280512',
@@ -79,7 +79,7 @@ export const getProtocolCodes = (
     store: Store,
     productId?: string,
 ): { device_code?: string; deviceCode?: string; protocal_codes?: string[]; protocalCodes?: string[] } => {
-    const codes = productId === store.AQUATEMP_POOLSANA ? CODES_POOLSANA : CODES_OTHER;
+    const codes = productId === Store.AQUATEMP_POOLSANA ? CODES_POOLSANA : CODES_OTHER;
 
     return store.apiLevel < 3
         ? { device_code: store.device, protocal_codes: codes }

@@ -24,7 +24,6 @@ module.exports = __toCommonJS(updateDevicePower_exports);
 var import_getSettings = require("./getSettings");
 var import_endPoints = require("./endPoints");
 var import_axiosParameter = require("./axiosParameter");
-var import_saveValue = require("./saveValue");
 var import_logging = require("./logging");
 var import_axios = require("./axios");
 var import_utils = require("./utils");
@@ -49,9 +48,9 @@ async function updateDevicePower(store, mode) {
     adapter.log.debug(`DeviceStatus: ${JSON.stringify(data)}`);
     if (mode >= 0) {
       store.setMode(mode);
-      await updateDeviceMode(store, mode.toString());
+      await updateDeviceMode(store, mode);
     } else {
-      await (0, import_saveValue.saveValue)({ key: "mode", value: mode.toString(), stateType: "string", store });
+      await store.saveValue("mode", mode);
     }
   } catch (error) {
     (0, import_logging.errorLogger)("Error in updateDevicePower", error, adapter);
@@ -76,7 +75,7 @@ async function updateDeviceMode(store, mode) {
         return;
       }
       adapter.log.debug(`DeviceStatus: ${JSON.stringify(data)}`);
-      await (0, import_saveValue.saveValue)({ key: "mode", value: mode, stateType: "string", store });
+      await store.saveValue("mode", mode);
     }
   } catch (error) {
     (0, import_logging.errorLogger)("Error in updateDeviceMode", error, adapter);
