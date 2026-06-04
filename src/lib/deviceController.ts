@@ -1,15 +1,11 @@
 import { type StateKey, Store, type TMode } from './store';
 import type { DeviceDetails, DeviceStatus, MidasData, ObjectResultResponse, UpdateDeviceId } from '../types/types';
-import {
-    getAxiosUpdateDeviceIdParams,
-    getAxiosUpdateDevicePowerParams,
-    getAxiosUpdateDeviceSetTempParams,
-    getProtocolCodes,
-} from './axiosParameter';
+import { CODES_OTHER, CODES_POOLSANA, PRODUCT_IDS } from './axiosParameter';
 import { findCodeVal, isDefined, parseIntOrNull, parseFloatOrNull } from './utils';
 import { errorLogger } from './logging';
 import type { TokenManager } from './tokenManager';
 import type { ApiClient } from './apiClient';
+import type { AxiosUpdateDeviceParam, AxiosUpdateDeviceParams } from '../types';
 
 export class DeviceController {
     constructor(
@@ -21,17 +17,17 @@ export class DeviceController {
     public async updateDeviceStatus(): Promise<void> {
         const { apiLevel, adapter, saveValue, resetOnErrorHandler } = this.store;
         try {
-            const { token, device } = this.getTokenAndDevice();
-            if (!token || !device) {
+            const res = this.getTokenAndDevice();
+            if (!res) {
                 return;
             }
 
-            const payload = apiLevel < 3 ? { device_code: device } : { deviceCode: device };
+            const payload = apiLevel < 3 ? { device_code: res.device } : { deviceCode: res.device };
 
             const { data, error } = await this.apiClient.request<DeviceStatus>(
                 this.store.getUpdateDeviceStatusSUrl(),
                 payload,
-                token,
+                res.token,
             );
             if (!data || error) {
                 await this.store.resetOnErrorHandler();
@@ -81,7 +77,7 @@ export class DeviceController {
 
             const { data, error } = await this.apiClient.request<DeviceDetails>(
                 this.store.getSUrlUpdateDeviceId(),
-                getProtocolCodes(this.store, product),
+                this.getProtocolCodes(product),
                 token,
             );
 
@@ -146,7 +142,7 @@ export class DeviceController {
 
             const { data, status, error } = await this.apiClient.request<UpdateDeviceId>(
                 this.store.getUpdateDeviceIdSUrl(),
-                getAxiosUpdateDeviceIdParams(this.store),
+                this.getAxiosUpdateDeviceIdParams(),
                 token,
             );
 
@@ -197,16 +193,16 @@ export class DeviceController {
         try {
             const { powerMode, powerOpt } = DeviceController.getPowerMode(mode);
 
-            const { token, device } = this.getTokenAndDevice();
-            if (!isDefined(powerOpt) || !isDefined(powerMode) || !token || !device) {
-                this.store.adapter.log.warn(`Invalid value(s) : ${mode}, ${token}, ${device}`);
+            const res = this.getTokenAndDevice();
+            if (!isDefined(powerOpt) || !isDefined(powerMode) || !res) {
+                this.store.adapter.log.warn(`Invalid value(s) : ${mode}, ${res?.token}, ${res?.device}`);
                 return;
             }
 
             const { data, error } = await this.apiClient.request<MidasData>(
                 this.store.getSUrl(),
-                getAxiosUpdateDevicePowerParams(this.store, device, powerOpt, 'Power'),
-                token,
+                this.getAxiosUpdateDevicePowerParams(res.device, powerOpt, 'Power'),
+                res.token,
             );
             if (!data || error) {
                 await resetOnErrorHandler();
@@ -246,14 +242,14 @@ export class DeviceController {
                 adapter.log.debug(`Mode set to: ${result?.val}`);
                 return;
             }
-            const { token, device } = this.getTokenAndDevice();
-            if (!token || !device) {
+            const res = this.getTokenAndDevice();
+            if (!res) {
                 return;
             }
             const { data, error } = await this.apiClient.request<MidasData>(
                 this.store.getSUrl(),
-                getAxiosUpdateDeviceSetTempParams(device, sTemperature, this.store),
-                token,
+                this.getAxiosUpdateDeviceSetTempParams(res.device, sTemperature),
+                res.token,
             );
             adapter.log.debug(`DeviceStatus: ${JSON.stringify(data)}`);
 
@@ -272,14 +268,14 @@ export class DeviceController {
         const { adapter, resetOnErrorHandler, saveValue } = this.store;
         try {
             const silentMode = silent ? '1' : '0';
-            const { device, token } = this.getTokenAndDevice();
-            if (!token || !device) {
+            const res = this.getTokenAndDevice();
+            if (!res) {
                 return;
             }
             const { data, error } = await this.apiClient.request<MidasData>(
                 this.store.getSUrl(),
-                getAxiosUpdateDevicePowerParams(this.store, device, silentMode, 'Manual-mute'),
-                token,
+                this.getAxiosUpdateDevicePowerParams(res.device, silentMode, 'Manual-mute'),
+                res.token,
             );
             if (!data || error) {
                 await resetOnErrorHandler();
@@ -293,6 +289,49 @@ export class DeviceController {
             errorLogger('Error in updateDeviceSilent', error, adapter);
         }
     }
+
+    private getAxiosUpdateDeviceSetTempParams(deviceCode: string, sTemperature: string): AxiosUpdateDeviceParams {
+        return {
+            param: ['R01', 'R02', 'R03', 'Set_Temp'].map(code => this.controlParam(deviceCode, code, sTemperature)),
+        };
+    }
+
+    private getAxiosUpdateDeviceIdParams(): { product_ids?: string[]; productIds?: string[] } {
+        return this.store.apiLevel < 3 ? { product_ids: PRODUCT_IDS } : { productIds: PRODUCT_IDS };
+    }
+
+    private getProtocolCodes(productId?: string): {
+        device_code?: string;
+        deviceCode?: string;
+        protocal_codes?: string[];
+        protocalCodes?: string[];
+    } {
+        const codes = productId === Store.AQUATEMP_POOLSANA ? CODES_POOLSANA : CODES_OTHER;
+
+        return this.store.apiLevel < 3
+            ? { device_code: this.store.device, protocal_codes: codes }
+            : { deviceCode: this.store.device, protocalCodes: codes };
+    }
+
+    private getAxiosUpdateDevicePowerParams(
+        deviceCode: string,
+        value: number | string,
+        protocolCode: string,
+    ): AxiosUpdateDeviceParams {
+        return {
+            param: [this.controlParam(deviceCode, protocolCode, value)],
+        };
+    }
+
+    private controlParam = (
+        deviceCode: string,
+        protocolCode: string,
+        value: string | number,
+    ): AxiosUpdateDeviceParam => {
+        return this.store.apiLevel < 3
+            ? { device_code: deviceCode, protocol_code: protocolCode, value }
+            : { deviceCode, protocolCode, value };
+    };
 
     private async savePowerOnSensors(responseValue: ObjectResultResponse, isPoolsana: boolean): Promise<void> {
         const { saveValue } = this.store;
@@ -329,8 +368,8 @@ export class DeviceController {
     private async updateDeviceErrorMsg(): Promise<void> {
         const { adapter, apiLevel, cloudURL, resetOnErrorHandler, saveValue } = this.store;
         try {
-            const { token, device } = this.getTokenAndDevice();
-            if (!token || !device) {
+            const res = this.getTokenAndDevice();
+            if (!res) {
                 return;
             }
             const sURL =
@@ -341,10 +380,10 @@ export class DeviceController {
             const { data, error } = await this.apiClient.request<MidasData>(
                 sURL,
                 {
-                    device_code: device,
-                    deviceCode: device,
+                    device_code: res.device,
+                    deviceCode: res.device,
                 },
-                token,
+                res.token,
             );
 
             if (!data || error) {
@@ -368,14 +407,14 @@ export class DeviceController {
         const { adapter, resetOnErrorHandler, saveValue } = this.store;
 
         try {
-            const { token, device } = this.getTokenAndDevice();
-            if (!token || !device) {
+            const res = this.getTokenAndDevice();
+            if (!res) {
                 return;
             }
             const { data, error } = await this.apiClient.request<MidasData>(
                 this.store.getSUrl(),
-                getAxiosUpdateDevicePowerParams(this.store, device, mode, 'Mode'),
-                token,
+                this.getAxiosUpdateDevicePowerParams(res.device, mode, 'Mode'),
+                res.token,
             );
             if (!data || error) {
                 await resetOnErrorHandler();
@@ -413,11 +452,11 @@ export class DeviceController {
         };
     }
 
-    private getTokenAndDevice(): { token: string | null; device: string | null } {
+    private getTokenAndDevice(): { token: string; device: string } | null {
         const token = this.tokenManager.getValidTokenOrNull();
         const device = this.store.device;
         if (!token || !device) {
-            return { token: null, device: null };
+            return null;
         }
         return { token, device };
     }

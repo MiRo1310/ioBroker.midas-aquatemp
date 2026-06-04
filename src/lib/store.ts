@@ -92,20 +92,20 @@ export class Store {
         this.tokenManager = tokenManager;
     }
 
-    public getDpRoot(): string {
+    public getDpRoot = (): string => {
         return `midas-aquatemp.${this.instance}`;
-    }
+    };
 
-    public async resetOnErrorHandler(): Promise<void> {
+    public resetOnErrorHandler = async (): Promise<void> => {
         this.tokenManager?.resetToken();
         this.device = '';
         this.reachable = false;
         await this.saveValue('info.connection', false);
-    }
+    };
 
-    public setMode(mode: TMode): void {
+    public setMode = (mode: TMode): void => {
         this.mode = mode;
-    }
+    };
 
     public getMode(): TMode {
         return this.mode;
@@ -115,7 +115,7 @@ export class Store {
         return Store.modes.includes(curr as TMode);
     }
 
-    public async saveValue(key: StateKey, value?: ioBroker.StateValue): Promise<void> {
+    public saveValue = async (key: StateKey, value?: ioBroker.StateValue): Promise<void> => {
         try {
             const dp = `${this.getDpRoot()}.${key}`;
 
@@ -135,7 +135,7 @@ export class Store {
         } catch (err: any) {
             errorLogger('Error in saveValue', err, this.adapter);
         }
-    }
+    };
 
     public async clearStateValues(): Promise<void> {
         await this.saveValue('error', true);

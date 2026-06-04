@@ -18,13 +18,11 @@ var __copyProps = (to, from, except, desc) => {
 var __toCommonJS = (mod) => __copyProps(__defProp({}, "__esModule", { value: true }), mod);
 var axiosParameter_exports = {};
 __export(axiosParameter_exports, {
-  getAxiosUpdateDeviceIdParams: () => getAxiosUpdateDeviceIdParams,
-  getAxiosUpdateDevicePowerParams: () => getAxiosUpdateDevicePowerParams,
-  getAxiosUpdateDeviceSetTempParams: () => getAxiosUpdateDeviceSetTempParams,
-  getProtocolCodes: () => getProtocolCodes
+  CODES_OTHER: () => CODES_OTHER,
+  CODES_POOLSANA: () => CODES_POOLSANA,
+  PRODUCT_IDS: () => PRODUCT_IDS
 });
 module.exports = __toCommonJS(axiosParameter_exports);
-var import_store = require("./store");
 const PRODUCT_IDS = [
   "1132174963097280512",
   "1186904563333062656",
@@ -96,31 +94,10 @@ const CODES_OTHER = [
   "T17",
   "S3"
 ];
-const getProtocolCodes = (store, productId) => {
-  const codes = productId === import_store.Store.AQUATEMP_POOLSANA ? CODES_POOLSANA : CODES_OTHER;
-  return store.apiLevel < 3 ? { device_code: store.device, protocal_codes: codes } : { deviceCode: store.device, protocalCodes: codes };
-};
-const getAxiosUpdateDeviceIdParams = (store) => {
-  return store.apiLevel < 3 ? { product_ids: PRODUCT_IDS } : { productIds: PRODUCT_IDS };
-};
-const controlParam = (store, deviceCode, protocolCode, value) => {
-  return store.apiLevel < 3 ? { device_code: deviceCode, protocol_code: protocolCode, value } : { deviceCode, protocolCode, value };
-};
-const getAxiosUpdateDevicePowerParams = (store, deviceCode, value, protocolCode) => {
-  return {
-    param: [controlParam(store, deviceCode, protocolCode, value)]
-  };
-};
-const getAxiosUpdateDeviceSetTempParams = (deviceCode, sTemperature, store) => {
-  return {
-    param: ["R01", "R02", "R03", "Set_Temp"].map((code) => controlParam(store, deviceCode, code, sTemperature))
-  };
-};
 // Annotate the CommonJS export names for ESM import in node:
 0 && (module.exports = {
-  getAxiosUpdateDeviceIdParams,
-  getAxiosUpdateDevicePowerParams,
-  getAxiosUpdateDeviceSetTempParams,
-  getProtocolCodes
+  CODES_OTHER,
+  CODES_POOLSANA,
+  PRODUCT_IDS
 });
 //# sourceMappingURL=axiosParameter.js.map

@@ -78,26 +78,26 @@ class Store {
   setTokenManager(tokenManager) {
     this.tokenManager = tokenManager;
   }
-  getDpRoot() {
+  getDpRoot = () => {
     return `midas-aquatemp.${this.instance}`;
-  }
-  async resetOnErrorHandler() {
+  };
+  resetOnErrorHandler = async () => {
     var _a;
     (_a = this.tokenManager) == null ? void 0 : _a.resetToken();
     this.device = "";
     this.reachable = false;
     await this.saveValue("info.connection", false);
-  }
-  setMode(mode) {
+  };
+  setMode = (mode) => {
     this.mode = mode;
-  }
+  };
   getMode() {
     return this.mode;
   }
   isValidMode(curr) {
     return Store.modes.includes(curr);
   }
-  async saveValue(key, value) {
+  saveValue = async (key, value) => {
     try {
       const dp = `${this.getDpRoot()}.${key}`;
       await this.adapter.setObjectNotExists(dp, {
@@ -115,7 +115,7 @@ class Store {
     } catch (err) {
       (0, import_logging.errorLogger)("Error in saveValue", err, this.adapter);
     }
-  }
+  };
   async clearStateValues() {
     await this.saveValue("error", true);
     await this.saveValue("consumption", 0);

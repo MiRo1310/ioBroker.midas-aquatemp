@@ -144,13 +144,11 @@ class MidasAquatemp extends utils.Adapter {
         }
         if (id === `${dpRoot}.state`) {
           this.log.debug(`State: ${JSON.stringify(state)}`);
-          if ((0, import_utils.isStateValue)(state)) {
-            if (!state.val) {
-              await deviceController.updateDevicePower(-1);
-            } else {
-              const currentMode2 = parseInt(String(store.getMode()));
-              await deviceController.updateDevicePower(currentMode2 >= 0 ? currentMode2 : 0);
-            }
+          if (!state.val) {
+            await deviceController.updateDevicePower(-1);
+          } else {
+            const currentMode2 = parseInt(String(store.getMode()));
+            await deviceController.updateDevicePower(currentMode2 >= 0 ? currentMode2 : 0);
           }
           await this.setState(id, { ack: true });
         }
