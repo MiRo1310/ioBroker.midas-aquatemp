@@ -1,16 +1,15 @@
 import { type StateKey, Store, type TMode } from './store';
-import type { DeviceDetails, DeviceStatus, MidasData, UpdateDeviceId } from '../types/types';
+import type { DeviceDetails, DeviceStatus, MidasData, ObjectResultResponse, UpdateDeviceId } from '../types/types';
 import {
     getAxiosUpdateDeviceIdParams,
     getAxiosUpdateDevicePowerParams,
     getAxiosUpdateDeviceSetTempParams,
-    getHeaders,
     getProtocolCodes,
 } from './axiosParameter';
 import { findCodeVal, isDefined, parseIntOrNull, parseNumberOrNull } from './utils';
 import { errorLogger } from './logging';
 import type { TokenManager } from './tokenManager';
-import type { ApiClient } from './axios';
+import type { ApiClient } from './apiClient';
 
 export class DeviceController {
     constructor(
@@ -20,19 +19,19 @@ export class DeviceController {
     ) {}
 
     public async updateDeviceStatus(): Promise<void> {
-        const { device: deviceCode, apiLevel, adapter, saveValue, resetOnErrorHandler } = this.store;
+        const { apiLevel, adapter, saveValue, resetOnErrorHandler } = this.store;
         try {
-            const token = this.tokenManager.getValidTokenOrNull();
-            if (!token || !deviceCode) {
+            const { token, device } = this.getTokenAndDevice();
+            if (!token || !device) {
                 return;
             }
 
-            const payload = apiLevel < 3 ? { device_code: deviceCode } : { deviceCode };
+            const payload = apiLevel < 3 ? { device_code: device } : { deviceCode: device };
 
             const { data, error } = await this.apiClient.request<DeviceStatus>(
                 this.store.getUpdateDeviceStatusSUrl(),
                 payload,
-                getHeaders(token),
+                token,
             );
             if (!data || error) {
                 await this.store.resetOnErrorHandler();
@@ -73,17 +72,17 @@ export class DeviceController {
     }
 
     public async updateDeviceDetails(): Promise<void> {
-        const { device: deviceCode, product, resetOnErrorHandler, saveValue, adapter } = this.store;
+        const { product, resetOnErrorHandler, saveValue, adapter } = this.store;
         try {
             const token = this.tokenManager.getValidTokenOrNull();
-            if (!token || !deviceCode || !product) {
+            if (!token || !product) {
                 return;
             }
 
             const { data, error } = await this.apiClient.request<DeviceDetails>(
                 this.store.getSUrlUpdateDeviceId(),
                 getProtocolCodes(this.store, product),
-                getHeaders(token),
+                token,
             );
 
             if (!data || error) {
@@ -121,35 +120,7 @@ export class DeviceController {
             );
 
             if (powerOn) {
-                const tPower = isPoolsana ? 'T07' : 'T7';
-                const tVoltage = 'T14';
-                const tSuction = isPoolsana ? 'T01' : 'T1';
-                const tIn = isPoolsana ? 'T02' : 'T2';
-                const tOut = isPoolsana ? 'T03' : 'T3';
-                const tCoil = isPoolsana ? 'T04' : 'T4';
-                const tAmb = isPoolsana ? 'T05' : 'T5';
-                const flowSwitch = isPoolsana ? 'S03' : 'S3';
-                const tRotor = 'T17';
-
-                const powerVal = parseNumberOrNull(findCodeVal(responseValue, tPower));
-                const tVoltageVal = parseNumberOrNull(findCodeVal(responseValue, tVoltage));
-                const consumptionValue = isDefined(powerVal) && isDefined(tVoltageVal) ? powerVal * tVoltageVal : 0;
-
-                await saveValue('consumption', consumptionValue);
-
-                const flowSwitchValue = findCodeVal(responseValue, flowSwitch);
-
-                await this.saveNumberIfValid('suctionTemp', parseNumberOrNull(findCodeVal(responseValue, tSuction)));
-                await this.saveNumberIfValid('tempIn', parseNumberOrNull(findCodeVal(responseValue, tIn)));
-                await this.saveNumberIfValid('tempOut', parseNumberOrNull(findCodeVal(responseValue, tOut)));
-                await this.saveNumberIfValid('coilTemp', parseNumberOrNull(findCodeVal(responseValue, tCoil)));
-                await this.saveNumberIfValid('ambient', parseNumberOrNull(findCodeVal(responseValue, tAmb)));
-                await this.saveNumberIfValid('voltage', tVoltageVal);
-                await saveValue(
-                    'flowSwitch',
-                    flowSwitchValue ? [1, '1', 'true', true].includes(flowSwitchValue) : null,
-                );
-                await this.saveNumberIfValid('rotor', parseIntOrNull(findCodeVal(responseValue, tRotor)));
+                await this.savePowerOnSensors(responseValue, isPoolsana);
             } else {
                 await saveValue('consumption', 0);
                 await saveValue('rotor', 0);
@@ -176,7 +147,7 @@ export class DeviceController {
             const { data, status, error } = await this.apiClient.request<UpdateDeviceId>(
                 this.store.getUpdateDeviceIdSUrl(),
                 getAxiosUpdateDeviceIdParams(this.store),
-                getHeaders(token),
+                token,
             );
 
             adapter.log.debug(`UpdateDeviceID response: ${JSON.stringify(data)}, status: ${status}`);
@@ -222,11 +193,11 @@ export class DeviceController {
     }
 
     public async updateDevicePower(mode: TMode): Promise<void> {
-        const { adapter, device, resetOnErrorHandler, setMode, saveValue } = this.store;
+        const { adapter, resetOnErrorHandler, setMode, saveValue } = this.store;
         try {
             const { powerMode, powerOpt } = DeviceController.getPowerMode(mode);
 
-            const token = this.tokenManager.getValidTokenOrNull();
+            const { token, device } = this.getTokenAndDevice();
             if (!isDefined(powerOpt) || !isDefined(powerMode) || !token || !device) {
                 this.store.adapter.log.warn(`Invalid value(s) : ${mode}, ${token}, ${device}`);
                 return;
@@ -235,7 +206,7 @@ export class DeviceController {
             const { data, error } = await this.apiClient.request<MidasData>(
                 this.store.getSUrl(),
                 getAxiosUpdateDevicePowerParams(this.store, device, powerOpt, 'Power'),
-                getHeaders(token),
+                token,
             );
             if (!data || error) {
                 await resetOnErrorHandler();
@@ -255,7 +226,7 @@ export class DeviceController {
     }
 
     public async updateDeviceSetTemp(temperature: number): Promise<void> {
-        const { adapter, device, getDpRoot, resetOnErrorHandler, saveValue } = this.store;
+        const { adapter, getDpRoot, resetOnErrorHandler, saveValue } = this.store;
         try {
             const numericTemperature =
                 typeof temperature === 'number' ? temperature : parseFloat(String(temperature).replace(',', '.'));
@@ -275,57 +246,84 @@ export class DeviceController {
                 adapter.log.debug(`Mode set to: ${result?.val}`);
                 return;
             }
-            const token = this.tokenManager.getValidTokenOrNull();
-            if (token && device) {
-                const { data, error } = await this.apiClient.request<MidasData>(
-                    this.store.getSUrl(),
-                    getAxiosUpdateDeviceSetTempParams(device, sTemperature, this.store),
-                    getHeaders(token),
-                );
-                adapter.log.debug(`DeviceStatus: ${JSON.stringify(data)}`);
-
-                if (error) {
-                    await resetOnErrorHandler();
-                    return;
-                }
-
-                await saveValue('tempSet', numericTemperature);
+            const { token, device } = this.getTokenAndDevice();
+            if (!token || !device) {
+                return;
             }
+            const { data, error } = await this.apiClient.request<MidasData>(
+                this.store.getSUrl(),
+                getAxiosUpdateDeviceSetTempParams(device, sTemperature, this.store),
+                token,
+            );
+            adapter.log.debug(`DeviceStatus: ${JSON.stringify(data)}`);
+
+            if (error) {
+                await resetOnErrorHandler();
+                return;
+            }
+
+            await saveValue('tempSet', numericTemperature);
         } catch (error: any) {
             errorLogger('Error in updateDeviceSetTemp', error, adapter);
         }
     }
 
     public async updateDeviceSilent(silent: boolean): Promise<void> {
-        const { adapter, device, resetOnErrorHandler, saveValue } = this.store;
+        const { adapter, resetOnErrorHandler, saveValue } = this.store;
         try {
             const silentMode = silent ? '1' : '0';
-            const token = this.tokenManager.getValidTokenOrNull();
-            if (token && device) {
-                const { data, error } = await this.apiClient.request<MidasData>(
-                    this.store.getSUrl(),
-                    getAxiosUpdateDevicePowerParams(this.store, device, silentMode, 'Manual-mute'),
-                    getHeaders(token),
-                );
-                if (!data || error) {
-                    await resetOnErrorHandler();
-                    return;
-                }
-
-                adapter.log.debug(`DeviceStatus: ${JSON.stringify(data)}`);
-
-                await saveValue('silent', silent);
+            const { device, token } = this.getTokenAndDevice();
+            if (!token || !device) {
+                return;
             }
+            const { data, error } = await this.apiClient.request<MidasData>(
+                this.store.getSUrl(),
+                getAxiosUpdateDevicePowerParams(this.store, device, silentMode, 'Manual-mute'),
+                token,
+            );
+            if (!data || error) {
+                await resetOnErrorHandler();
+                return;
+            }
+
+            adapter.log.debug(`DeviceStatus: ${JSON.stringify(data)}`);
+
+            await saveValue('silent', silent);
         } catch (error: any) {
             errorLogger('Error in updateDeviceSilent', error, adapter);
         }
     }
 
+    private async savePowerOnSensors(responseValue: ObjectResultResponse, isPoolsana: boolean): Promise<void> {
+        const { saveValue } = this.store;
+        const sensorCodes = DeviceController.getSensorCodes(isPoolsana);
+
+        const powerVal = parseNumberOrNull(findCodeVal(responseValue, sensorCodes.tPower));
+        const tVoltageVal = parseNumberOrNull(findCodeVal(responseValue, sensorCodes.tVoltage));
+        const consumptionValue = isDefined(powerVal) && isDefined(tVoltageVal) ? powerVal * tVoltageVal : 0;
+
+        await saveValue('consumption', consumptionValue);
+
+        const flowSwitchValue = findCodeVal(responseValue, sensorCodes.flowSwitch);
+
+        await this.saveNumberIfValid(
+            'suctionTemp',
+            parseNumberOrNull(findCodeVal(responseValue, sensorCodes.tSuction)),
+        );
+        await this.saveNumberIfValid('tempIn', parseNumberOrNull(findCodeVal(responseValue, sensorCodes.tIn)));
+        await this.saveNumberIfValid('tempOut', parseNumberOrNull(findCodeVal(responseValue, sensorCodes.tOut)));
+        await this.saveNumberIfValid('coilTemp', parseNumberOrNull(findCodeVal(responseValue, sensorCodes.tCoil)));
+        await this.saveNumberIfValid('ambient', parseNumberOrNull(findCodeVal(responseValue, sensorCodes.tAmb)));
+        await this.saveNumberIfValid('voltage', tVoltageVal);
+        await saveValue('flowSwitch', flowSwitchValue ? [1, '1', 'true', true].includes(flowSwitchValue) : null);
+        await this.saveNumberIfValid('rotor', parseIntOrNull(findCodeVal(responseValue, sensorCodes.tRotor)));
+    }
+
     private async updateDeviceErrorMsg(): Promise<void> {
-        const { adapter, apiLevel, cloudURL, device: deviceCode, resetOnErrorHandler, saveValue } = this.store;
+        const { adapter, apiLevel, cloudURL, resetOnErrorHandler, saveValue } = this.store;
         try {
-            const token = this.tokenManager.getValidTokenOrNull();
-            if (!token) {
+            const { token, device } = this.getTokenAndDevice();
+            if (!token || !device) {
                 return;
             }
             const sURL =
@@ -336,10 +334,10 @@ export class DeviceController {
             const { data, error } = await this.apiClient.request<MidasData>(
                 sURL,
                 {
-                    device_code: deviceCode,
-                    deviceCode: deviceCode,
+                    device_code: device,
+                    deviceCode: device,
                 },
-                getHeaders(token),
+                token,
             );
 
             if (!data || error) {
@@ -360,29 +358,61 @@ export class DeviceController {
     }
 
     private async updateDeviceMode(mode: TMode): Promise<void> {
-        const { adapter, device, resetOnErrorHandler, saveValue } = this.store;
+        const { adapter, resetOnErrorHandler, saveValue } = this.store;
 
         try {
-            const token = this.tokenManager.getValidTokenOrNull();
-            if (token && device) {
-                const { data, error } = await this.apiClient.request<MidasData>(
-                    this.store.getSUrl(),
-                    getAxiosUpdateDevicePowerParams(this.store, device, mode, 'Mode'),
-                    {
-                        headers: { 'x-token': token },
-                    },
-                );
-                if (!data || error) {
-                    await resetOnErrorHandler();
-                    return;
-                }
-                adapter.log.debug(`DeviceStatus: ${JSON.stringify(data)}`);
-
-                await saveValue('mode', mode);
+            const { token, device } = this.getTokenAndDevice();
+            if (!token || !device) {
+                return;
             }
+            const { data, error } = await this.apiClient.request<MidasData>(
+                this.store.getSUrl(),
+                getAxiosUpdateDevicePowerParams(this.store, device, mode, 'Mode'),
+                token,
+            );
+            if (!data || error) {
+                await resetOnErrorHandler();
+                return;
+            }
+            adapter.log.debug(`DeviceStatus: ${JSON.stringify(data)}`);
+
+            await saveValue('mode', mode);
         } catch (error: any) {
             errorLogger('Error in updateDeviceMode', error, adapter);
         }
+    }
+
+    private static getSensorCodes(isPoolsana: boolean): {
+        tPower: string;
+        tSuction: string;
+        tIn: string;
+        tOut: string;
+        tCoil: string;
+        tAmb: string;
+        flowSwitch: string;
+        tVoltage: string;
+        tRotor: string;
+    } {
+        return {
+            tPower: isPoolsana ? 'T07' : 'T7',
+            tSuction: isPoolsana ? 'T01' : 'T1',
+            tIn: isPoolsana ? 'T02' : 'T2',
+            tOut: isPoolsana ? 'T03' : 'T3',
+            tCoil: isPoolsana ? 'T04' : 'T4',
+            tAmb: isPoolsana ? 'T05' : 'T5',
+            flowSwitch: isPoolsana ? 'S03' : 'S3',
+            tVoltage: 'T14',
+            tRotor: 'T17',
+        };
+    }
+
+    private getTokenAndDevice(): { token: string | null; device: string | null } {
+        const token = this.tokenManager.getValidTokenOrNull();
+        const device = this.store.device;
+        if (!token || !device) {
+            return { token: null, device: null };
+        }
+        return { token, device };
     }
 
     private async saveNumberIfValid(key: StateKey, value: number): Promise<boolean> {

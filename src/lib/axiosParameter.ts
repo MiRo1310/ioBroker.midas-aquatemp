@@ -121,9 +121,3 @@ export const getAxiosUpdateDeviceSetTempParams = (
         param: ['R01', 'R02', 'R03', 'Set_Temp'].map(code => controlParam(store, deviceCode, code, sTemperature)),
     };
 };
-
-export const getHeaders = (token: string): { headers: { 'x-token': string } } => {
-    return {
-        headers: { 'x-token': token },
-    };
-};

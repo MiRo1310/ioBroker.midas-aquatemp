@@ -39,7 +39,7 @@ var import_utils = require("./lib/utils");
 var import_logging = require("./lib/logging");
 var import_deviceController = require("./lib/deviceController");
 var import_tokenManager = require("./lib/tokenManager");
-var import_axios = require("./lib/axios");
+var import_apiClient = require("./lib/apiClient");
 class MidasAquatemp extends utils.Adapter {
   static instance;
   updateInterval;
@@ -65,7 +65,7 @@ class MidasAquatemp extends utils.Adapter {
     }
     const { username, password, refresh, selectApi, useDeviceMac, deviceMac } = this.config;
     const store = new import_store.Store(this, username, password, this.instance, refresh, selectApi, useDeviceMac, deviceMac);
-    const apiClient = new import_axios.ApiClient(store);
+    const apiClient = new import_apiClient.ApiClient(store);
     const tokenManager = new import_tokenManager.TokenManager(store, apiClient);
     const deviceController = new import_deviceController.DeviceController(store, tokenManager, apiClient);
     tokenManager.setDeviceController(deviceController);

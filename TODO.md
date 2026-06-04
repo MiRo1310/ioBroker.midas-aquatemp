@@ -12,7 +12,7 @@
   `request()` bekommt `adapter` bei jedem Aufruf als erstes Argument. Klasse mit `Store` im Konstruktor bauen — entfernt
   den Parameter aus allen ~8 `request()`-Aufrufen in `DeviceController`
 
-- [ ] **`endPoints.ts` → Methoden auf `Store`**
+- [x] **`endPoints.ts` → Methoden auf `Store`**
   Alle Endpoint-Funktionen lesen nur aus `Store` — könnten direkt `Store`-Methoden werden (optional, Geschmackssache)
 
 ---

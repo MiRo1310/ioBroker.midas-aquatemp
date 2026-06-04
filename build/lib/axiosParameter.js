@@ -21,7 +21,6 @@ __export(axiosParameter_exports, {
   getAxiosUpdateDeviceIdParams: () => getAxiosUpdateDeviceIdParams,
   getAxiosUpdateDevicePowerParams: () => getAxiosUpdateDevicePowerParams,
   getAxiosUpdateDeviceSetTempParams: () => getAxiosUpdateDeviceSetTempParams,
-  getHeaders: () => getHeaders,
   getProtocolCodes: () => getProtocolCodes
 });
 module.exports = __toCommonJS(axiosParameter_exports);
@@ -117,17 +116,11 @@ const getAxiosUpdateDeviceSetTempParams = (deviceCode, sTemperature, store) => {
     param: ["R01", "R02", "R03", "Set_Temp"].map((code) => controlParam(store, deviceCode, code, sTemperature))
   };
 };
-const getHeaders = (token) => {
-  return {
-    headers: { "x-token": token }
-  };
-};
 // Annotate the CommonJS export names for ESM import in node:
 0 && (module.exports = {
   getAxiosUpdateDeviceIdParams,
   getAxiosUpdateDevicePowerParams,
   getAxiosUpdateDeviceSetTempParams,
-  getHeaders,
   getProtocolCodes
 });
 //# sourceMappingURL=axiosParameter.js.map

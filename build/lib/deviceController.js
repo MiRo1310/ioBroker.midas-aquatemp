@@ -33,17 +33,17 @@ class DeviceController {
   }
   async updateDeviceStatus() {
     var _a, _b, _c, _d, _e, _f;
-    const { device: deviceCode, apiLevel, adapter, saveValue, resetOnErrorHandler } = this.store;
+    const { apiLevel, adapter, saveValue, resetOnErrorHandler } = this.store;
     try {
-      const token = this.tokenManager.getValidTokenOrNull();
-      if (!token || !deviceCode) {
+      const { token, device } = this.getTokenAndDevice();
+      if (!token || !device) {
         return;
       }
-      const payload = apiLevel < 3 ? { device_code: deviceCode } : { deviceCode };
+      const payload = apiLevel < 3 ? { device_code: device } : { deviceCode: device };
       const { data, error } = await this.apiClient.request(
         this.store.getUpdateDeviceStatusSUrl(),
         payload,
-        (0, import_axiosParameter.getHeaders)(token)
+        token
       );
       if (!data || error) {
         await this.store.resetOnErrorHandler();
@@ -76,16 +76,16 @@ class DeviceController {
   }
   async updateDeviceDetails() {
     var _a, _b;
-    const { device: deviceCode, product, resetOnErrorHandler, saveValue, adapter } = this.store;
+    const { product, resetOnErrorHandler, saveValue, adapter } = this.store;
     try {
       const token = this.tokenManager.getValidTokenOrNull();
-      if (!token || !deviceCode || !product) {
+      if (!token || !product) {
         return;
       }
       const { data, error } = await this.apiClient.request(
         this.store.getSUrlUpdateDeviceId(),
         (0, import_axiosParameter.getProtocolCodes)(this.store, product),
-        (0, import_axiosParameter.getHeaders)(token)
+        token
       );
       if (!data || error) {
         await resetOnErrorHandler();
@@ -115,31 +115,7 @@ class DeviceController {
         (_b = tempSetValue ? parseFloat(tempSetValue) : null) != null ? _b : tempSetValueByMode ? parseFloat(tempSetValueByMode) : null
       );
       if (powerOn) {
-        const tPower = isPoolsana ? "T07" : "T7";
-        const tVoltage = "T14";
-        const tSuction = isPoolsana ? "T01" : "T1";
-        const tIn = isPoolsana ? "T02" : "T2";
-        const tOut = isPoolsana ? "T03" : "T3";
-        const tCoil = isPoolsana ? "T04" : "T4";
-        const tAmb = isPoolsana ? "T05" : "T5";
-        const flowSwitch = isPoolsana ? "S03" : "S3";
-        const tRotor = "T17";
-        const powerVal = (0, import_utils.parseNumberOrNull)((0, import_utils.findCodeVal)(responseValue, tPower));
-        const tVoltageVal = (0, import_utils.parseNumberOrNull)((0, import_utils.findCodeVal)(responseValue, tVoltage));
-        const consumptionValue = (0, import_utils.isDefined)(powerVal) && (0, import_utils.isDefined)(tVoltageVal) ? powerVal * tVoltageVal : 0;
-        await saveValue("consumption", consumptionValue);
-        const flowSwitchValue = (0, import_utils.findCodeVal)(responseValue, flowSwitch);
-        await this.saveNumberIfValid("suctionTemp", (0, import_utils.parseNumberOrNull)((0, import_utils.findCodeVal)(responseValue, tSuction)));
-        await this.saveNumberIfValid("tempIn", (0, import_utils.parseNumberOrNull)((0, import_utils.findCodeVal)(responseValue, tIn)));
-        await this.saveNumberIfValid("tempOut", (0, import_utils.parseNumberOrNull)((0, import_utils.findCodeVal)(responseValue, tOut)));
-        await this.saveNumberIfValid("coilTemp", (0, import_utils.parseNumberOrNull)((0, import_utils.findCodeVal)(responseValue, tCoil)));
-        await this.saveNumberIfValid("ambient", (0, import_utils.parseNumberOrNull)((0, import_utils.findCodeVal)(responseValue, tAmb)));
-        await this.saveNumberIfValid("voltage", tVoltageVal);
-        await saveValue(
-          "flowSwitch",
-          flowSwitchValue ? [1, "1", "true", true].includes(flowSwitchValue) : null
-        );
-        await this.saveNumberIfValid("rotor", (0, import_utils.parseIntOrNull)((0, import_utils.findCodeVal)(responseValue, tRotor)));
+        await this.savePowerOnSensors(responseValue, isPoolsana);
       } else {
         await saveValue("consumption", 0);
         await saveValue("rotor", 0);
@@ -164,7 +140,7 @@ class DeviceController {
       const { data, status, error } = await this.apiClient.request(
         this.store.getUpdateDeviceIdSUrl(),
         (0, import_axiosParameter.getAxiosUpdateDeviceIdParams)(this.store),
-        (0, import_axiosParameter.getHeaders)(token)
+        token
       );
       adapter.log.debug(`UpdateDeviceID response: ${JSON.stringify(data)}, status: ${status}`);
       if (!data || error) {
@@ -202,10 +178,10 @@ class DeviceController {
     }
   }
   async updateDevicePower(mode) {
-    const { adapter, device, resetOnErrorHandler, setMode, saveValue } = this.store;
+    const { adapter, resetOnErrorHandler, setMode, saveValue } = this.store;
     try {
       const { powerMode, powerOpt } = DeviceController.getPowerMode(mode);
-      const token = this.tokenManager.getValidTokenOrNull();
+      const { token, device } = this.getTokenAndDevice();
       if (!(0, import_utils.isDefined)(powerOpt) || !(0, import_utils.isDefined)(powerMode) || !token || !device) {
         this.store.adapter.log.warn(`Invalid value(s) : ${mode}, ${token}, ${device}`);
         return;
@@ -213,7 +189,7 @@ class DeviceController {
       const { data, error } = await this.apiClient.request(
         this.store.getSUrl(),
         (0, import_axiosParameter.getAxiosUpdateDevicePowerParams)(this.store, device, powerOpt, "Power"),
-        (0, import_axiosParameter.getHeaders)(token)
+        token
       );
       if (!data || error) {
         await resetOnErrorHandler();
@@ -231,7 +207,7 @@ class DeviceController {
     }
   }
   async updateDeviceSetTemp(temperature) {
-    const { adapter, device, getDpRoot, resetOnErrorHandler, saveValue } = this.store;
+    const { adapter, getDpRoot, resetOnErrorHandler, saveValue } = this.store;
     try {
       const numericTemperature = typeof temperature === "number" ? temperature : parseFloat(String(temperature).replace(",", "."));
       if (!Number.isFinite(numericTemperature)) {
@@ -248,62 +224,84 @@ class DeviceController {
         adapter.log.debug(`Mode set to: ${result == null ? void 0 : result.val}`);
         return;
       }
-      const token = this.tokenManager.getValidTokenOrNull();
-      if (token && device) {
-        const { data, error } = await this.apiClient.request(
-          this.store.getSUrl(),
-          (0, import_axiosParameter.getAxiosUpdateDeviceSetTempParams)(device, sTemperature, this.store),
-          (0, import_axiosParameter.getHeaders)(token)
-        );
-        adapter.log.debug(`DeviceStatus: ${JSON.stringify(data)}`);
-        if (error) {
-          await resetOnErrorHandler();
-          return;
-        }
-        await saveValue("tempSet", numericTemperature);
+      const { token, device } = this.getTokenAndDevice();
+      if (!token || !device) {
+        return;
       }
+      const { data, error } = await this.apiClient.request(
+        this.store.getSUrl(),
+        (0, import_axiosParameter.getAxiosUpdateDeviceSetTempParams)(device, sTemperature, this.store),
+        token
+      );
+      adapter.log.debug(`DeviceStatus: ${JSON.stringify(data)}`);
+      if (error) {
+        await resetOnErrorHandler();
+        return;
+      }
+      await saveValue("tempSet", numericTemperature);
     } catch (error) {
       (0, import_logging.errorLogger)("Error in updateDeviceSetTemp", error, adapter);
     }
   }
   async updateDeviceSilent(silent) {
-    const { adapter, device, resetOnErrorHandler, saveValue } = this.store;
+    const { adapter, resetOnErrorHandler, saveValue } = this.store;
     try {
       const silentMode = silent ? "1" : "0";
-      const token = this.tokenManager.getValidTokenOrNull();
-      if (token && device) {
-        const { data, error } = await this.apiClient.request(
-          this.store.getSUrl(),
-          (0, import_axiosParameter.getAxiosUpdateDevicePowerParams)(this.store, device, silentMode, "Manual-mute"),
-          (0, import_axiosParameter.getHeaders)(token)
-        );
-        if (!data || error) {
-          await resetOnErrorHandler();
-          return;
-        }
-        adapter.log.debug(`DeviceStatus: ${JSON.stringify(data)}`);
-        await saveValue("silent", silent);
+      const { device, token } = this.getTokenAndDevice();
+      if (!token || !device) {
+        return;
       }
+      const { data, error } = await this.apiClient.request(
+        this.store.getSUrl(),
+        (0, import_axiosParameter.getAxiosUpdateDevicePowerParams)(this.store, device, silentMode, "Manual-mute"),
+        token
+      );
+      if (!data || error) {
+        await resetOnErrorHandler();
+        return;
+      }
+      adapter.log.debug(`DeviceStatus: ${JSON.stringify(data)}`);
+      await saveValue("silent", silent);
     } catch (error) {
       (0, import_logging.errorLogger)("Error in updateDeviceSilent", error, adapter);
     }
   }
+  async savePowerOnSensors(responseValue, isPoolsana) {
+    const { saveValue } = this.store;
+    const sensorCodes = DeviceController.getSensorCodes(isPoolsana);
+    const powerVal = (0, import_utils.parseNumberOrNull)((0, import_utils.findCodeVal)(responseValue, sensorCodes.tPower));
+    const tVoltageVal = (0, import_utils.parseNumberOrNull)((0, import_utils.findCodeVal)(responseValue, sensorCodes.tVoltage));
+    const consumptionValue = (0, import_utils.isDefined)(powerVal) && (0, import_utils.isDefined)(tVoltageVal) ? powerVal * tVoltageVal : 0;
+    await saveValue("consumption", consumptionValue);
+    const flowSwitchValue = (0, import_utils.findCodeVal)(responseValue, sensorCodes.flowSwitch);
+    await this.saveNumberIfValid(
+      "suctionTemp",
+      (0, import_utils.parseNumberOrNull)((0, import_utils.findCodeVal)(responseValue, sensorCodes.tSuction))
+    );
+    await this.saveNumberIfValid("tempIn", (0, import_utils.parseNumberOrNull)((0, import_utils.findCodeVal)(responseValue, sensorCodes.tIn)));
+    await this.saveNumberIfValid("tempOut", (0, import_utils.parseNumberOrNull)((0, import_utils.findCodeVal)(responseValue, sensorCodes.tOut)));
+    await this.saveNumberIfValid("coilTemp", (0, import_utils.parseNumberOrNull)((0, import_utils.findCodeVal)(responseValue, sensorCodes.tCoil)));
+    await this.saveNumberIfValid("ambient", (0, import_utils.parseNumberOrNull)((0, import_utils.findCodeVal)(responseValue, sensorCodes.tAmb)));
+    await this.saveNumberIfValid("voltage", tVoltageVal);
+    await saveValue("flowSwitch", flowSwitchValue ? [1, "1", "true", true].includes(flowSwitchValue) : null);
+    await this.saveNumberIfValid("rotor", (0, import_utils.parseIntOrNull)((0, import_utils.findCodeVal)(responseValue, sensorCodes.tRotor)));
+  }
   async updateDeviceErrorMsg() {
     var _a, _b, _c, _d, _e, _f, _g, _h, _i, _j, _k, _l, _m, _n, _o, _p;
-    const { adapter, apiLevel, cloudURL, device: deviceCode, resetOnErrorHandler, saveValue } = this.store;
+    const { adapter, apiLevel, cloudURL, resetOnErrorHandler, saveValue } = this.store;
     try {
-      const token = this.tokenManager.getValidTokenOrNull();
-      if (!token) {
+      const { token, device } = this.getTokenAndDevice();
+      if (!token || !device) {
         return;
       }
       const sURL = apiLevel < 3 ? `${cloudURL}/app/device/getFaultDataByDeviceCode.json` : `${cloudURL}/app/device/getFaultDataByDeviceCode`;
       const { data, error } = await this.apiClient.request(
         sURL,
         {
-          device_code: deviceCode,
-          deviceCode
+          device_code: device,
+          deviceCode: device
         },
-        (0, import_axiosParameter.getHeaders)(token)
+        token
       );
       if (!data || error) {
         await resetOnErrorHandler();
@@ -321,27 +319,47 @@ class DeviceController {
     }
   }
   async updateDeviceMode(mode) {
-    const { adapter, device, resetOnErrorHandler, saveValue } = this.store;
+    const { adapter, resetOnErrorHandler, saveValue } = this.store;
     try {
-      const token = this.tokenManager.getValidTokenOrNull();
-      if (token && device) {
-        const { data, error } = await this.apiClient.request(
-          this.store.getSUrl(),
-          (0, import_axiosParameter.getAxiosUpdateDevicePowerParams)(this.store, device, mode, "Mode"),
-          {
-            headers: { "x-token": token }
-          }
-        );
-        if (!data || error) {
-          await resetOnErrorHandler();
-          return;
-        }
-        adapter.log.debug(`DeviceStatus: ${JSON.stringify(data)}`);
-        await saveValue("mode", mode);
+      const { token, device } = this.getTokenAndDevice();
+      if (!token || !device) {
+        return;
       }
+      const { data, error } = await this.apiClient.request(
+        this.store.getSUrl(),
+        (0, import_axiosParameter.getAxiosUpdateDevicePowerParams)(this.store, device, mode, "Mode"),
+        token
+      );
+      if (!data || error) {
+        await resetOnErrorHandler();
+        return;
+      }
+      adapter.log.debug(`DeviceStatus: ${JSON.stringify(data)}`);
+      await saveValue("mode", mode);
     } catch (error) {
       (0, import_logging.errorLogger)("Error in updateDeviceMode", error, adapter);
     }
+  }
+  static getSensorCodes(isPoolsana) {
+    return {
+      tPower: isPoolsana ? "T07" : "T7",
+      tSuction: isPoolsana ? "T01" : "T1",
+      tIn: isPoolsana ? "T02" : "T2",
+      tOut: isPoolsana ? "T03" : "T3",
+      tCoil: isPoolsana ? "T04" : "T4",
+      tAmb: isPoolsana ? "T05" : "T5",
+      flowSwitch: isPoolsana ? "S03" : "S3",
+      tVoltage: "T14",
+      tRotor: "T17"
+    };
+  }
+  getTokenAndDevice() {
+    const token = this.tokenManager.getValidTokenOrNull();
+    const device = this.store.device;
+    if (!token || !device) {
+      return { token: null, device: null };
+    }
+    return { token, device };
   }
   async saveNumberIfValid(key, value) {
     if (!Number.isFinite(value)) {

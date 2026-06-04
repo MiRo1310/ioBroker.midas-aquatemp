@@ -58,14 +58,15 @@ export class ApiClient {
     public async request<T extends { error_code?: string | number }>(
         url: string,
         options: unknown,
-        header: { headers?: Record<string, string> } = {},
+        token?: string | null,
     ): Promise<{ status?: number; data: T | undefined; error: boolean }> {
         try {
+            const tokenHeader = token ? { 'x-token': token } : {};
+
             const result = await axios.post<T>(url, options, {
-                ...header,
                 headers: {
                     'Content-Type': 'application/json',
-                    ...header.headers,
+                    ...tokenHeader,
                 },
                 httpsAgent: this.getHttpsAgent(url),
             });

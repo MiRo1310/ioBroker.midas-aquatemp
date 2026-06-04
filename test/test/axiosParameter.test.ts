@@ -5,7 +5,6 @@ import {
     getAxiosUpdateDeviceIdParams,
     getAxiosUpdateDevicePowerParams,
     getAxiosUpdateDeviceSetTempParams,
-    getHeaders,
     getProtocolCodes,
 } from '../../src/lib/axiosParameter.ts';
 import { Store } from '../../src/lib/store.ts';
@@ -116,12 +115,6 @@ describe('axiosParameter.ts', () => {
             const result = getAxiosUpdateDeviceSetTempParams('DEV123', '25', storeV2);
             const codes = result.param.map((p: any) => p.protocol_code);
             expect(codes).to.have.members(['R01', 'R02', 'R03', 'Set_Temp']);
-        });
-    });
-
-    describe('getHeaders', () => {
-        it('returns x-token header with provided token', () => {
-            expect(getHeaders('my-token-123')).to.deep.equal({ headers: { 'x-token': 'my-token-123' } });
         });
     });
 });

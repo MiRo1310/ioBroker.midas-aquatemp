@@ -5,7 +5,7 @@ import { beforeEach, describe, it } from 'mocha';
 import { Store } from '../../src/lib/store.ts';
 import type { MidasAquatemp } from '../../src/main.ts';
 import { TokenManager } from '../../src/lib/tokenManager.ts';
-import { ApiClient } from '../../src/lib/axios.ts';
+import { ApiClient } from '../../src/lib/apiClient.ts';
 import { utils } from '@iobroker/testing';
 
 const { adapter } = utils.unit.createMocks({});

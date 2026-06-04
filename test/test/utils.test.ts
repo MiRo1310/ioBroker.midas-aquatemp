@@ -5,7 +5,7 @@ import { findCodeVal, isDefined, isStateValue, parseIntOrNull, parseNumberOrNull
 import { TokenManager } from '../../src/lib/tokenManager.ts';
 import { Store } from '../../src/lib/store.ts';
 import type { MidasAquatemp } from '../../src/main.ts';
-import { ApiClient } from '../../src/lib/axios.ts';
+import { ApiClient } from '../../src/lib/apiClient.ts';
 import { utils } from '@iobroker/testing';
 
 const { adapter } = utils.unit.createMocks({});

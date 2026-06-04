@@ -3,7 +3,7 @@ import { errorLogger } from './logging';
 import type { RequestToken } from '../types/types';
 import { isDefined } from './utils';
 import type { DeviceController } from './deviceController';
-import type { ApiClient } from './axios';
+import type { ApiClient } from './apiClient';
 
 export class TokenManager {
     private token: string | null = null;

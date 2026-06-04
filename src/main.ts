@@ -12,7 +12,7 @@ import { isDefined, isStateValue } from './lib/utils';
 import { errorLogger } from './lib/logging';
 import { DeviceController } from './lib/deviceController';
 import { TokenManager } from './lib/tokenManager';
-import { ApiClient } from './lib/axios';
+import { ApiClient } from './lib/apiClient';
 
 export class MidasAquatemp extends utils.Adapter {
     private static instance: MidasAquatemp;
