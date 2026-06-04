@@ -88,9 +88,9 @@ class Store {
     this.reachable = false;
     await this.saveValue("info.connection", false);
   };
-  setMode = (mode) => {
+  setMode(mode) {
     this.mode = mode;
-  };
+  }
   getMode() {
     return this.mode;
   }

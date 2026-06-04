@@ -1,22 +1,9 @@
 import { expect } from 'chai';
-import { beforeEach, describe, it } from 'mocha';
+import { describe, it } from 'mocha';
 
 import { ApiClient } from '../../src/lib/apiClient.ts';
-import { Store } from '../../src/lib/store.ts';
-import type { MidasAquatemp } from '../../src/main.ts';
-import { utils } from '@iobroker/testing';
-
-const { adapter } = utils.unit.createMocks({});
 
 describe('ApiClient', () => {
-    let store: Store;
-    let apiClient: ApiClient;
-
-    beforeEach(() => {
-        store = new Store(adapter as unknown as MidasAquatemp, 'user@test.com', 'pass', 0);
-        apiClient = new ApiClient(store);
-    });
-
     describe('isApiSuccess', () => {
         it('treats undefined and null as success', () => {
             expect(ApiClient.isApiSuccess(undefined)).to.be.true;

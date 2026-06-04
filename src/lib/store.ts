@@ -103,9 +103,9 @@ export class Store {
         await this.saveValue('info.connection', false);
     };
 
-    public setMode = (mode: TMode): void => {
+    public setMode(mode: TMode): void {
         this.mode = mode;
-    };
+    }
 
     public getMode(): TMode {
         return this.mode;

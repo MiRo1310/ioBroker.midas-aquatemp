@@ -15,7 +15,7 @@ function makeApiClient(
 ): ApiClient & { callCount: number } {
     const mock = {
         callCount: 0,
-        request: async () => {
+        request: () => {
             mock.callCount++;
             return { ...response, status: 200 };
         },

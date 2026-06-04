@@ -178,7 +178,7 @@ class DeviceController {
     }
   }
   async updateDevicePower(mode) {
-    const { adapter, resetOnErrorHandler, setMode, saveValue } = this.store;
+    const { adapter, resetOnErrorHandler, saveValue } = this.store;
     try {
       const { powerMode, powerOpt } = DeviceController.getPowerMode(mode);
       const res = this.getTokenAndDevice();
@@ -197,7 +197,7 @@ class DeviceController {
       }
       adapter.log.debug(`DeviceStatus: ${JSON.stringify(data)}`);
       if (mode >= 0) {
-        setMode(mode);
+        this.store.setMode(mode);
         await this.updateDeviceMode(mode);
       } else {
         await saveValue("mode", mode);

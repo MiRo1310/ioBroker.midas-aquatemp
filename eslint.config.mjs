@@ -13,6 +13,7 @@ export default [
             'test/**/*.js',
             '*.config.mjs',
             'build',
+            'coverage',
             'admin/build',
             'admin/words.js',
             'admin/admin.d.ts',
@@ -28,6 +29,12 @@ export default [
             // 'jsdoc/require-param-description': 'off',
             // 'jsdoc/require-returns-description': 'off',
             // 'jsdoc/require-returns-check': 'off',
+        },
+    },
+    {
+        files: ['src/**/*.ts'],
+        rules: {
+            '@typescript-eslint/unbound-method': 'error',
         },
     },
 ];
