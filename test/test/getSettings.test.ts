@@ -22,9 +22,9 @@ describe('DeviceController', () => {
         });
 
         it('returns null values for any invalid mode', () => {
-            expect(DeviceController.getPowerMode(99 as TMode)).to.deep.equal({ powerOpt: null, powerMode: null });
-            expect(DeviceController.getPowerMode(-2 as TMode)).to.deep.equal({ powerOpt: null, powerMode: null });
-            expect(DeviceController.getPowerMode(3 as TMode)).to.deep.equal({ powerOpt: null, powerMode: null });
+            expect(DeviceController.getPowerMode(99 as TMode)).to.deep.equal({ powerOpt: 0, powerMode: -1 });
+            expect(DeviceController.getPowerMode(-2 as TMode)).to.deep.equal({ powerOpt: 0, powerMode: -1 });
+            expect(DeviceController.getPowerMode(3 as TMode)).to.deep.equal({ powerOpt: 0, powerMode: -1 });
         });
     });
 });
