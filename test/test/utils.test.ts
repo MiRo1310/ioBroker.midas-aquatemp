@@ -1,7 +1,7 @@
 import { expect } from 'chai';
 import { describe, it } from 'mocha';
 
-import { findCodeVal, isDefined, isStateValue, parseIntOrNull, parseNumberOrNull } from '../../src/lib/utils.ts';
+import { findCodeVal, isDefined, isStateValue, parseIntOrNull, parseFloatOrNull } from '../../src/lib/utils.ts';
 
 describe('utils.ts', () => {
     describe('isDefined', () => {
@@ -32,19 +32,19 @@ describe('utils.ts', () => {
         });
     });
 
-    describe('parseNumberOrNull', () => {
+    describe('parseFloatOrNull', () => {
         it('returns 0 for empty input', () => {
-            expect(parseNumberOrNull('')).to.equal(0);
+            expect(parseFloatOrNull('')).to.equal(0);
         });
 
         it('parses decimal values including comma notation', () => {
-            expect(parseNumberOrNull('12.5')).to.equal(12.5);
-            expect(parseNumberOrNull('12,5')).to.equal(12.5);
-            expect(parseNumberOrNull('-2,75')).to.equal(-2.75);
+            expect(parseFloatOrNull('12.5')).to.equal(12.5);
+            expect(parseFloatOrNull('12,5')).to.equal(12.5);
+            expect(parseFloatOrNull('-2,75')).to.equal(-2.75);
         });
 
         it('returns 0 for invalid numeric values', () => {
-            expect(parseNumberOrNull('abc')).to.equal(0);
+            expect(parseFloatOrNull('abc')).to.equal(0);
         });
     });
 

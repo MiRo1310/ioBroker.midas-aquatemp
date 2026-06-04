@@ -21,13 +21,13 @@ __export(utils_exports, {
   findCodeVal: () => findCodeVal,
   isDefined: () => isDefined,
   isStateValue: () => isStateValue,
-  parseIntOrNull: () => parseIntOrNull,
-  parseNumberOrNull: () => parseNumberOrNull
+  parseFloatOrNull: () => parseFloatOrNull,
+  parseIntOrNull: () => parseIntOrNull
 });
 module.exports = __toCommonJS(utils_exports);
 const isDefined = (value) => value !== void 0 && value !== null;
 const isStateValue = (state) => isDefined(state) && isDefined(state == null ? void 0 : state.val);
-const parseNumberOrNull = (value) => {
+const parseFloatOrNull = (value) => {
   if (value === "" || !isDefined(value)) {
     return 0;
   }
@@ -50,7 +50,7 @@ function findCodeVal(result, code) {
   findCodeVal,
   isDefined,
   isStateValue,
-  parseIntOrNull,
-  parseNumberOrNull
+  parseFloatOrNull,
+  parseIntOrNull
 });
 //# sourceMappingURL=utils.js.map

@@ -269,22 +269,23 @@ class DeviceController {
   async savePowerOnSensors(responseValue, isPoolsana) {
     const { saveValue } = this.store;
     const sensorCodes = DeviceController.getSensorCodes(isPoolsana);
-    const powerVal = (0, import_utils.parseNumberOrNull)((0, import_utils.findCodeVal)(responseValue, sensorCodes.tPower));
-    const tVoltageVal = (0, import_utils.parseNumberOrNull)((0, import_utils.findCodeVal)(responseValue, sensorCodes.tVoltage));
+    const powerVal = (0, import_utils.parseFloatOrNull)((0, import_utils.findCodeVal)(responseValue, sensorCodes.tPower));
+    const tVoltageVal = (0, import_utils.parseFloatOrNull)((0, import_utils.findCodeVal)(responseValue, sensorCodes.tVoltage));
     const consumptionValue = (0, import_utils.isDefined)(powerVal) && (0, import_utils.isDefined)(tVoltageVal) ? powerVal * tVoltageVal : 0;
     await saveValue("consumption", consumptionValue);
     const flowSwitchValue = (0, import_utils.findCodeVal)(responseValue, sensorCodes.flowSwitch);
-    await this.saveNumberIfValid(
-      "suctionTemp",
-      (0, import_utils.parseNumberOrNull)((0, import_utils.findCodeVal)(responseValue, sensorCodes.tSuction))
-    );
-    await this.saveNumberIfValid("tempIn", (0, import_utils.parseNumberOrNull)((0, import_utils.findCodeVal)(responseValue, sensorCodes.tIn)));
-    await this.saveNumberIfValid("tempOut", (0, import_utils.parseNumberOrNull)((0, import_utils.findCodeVal)(responseValue, sensorCodes.tOut)));
-    await this.saveNumberIfValid("coilTemp", (0, import_utils.parseNumberOrNull)((0, import_utils.findCodeVal)(responseValue, sensorCodes.tCoil)));
-    await this.saveNumberIfValid("ambient", (0, import_utils.parseNumberOrNull)((0, import_utils.findCodeVal)(responseValue, sensorCodes.tAmb)));
+    await this.saveSensorNumber("suctionTemp", responseValue, sensorCodes.tSuction);
+    await this.saveSensorNumber("tempIn", responseValue, sensorCodes.tIn);
+    await this.saveSensorNumber("tempOut", responseValue, sensorCodes.tOut);
+    await this.saveSensorNumber("coilTemp", responseValue, sensorCodes.tCoil);
+    await this.saveSensorNumber("ambient", responseValue, sensorCodes.tAmb);
     await this.saveNumberIfValid("voltage", tVoltageVal);
     await saveValue("flowSwitch", flowSwitchValue ? [1, "1", "true", true].includes(flowSwitchValue) : null);
-    await this.saveNumberIfValid("rotor", (0, import_utils.parseIntOrNull)((0, import_utils.findCodeVal)(responseValue, sensorCodes.tRotor)));
+    await this.saveSensorNumber("rotor", responseValue, sensorCodes.tRotor, true);
+  }
+  async saveSensorNumber(key, res, code, int) {
+    const val = (0, import_utils.findCodeVal)(res, code);
+    await this.saveNumberIfValid(key, int ? (0, import_utils.parseIntOrNull)(val) : (0, import_utils.parseFloatOrNull)(val));
   }
   async updateDeviceErrorMsg() {
     var _a, _b, _c, _d, _e, _f, _g, _h, _i, _j, _k, _l, _m, _n, _o, _p;

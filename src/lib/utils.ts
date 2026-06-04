@@ -4,7 +4,7 @@ export const isDefined = <T>(value: T | undefined | null): value is T => value !
 
 export const isStateValue = (state?: IoBrokerState | null): boolean => isDefined(state) && isDefined(state?.val);
 
-export const parseNumberOrNull = (value: string | null): number => {
+export const parseFloatOrNull = (value: string | null): number => {
     if (value === '' || !isDefined(value)) {
         return 0;
     }

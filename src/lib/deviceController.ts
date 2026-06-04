@@ -6,7 +6,7 @@ import {
     getAxiosUpdateDeviceSetTempParams,
     getProtocolCodes,
 } from './axiosParameter';
-import { findCodeVal, isDefined, parseIntOrNull, parseNumberOrNull } from './utils';
+import { findCodeVal, isDefined, parseIntOrNull, parseFloatOrNull } from './utils';
 import { errorLogger } from './logging';
 import type { TokenManager } from './tokenManager';
 import type { ApiClient } from './apiClient';
@@ -298,25 +298,32 @@ export class DeviceController {
         const { saveValue } = this.store;
         const sensorCodes = DeviceController.getSensorCodes(isPoolsana);
 
-        const powerVal = parseNumberOrNull(findCodeVal(responseValue, sensorCodes.tPower));
-        const tVoltageVal = parseNumberOrNull(findCodeVal(responseValue, sensorCodes.tVoltage));
+        const powerVal = parseFloatOrNull(findCodeVal(responseValue, sensorCodes.tPower));
+        const tVoltageVal = parseFloatOrNull(findCodeVal(responseValue, sensorCodes.tVoltage));
         const consumptionValue = isDefined(powerVal) && isDefined(tVoltageVal) ? powerVal * tVoltageVal : 0;
 
         await saveValue('consumption', consumptionValue);
 
         const flowSwitchValue = findCodeVal(responseValue, sensorCodes.flowSwitch);
 
-        await this.saveNumberIfValid(
-            'suctionTemp',
-            parseNumberOrNull(findCodeVal(responseValue, sensorCodes.tSuction)),
-        );
-        await this.saveNumberIfValid('tempIn', parseNumberOrNull(findCodeVal(responseValue, sensorCodes.tIn)));
-        await this.saveNumberIfValid('tempOut', parseNumberOrNull(findCodeVal(responseValue, sensorCodes.tOut)));
-        await this.saveNumberIfValid('coilTemp', parseNumberOrNull(findCodeVal(responseValue, sensorCodes.tCoil)));
-        await this.saveNumberIfValid('ambient', parseNumberOrNull(findCodeVal(responseValue, sensorCodes.tAmb)));
+        await this.saveSensorNumber('suctionTemp', responseValue, sensorCodes.tSuction);
+        await this.saveSensorNumber('tempIn', responseValue, sensorCodes.tIn);
+        await this.saveSensorNumber('tempOut', responseValue, sensorCodes.tOut);
+        await this.saveSensorNumber('coilTemp', responseValue, sensorCodes.tCoil);
+        await this.saveSensorNumber('ambient', responseValue, sensorCodes.tAmb);
         await this.saveNumberIfValid('voltage', tVoltageVal);
         await saveValue('flowSwitch', flowSwitchValue ? [1, '1', 'true', true].includes(flowSwitchValue) : null);
-        await this.saveNumberIfValid('rotor', parseIntOrNull(findCodeVal(responseValue, sensorCodes.tRotor)));
+        await this.saveSensorNumber('rotor', responseValue, sensorCodes.tRotor, true);
+    }
+
+    private async saveSensorNumber(
+        key: StateKey,
+        res: ObjectResultResponse,
+        code: string,
+        int?: boolean,
+    ): Promise<void> {
+        const val = findCodeVal(res, code);
+        await this.saveNumberIfValid(key, int ? parseIntOrNull(val) : parseFloatOrNull(val));
     }
 
     private async updateDeviceErrorMsg(): Promise<void> {
