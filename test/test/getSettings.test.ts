@@ -3,7 +3,7 @@ import { describe, it } from 'mocha';
 import { DeviceController } from '../../src/lib/deviceController.ts';
 import type { TMode } from '../../src/lib/store.ts';
 
-describe('getSettings.ts', () => {
+describe('DeviceController', () => {
     describe('getPowerMode', () => {
         it('returns powerOpt=0, powerMode=-1 for mode -1 (off)', () => {
             expect(DeviceController.getPowerMode(-1)).to.deep.equal({ powerOpt: 0, powerMode: -1 });
