@@ -36,7 +36,6 @@ var import_store = require("./lib/store");
 var utils = __toESM(require("@iobroker/adapter-core"));
 var import_createState = require("./lib/createState");
 var import_utils = require("./lib/utils");
-var import_logging = require("./lib/logging");
 var import_deviceController = require("./lib/deviceController");
 var import_tokenManager = require("./lib/tokenManager");
 var import_apiClient = require("./lib/apiClient");
@@ -99,7 +98,7 @@ class MidasAquatemp extends utils.Adapter {
           await deviceController.updateDeviceSilent(!!(silent == null ? void 0 : silent.val));
         }
       } catch (error) {
-        (0, import_logging.errorLogger)("Error in updateInterval", error, this);
+        store.logger.errorLogger("Error in updateInterval", error);
       }
     }, this.interval * 1e3);
     this.tokenRefreshInterval = this.setInterval(async function() {
@@ -157,7 +156,7 @@ class MidasAquatemp extends utils.Adapter {
           await this.setState(id, { ack: true });
         }
       } catch (error) {
-        (0, import_logging.errorLogger)(`Error in stateChange for ${id}`, error, this);
+        store.logger.errorLogger(`Error in stateChange for ${id}`, error);
       }
     });
     await this.subscribeStatesAsync(`${dpRoot}.mode`);

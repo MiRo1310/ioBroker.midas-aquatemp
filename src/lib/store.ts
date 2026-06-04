@@ -1,6 +1,6 @@
 import type { MidasAquatemp } from '../main';
 import { createHash } from 'crypto';
-import { errorLogger } from './logging';
+import { Logger } from './logging';
 import type { TokenManager } from './tokenManager';
 
 export type TMode = -1 | 0 | 1 | 2;
@@ -66,6 +66,7 @@ export class Store {
     private mode: TMode = 2;
     public readonly encryptedPassword: string;
     private tokenManager?: TokenManager;
+    public readonly logger: Logger;
 
     constructor(
         public readonly adapter: MidasAquatemp,
@@ -84,6 +85,7 @@ export class Store {
             this.device = deviceMac ?? this.device;
         }
         this.setupEndpoints();
+        this.logger = new Logger(this.adapter);
     }
 
     public setTokenManager(tokenManager: TokenManager): void {
@@ -94,12 +96,17 @@ export class Store {
         return `midas-aquatemp.${this.instance}`;
     };
 
-    public resetOnErrorHandler = async (): Promise<void> => {
+    public resetOnError = async (): Promise<void> => {
         this.tokenManager?.resetToken();
         this.device = '';
         this.reachable = false;
         await this.saveValue('info.connection', false);
     };
+
+    public async resetAndHandleErrorWithSentry(title: string, e: any): Promise<void> {
+        await this.resetOnError();
+        this.logger.errorHandler(title, e);
+    }
 
     public setMode(mode: TMode): void {
         this.mode = mode;
@@ -131,7 +138,7 @@ export class Store {
 
             await this.adapter.setState(dp, value ?? null, true);
         } catch (err: any) {
-            errorLogger('Error in saveValue', err, this.adapter);
+            this.logger.errorHandler('Error in saveValue', err);
         }
     };
 

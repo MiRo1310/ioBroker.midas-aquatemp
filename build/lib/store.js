@@ -58,6 +58,7 @@ class Store {
       this.device = deviceMac != null ? deviceMac : this.device;
     }
     this.setupEndpoints();
+    this.logger = new import_logging.Logger(this.adapter);
   }
   static modes = [-1, 0, 1, 2];
   static AQUATEMP_POOLSANA = "1132174963097280512";
@@ -73,19 +74,24 @@ class Store {
   mode = 2;
   encryptedPassword;
   tokenManager;
+  logger;
   setTokenManager(tokenManager) {
     this.tokenManager = tokenManager;
   }
   getDpRoot = () => {
     return `midas-aquatemp.${this.instance}`;
   };
-  resetOnErrorHandler = async () => {
+  resetOnError = async () => {
     var _a;
     (_a = this.tokenManager) == null ? void 0 : _a.resetToken();
     this.device = "";
     this.reachable = false;
     await this.saveValue("info.connection", false);
   };
+  async resetAndHandleErrorWithSentry(title, e) {
+    await this.resetOnError();
+    this.logger.errorLogger(title, e);
+  }
   setMode(mode) {
     this.mode = mode;
   }
@@ -111,7 +117,7 @@ class Store {
       });
       await this.adapter.setState(dp, value != null ? value : null, true);
     } catch (err) {
-      (0, import_logging.errorLogger)("Error in saveValue", err, this.adapter);
+      this.logger.errorLogger("Error in saveValue", err);
     }
   };
   async clearStateValues() {

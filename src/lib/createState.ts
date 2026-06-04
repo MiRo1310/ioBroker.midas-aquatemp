@@ -1,9 +1,8 @@
 import type { CreateObjects } from '../types';
-import { errorLogger } from './logging';
 import type { Store } from './store.ts';
 
 export const createObjects = async (store: Store): Promise<void> => {
-    const { adapter } = store;
+    const { logger, adapter } = store;
     const dpRoot = store.getDpRoot();
 
     const objects: CreateObjects[] = [
@@ -420,7 +419,7 @@ export const createObjects = async (store: Store): Promise<void> => {
 
     try {
         for (const { id, name, role, unit, type, def, write, states } of objects) {
-            adapter.log.debug(`Create object: ${id}`);
+            logger.debug(`Create object: ${id}`);
             await adapter.setObjectNotExistsAsync(id, {
                 type: 'state',
                 common: { read: true, write: write || false, type: type, unit, role, name, def, states },
@@ -428,6 +427,6 @@ export const createObjects = async (store: Store): Promise<void> => {
             });
         }
     } catch (error: any) {
-        errorLogger('Error in createObjects', error, adapter);
+        logger.errorHandler('Error in createObjects', error);
     }
 };

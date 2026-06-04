@@ -21,9 +21,8 @@ __export(createState_exports, {
   createObjects: () => createObjects
 });
 module.exports = __toCommonJS(createState_exports);
-var import_logging = require("./logging");
 const createObjects = async (store) => {
-  const { adapter } = store;
+  const { logger, adapter } = store;
   const dpRoot = store.getDpRoot();
   const objects = [
     {
@@ -438,7 +437,7 @@ const createObjects = async (store) => {
   ];
   try {
     for (const { id, name, role, unit, type, def, write, states } of objects) {
-      adapter.log.debug(`Create object: ${id}`);
+      logger.debug(`Create object: ${id}`);
       await adapter.setObjectNotExistsAsync(id, {
         type: "state",
         common: { read: true, write: write || false, type, unit, role, name, def, states },
@@ -446,7 +445,7 @@ const createObjects = async (store) => {
       });
     }
   } catch (error) {
-    (0, import_logging.errorLogger)("Error in createObjects", error, adapter);
+    logger.errorLogger("Error in createObjects", error);
   }
 };
 // Annotate the CommonJS export names for ESM import in node:

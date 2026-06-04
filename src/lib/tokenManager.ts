@@ -1,5 +1,4 @@
 import type { Store } from './store';
-import { errorLogger } from './logging';
 import type { RequestToken } from '../types/types';
 import { isDefined } from './utils';
 import type { DeviceController } from './deviceController';
@@ -21,13 +20,13 @@ export class TokenManager {
     }
 
     public async fetchToken(): Promise<void> {
-        const { adapter, resetOnErrorHandler } = this.store;
+        const { logger } = this.store;
         try {
             if (this.isValidToken()) {
                 return;
             }
 
-            adapter.log.debug('Request token');
+            logger.debug('Request token');
             const { sUrl, options } = this.store.getOptionsAndSUrl();
 
             const data = await this.apiClient.request<RequestToken>(sUrl, options);
@@ -37,19 +36,17 @@ export class TokenManager {
             this.token = token;
 
             if (token) {
-                adapter.log.debug('Login ok! Token');
+                logger.debug('Login ok! Token');
             } else {
-                adapter.log.error(`Login-error: ${JSON.stringify(data)}`);
-                await resetOnErrorHandler();
+                logger.error(`Login-error: ${JSON.stringify(data)}`);
+                await this.store.resetOnError();
             }
         } catch (error) {
-            await resetOnErrorHandler();
-            errorLogger('Error in getToken', error, adapter);
+            await this.store.resetAndHandleErrorWithSentry('Error in getToken', error);
         }
     }
 
     public updateToken = async (): Promise<void> => {
-        const { adapter, useDeviceMac } = this.store;
         try {
             await this.fetchToken();
 
@@ -57,16 +54,16 @@ export class TokenManager {
                 return;
             }
             if (!this.deviceController) {
-                this.store.adapter.log.debug('DeviceController not set');
+                this.store.logger.debug('DeviceController not set');
                 return;
             }
-            if (useDeviceMac) {
+            if (this.store.useDeviceMac) {
                 await this.deviceController.updateDeviceStatus();
                 return;
             }
             await this.deviceController.updateDeviceID();
         } catch (error: any) {
-            errorLogger('Error in updateToken', error, adapter);
+            await this.store.resetAndHandleErrorWithSentry('Error in updateToken', error);
         }
     };
 

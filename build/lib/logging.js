@@ -18,29 +18,47 @@ var __copyProps = (to, from, except, desc) => {
 var __toCommonJS = (mod) => __copyProps(__defProp({}, "__esModule", { value: true }), mod);
 var logging_exports = {};
 __export(logging_exports, {
-  errorLogger: () => errorLogger
+  Logger: () => Logger
 });
 module.exports = __toCommonJS(logging_exports);
-const errorLogger = (title, e, adapter) => {
-  var _a, _b, _c;
-  if (adapter.supportsFeature && adapter.supportsFeature("PLUGINS")) {
-    const sentryInstance = adapter.getPluginInstance("sentry");
-    if (sentryInstance) {
-      (_a = sentryInstance.getSentryObject()) == null ? void 0 : _a.captureException(e);
+class Logger {
+  constructor(adapter) {
+    this.adapter = adapter;
+  }
+  error(msg) {
+    this.adapter.log.error(msg);
+  }
+  debug(msg) {
+    this.adapter.log.debug(msg);
+  }
+  info(msg) {
+    this.adapter.log.info(msg);
+  }
+  errorLogger(title, e) {
+    var _a, _b;
+    this.sendToSentry(e);
+    this.adapter.log.error(title);
+    this.error(`Error message: ${e.message}`);
+    this.error(`Error stack: ${e.stack}`);
+    if (e == null ? void 0 : e.response) {
+      this.error(`Server response: ${(_a = e == null ? void 0 : e.response) == null ? void 0 : _a.status}`);
+    }
+    if (e == null ? void 0 : e.response) {
+      this.error(`Server status: ${(_b = e == null ? void 0 : e.response) == null ? void 0 : _b.statusText}`);
     }
   }
-  adapter.log.error(title);
-  adapter.log.error(`Error message: ${e.message}`);
-  adapter.log.error(`Error stack: ${e.stack}`);
-  if (e == null ? void 0 : e.response) {
-    adapter.log.error(`Server response: ${(_b = e == null ? void 0 : e.response) == null ? void 0 : _b.status}`);
+  sendToSentry(e) {
+    var _a;
+    if (this.adapter.supportsFeature && this.adapter.supportsFeature("PLUGINS")) {
+      const sentryInstance = this.adapter.getPluginInstance("sentry");
+      if (sentryInstance) {
+        (_a = sentryInstance.getSentryObject()) == null ? void 0 : _a.captureException(e);
+      }
+    }
   }
-  if (e == null ? void 0 : e.response) {
-    adapter.log.error(`Server status: ${(_c = e == null ? void 0 : e.response) == null ? void 0 : _c.statusText}`);
-  }
-};
+}
 // Annotate the CommonJS export names for ESM import in node:
 0 && (module.exports = {
-  errorLogger
+  Logger
 });
 //# sourceMappingURL=logging.js.map

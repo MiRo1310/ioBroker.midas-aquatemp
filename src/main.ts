@@ -9,7 +9,6 @@ import { Store } from './lib/store';
 import * as utils from '@iobroker/adapter-core';
 import { createObjects } from './lib/createState';
 import { isDefined, isStateValue } from './lib/utils';
-import { errorLogger } from './lib/logging';
 import { DeviceController } from './lib/deviceController';
 import { TokenManager } from './lib/tokenManager';
 import { ApiClient } from './lib/apiClient';
@@ -83,7 +82,7 @@ export class MidasAquatemp extends utils.Adapter {
                     await deviceController.updateDeviceSilent(!!silent?.val);
                 }
             } catch (error: any) {
-                errorLogger('Error in updateInterval', error, this);
+                store.logger.errorHandler('Error in updateInterval', error);
             }
         }, this.interval * 1000);
 
@@ -159,7 +158,7 @@ export class MidasAquatemp extends utils.Adapter {
                     await this.setState(id, { ack: true });
                 }
             } catch (error: any) {
-                errorLogger(`Error in stateChange for ${id}`, error, this);
+                store.logger.errorHandler(`Error in stateChange for ${id}`, error);
             }
         });
 

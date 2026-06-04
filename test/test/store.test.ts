@@ -114,7 +114,7 @@ describe('Store', () => {
             storeV3.device = 'device-123';
             storeV3.reachable = true;
 
-            await storeV3.resetOnErrorHandler();
+            await storeV3.resetOnError();
             expect(tokenManager.getValidTokenOrNull()).to.be.null;
             expect(storeV3.device).to.equal('');
             expect(storeV3.reachable).to.be.false;
