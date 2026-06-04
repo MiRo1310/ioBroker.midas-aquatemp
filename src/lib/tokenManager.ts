@@ -30,13 +30,8 @@ export class TokenManager {
             adapter.log.debug('Request token');
             const { sUrl, options } = this.store.getOptionsAndSUrl();
 
-            const { data, error } = await this.apiClient.request<RequestToken>(sUrl, options);
+            const data = await this.apiClient.request<RequestToken>(sUrl, options);
 
-            if (error || !data) {
-                adapter.log.error(`Login-error: ${JSON.stringify(data)}`);
-                await resetOnErrorHandler();
-                return;
-            }
             const token = data?.object_result?.['x-token'] ?? data?.objectResult?.['x-token'] ?? null;
 
             this.token = token;
@@ -48,6 +43,7 @@ export class TokenManager {
                 await resetOnErrorHandler();
             }
         } catch (error) {
+            await resetOnErrorHandler();
             errorLogger('Error in getToken', error, adapter);
         }
     }

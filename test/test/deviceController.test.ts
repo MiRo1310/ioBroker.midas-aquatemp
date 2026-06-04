@@ -10,14 +10,15 @@ import { utils } from '@iobroker/testing';
 
 const { adapter } = utils.unit.createMocks({});
 
-function makeApiClient(
-    response: { data?: any; error: boolean } = { data: { error_code: '0' }, error: false },
-): ApiClient & { callCount: number } {
+function makeApiClient(shouldThrow = false): ApiClient & { callCount: number } {
     const mock = {
         callCount: 0,
         request: () => {
             mock.callCount++;
-            return { ...response, status: 200 };
+            if (shouldThrow) {
+                throw new Error('API error');
+            }
+            return { error_code: '0' };
         },
     } as unknown as ApiClient & { callCount: number };
     return mock;
@@ -69,7 +70,7 @@ describe('DeviceController', () => {
         });
 
         it('resets connection on API error while turning on', async () => {
-            apiClient = makeApiClient({ data: null, error: true });
+            apiClient = makeApiClient(true);
             controller = new DeviceController(store, tokenManager, apiClient);
 
             store.device = 'DEVICE_CODE';
@@ -102,7 +103,7 @@ describe('DeviceController', () => {
         });
 
         it('resets on API error', async () => {
-            apiClient = makeApiClient({ data: null, error: true });
+            apiClient = makeApiClient(true);
             controller = new DeviceController(store, tokenManager, apiClient);
             store.device = 'DEVICE_CODE';
             store.reachable = true;
@@ -143,7 +144,7 @@ describe('DeviceController', () => {
         });
 
         it('resets on API error', async () => {
-            apiClient = makeApiClient({ data: { error_code: '0' }, error: true });
+            apiClient = makeApiClient(true);
             controller = new DeviceController(store, tokenManager, apiClient);
             store.device = 'DEVICE_CODE';
             store.reachable = true;

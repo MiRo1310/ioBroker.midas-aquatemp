@@ -47,12 +47,11 @@ const states = {
   flowSwitch: "boolean"
 };
 class Store {
-  constructor(adapter, username, password, instance, interval, apiLevel, useDeviceMac, deviceMac) {
+  constructor(adapter, username, password, instance, apiLevel, useDeviceMac, deviceMac) {
     this.adapter = adapter;
     this.username = username;
     this.encryptedPassword = this.encryptPassword(password);
     this.instance = instance;
-    this.interval = interval != null ? interval : this.interval;
     this.apiLevel = apiLevel != null ? apiLevel : this.apiLevel;
     this.useDeviceMac = useDeviceMac != null ? useDeviceMac : this.useDeviceMac;
     if (useDeviceMac) {
@@ -65,7 +64,6 @@ class Store {
   //Midas/Poolsana InverPro
   static AQUATEMP_OTHER1 = "1442284873216843776";
   instance;
-  interval = 6e4;
   cloudURL = null;
   apiLevel = 3;
   device;

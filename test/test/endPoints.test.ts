@@ -10,8 +10,8 @@ describe('Store endpoint methods', () => {
     let storeV3: Store;
     let storeV2: Store;
     beforeEach(() => {
-        storeV3 = new Store(adapter as unknown as MidasAquatemp, 'user@test.com', 'pass', 0, undefined, 3);
-        storeV2 = new Store(adapter as unknown as MidasAquatemp, 'user@test.com', 'pass', 0, undefined, 2);
+        storeV3 = new Store(adapter as unknown as MidasAquatemp, 'user@test.com', 'pass', 0, 3);
+        storeV2 = new Store(adapter as unknown as MidasAquatemp, 'user@test.com', 'pass', 0, 2);
     });
 
     describe('cloudURL (set in constructor)', () => {

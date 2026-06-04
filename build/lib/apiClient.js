@@ -33,7 +33,6 @@ __export(apiClient_exports, {
 module.exports = __toCommonJS(apiClient_exports);
 var import_axios = __toESM(require("axios"));
 var import_https = __toESM(require("https"));
-var import_logging = require("./logging");
 class ApiClient {
   constructor(store) {
     this.store = store;
@@ -75,28 +74,27 @@ class ApiClient {
     return ApiClient.insecureHttpsAgent;
   }
   async request(url, options, token) {
-    var _a;
-    try {
-      const tokenHeader = token ? { "x-token": token } : {};
-      const result = await import_axios.default.post(url, options, {
-        headers: {
-          "Content-Type": "application/json",
-          ...tokenHeader
-        },
-        httpsAgent: this.getHttpsAgent(url)
-      });
-      if (result.status !== 200) {
-        return { error: true, status: result.status, data: result.data };
-      }
-      if (!ApiClient.isApiSuccess((_a = result.data) == null ? void 0 : _a.error_code)) {
-        this.store.adapter.log.debug(`API error for ${url}: ${JSON.stringify(result.data)}`);
-        return { error: true, status: result.status, data: result.data };
-      }
-      return { error: false, status: result.status, data: result.data };
-    } catch (e) {
-      (0, import_logging.errorLogger)("Axios request error", e, this.store.adapter);
-      return { status: 500, data: void 0, error: true };
+    var _a, _b;
+    const tokenHeader = token ? { "x-token": token } : {};
+    const result = await import_axios.default.post(url, options, {
+      headers: {
+        "Content-Type": "application/json",
+        ...tokenHeader
+      },
+      httpsAgent: this.getHttpsAgent(url)
+    });
+    this.store.adapter.log.debug(`Status: ${result.status}`);
+    if (result.status !== 200) {
+      throw new Error(`HTTP error ${result.status} for ${url}`);
     }
+    if (!result.data) {
+      throw new Error("No response returned");
+    }
+    if (!ApiClient.isApiSuccess((_a = result.data) == null ? void 0 : _a.error_code)) {
+      this.store.adapter.log.debug(`API error for ${url}: ${JSON.stringify(result.data)}`);
+      throw new Error(`API error ${(_b = result.data) == null ? void 0 : _b.error_code} for ${url}`);
+    }
+    return result.data;
   }
   static isApiSuccess(errorCode) {
     return errorCode === void 0 || errorCode === null || parseInt(String(errorCode), 10) === 0;

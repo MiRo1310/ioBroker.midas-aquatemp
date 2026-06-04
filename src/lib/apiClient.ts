@@ -1,6 +1,5 @@
 import axios from 'axios';
 import https from 'https';
-import { errorLogger } from './logging';
 import type { Store } from './store';
 
 export class ApiClient {
@@ -59,32 +58,33 @@ export class ApiClient {
         url: string,
         options: unknown,
         token?: string | null,
-    ): Promise<{ status?: number; data: T | undefined; error: boolean }> {
-        try {
-            const tokenHeader = token ? { 'x-token': token } : {};
+    ): Promise<T> {
+        const tokenHeader = token ? { 'x-token': token } : {};
 
-            const result = await axios.post<T>(url, options, {
-                headers: {
-                    'Content-Type': 'application/json',
-                    ...tokenHeader,
-                },
-                httpsAgent: this.getHttpsAgent(url),
-            });
+        const result = await axios.post<T>(url, options, {
+            headers: {
+                'Content-Type': 'application/json',
+                ...tokenHeader,
+            },
+            httpsAgent: this.getHttpsAgent(url),
+        });
 
-            if (result.status !== 200) {
-                return { error: true, status: result.status, data: result.data };
-            }
+        this.store.adapter.log.debug(`Status: ${result.status}`);
 
-            if (!ApiClient.isApiSuccess(result.data?.error_code)) {
-                this.store.adapter.log.debug(`API error for ${url}: ${JSON.stringify(result.data)}`);
-                return { error: true, status: result.status, data: result.data };
-            }
-
-            return { error: false, status: result.status, data: result.data };
-        } catch (e) {
-            errorLogger('Axios request error', e, this.store.adapter);
-            return { status: 500, data: undefined, error: true };
+        if (result.status !== 200) {
+            throw new Error(`HTTP error ${result.status} for ${url}`);
         }
+
+        if (!result.data) {
+            throw new Error('No response returned');
+        }
+
+        if (!ApiClient.isApiSuccess(result.data?.error_code)) {
+            this.store.adapter.log.debug(`API error for ${url}: ${JSON.stringify(result.data)}`);
+            throw new Error(`API error ${result.data?.error_code} for ${url}`);
+        }
+
+        return result.data;
     }
 
     public static isApiSuccess(errorCode?: string | number): boolean {

@@ -43,12 +43,7 @@ class TokenManager {
       }
       adapter.log.debug("Request token");
       const { sUrl, options } = this.store.getOptionsAndSUrl();
-      const { data, error } = await this.apiClient.request(sUrl, options);
-      if (error || !data) {
-        adapter.log.error(`Login-error: ${JSON.stringify(data)}`);
-        await resetOnErrorHandler();
-        return;
-      }
+      const data = await this.apiClient.request(sUrl, options);
       const token = (_d = (_c = (_a = data == null ? void 0 : data.object_result) == null ? void 0 : _a["x-token"]) != null ? _c : (_b = data == null ? void 0 : data.objectResult) == null ? void 0 : _b["x-token"]) != null ? _d : null;
       this.token = token;
       if (token) {
@@ -58,6 +53,7 @@ class TokenManager {
         await resetOnErrorHandler();
       }
     } catch (error) {
+      await resetOnErrorHandler();
       (0, import_logging.errorLogger)("Error in getToken", error, adapter);
     }
   }

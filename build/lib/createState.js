@@ -182,7 +182,7 @@ const createObjects = async (store) => {
     {
       id: `${dpRoot}.mode`,
       name: "Modus",
-      type: "string",
+      type: "number",
       states: "-1:off;0:cool;1:heat;2:auto",
       def: "",
       write: true,

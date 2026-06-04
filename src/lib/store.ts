@@ -57,7 +57,6 @@ export class Store {
     public static readonly AQUATEMP_POOLSANA = '1132174963097280512'; //Midas/Poolsana InverPro
     public static readonly AQUATEMP_OTHER1 = '1442284873216843776';
     public readonly instance: number;
-    public readonly interval: number = 60000;
     public cloudURL: string | null = null;
     public apiLevel = 3;
     public device?: string;
@@ -67,19 +66,18 @@ export class Store {
     private mode: TMode = 2;
     public readonly encryptedPassword: string;
     private tokenManager?: TokenManager;
+
     constructor(
         public readonly adapter: MidasAquatemp,
         public readonly username: string,
         password: string,
         instance: number,
-        interval?: number,
         apiLevel?: number,
         useDeviceMac?: boolean,
         deviceMac?: string,
     ) {
         this.encryptedPassword = this.encryptPassword(password);
         this.instance = instance;
-        this.interval = interval ?? this.interval;
         this.apiLevel = apiLevel ?? this.apiLevel;
         this.useDeviceMac = useDeviceMac ?? this.useDeviceMac;
         if (useDeviceMac) {

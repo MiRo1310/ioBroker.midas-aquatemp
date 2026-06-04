@@ -78,33 +78,24 @@ describe('Store', () => {
     });
 
     describe('constructor defaults', () => {
-        it('applies default interval of 60000ms', () => {
-            expect(store.interval).to.equal(60000);
-        });
-
         it('applies default apiLevel 3', () => {
             expect(store.apiLevel).to.equal(3);
         });
 
-        it('applies custom interval', () => {
-            const s = new Store(adapter as unknown as MidasAquatemp, 'u', 'p', 0, 30000);
-            expect(s.interval).to.equal(30000);
-        });
-
         it('applies custom apiLevel', () => {
-            const s = new Store(adapter as unknown as MidasAquatemp, 'u', 'p', 0, undefined, 2);
+            const s = new Store(adapter as unknown as MidasAquatemp, 'u', 'p', 0, 2);
             expect(s.apiLevel).to.equal(2);
         });
 
         it('sets device from deviceMac when useDeviceMac is true', () => {
             const mac = 'AA:BB:CC:DD:EE:FF';
-            const s = new Store(adapter as unknown as MidasAquatemp, 'u', 'p', 0, undefined, 3, true, mac);
+            const s = new Store(adapter as unknown as MidasAquatemp, 'u', 'p', 0, 3, true, mac);
             expect(s.device).to.equal(mac);
             expect(s.useDeviceMac).to.be.true;
         });
 
         it('ignores deviceMac when useDeviceMac is false', () => {
-            const s = new Store(adapter as unknown as MidasAquatemp, 'u', 'p', 0, undefined, 3, false, 'AA:BB:CC');
+            const s = new Store(adapter as unknown as MidasAquatemp, 'u', 'p', 0, 3, false, 'AA:BB:CC');
             expect(s.device).to.be.undefined;
         });
     });
@@ -113,7 +104,7 @@ describe('Store', () => {
         let tokenManager: TokenManager;
         let storeV3: Store;
         beforeEach(() => {
-            storeV3 = new Store(adapter as unknown as MidasAquatemp, 'user@test.com', 'pass', 0, undefined, 3);
+            storeV3 = new Store(adapter as unknown as MidasAquatemp, 'user@test.com', 'pass', 0, 3);
             const apiClient = new ApiClient(storeV3);
             tokenManager = new TokenManager(storeV3, apiClient);
         });

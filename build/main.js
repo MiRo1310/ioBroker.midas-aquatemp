@@ -42,9 +42,12 @@ var import_tokenManager = require("./lib/tokenManager");
 var import_apiClient = require("./lib/apiClient");
 class MidasAquatemp extends utils.Adapter {
   static instance;
+  static tokenRefreshIntervalTime = 36e5;
   updateInterval;
-  tokenRefreshTimer;
+  tokenRefreshInterval;
+  interval = 6e4;
   constructor(options = {}) {
+    var _a;
     super({
       ...options,
       name: "midas-aquatemp"
@@ -52,6 +55,7 @@ class MidasAquatemp extends utils.Adapter {
     this.on("ready", this.onReady.bind(this));
     this.on("unload", this.onUnload.bind(this));
     MidasAquatemp.instance = this;
+    this.interval = (_a = this.config.refresh) != null ? _a : this.interval;
   }
   static getInstance() {
     return MidasAquatemp.instance;
@@ -63,8 +67,8 @@ class MidasAquatemp extends utils.Adapter {
       this.log.error("No instance found.");
       return;
     }
-    const { username, password, refresh, selectApi, useDeviceMac, deviceMac } = this.config;
-    const store = new import_store.Store(this, username, password, this.instance, refresh, selectApi, useDeviceMac, deviceMac);
+    const { username, password, selectApi, useDeviceMac, deviceMac } = this.config;
+    const store = new import_store.Store(this, username, password, this.instance, selectApi, useDeviceMac, deviceMac);
     const apiClient = new import_apiClient.ApiClient(store);
     const tokenManager = new import_tokenManager.TokenManager(store, apiClient);
     const deviceController = new import_deviceController.DeviceController(store, tokenManager, apiClient);
@@ -97,11 +101,11 @@ class MidasAquatemp extends utils.Adapter {
       } catch (error) {
         (0, import_logging.errorLogger)("Error in updateInterval", error, this);
       }
-    }, store.interval * 1e3);
-    this.tokenRefreshTimer = this.setInterval(async function() {
+    }, this.interval * 1e3);
+    this.tokenRefreshInterval = this.setInterval(async function() {
       tokenManager.resetToken();
       await tokenManager.updateToken();
-    }, 36e5);
+    }, MidasAquatemp.tokenRefreshIntervalTime);
     this.on("stateChange", async (id, state) => {
       try {
         if (!state || state.ack) {
@@ -169,7 +173,7 @@ class MidasAquatemp extends utils.Adapter {
   onUnload(callback) {
     try {
       this.clearInterval(this.updateInterval);
-      this.clearInterval(this.tokenRefreshTimer);
+      this.clearInterval(this.tokenRefreshInterval);
       callback();
     } catch (e) {
       callback();

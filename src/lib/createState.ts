@@ -163,7 +163,7 @@ export const createObjects = async (store: Store): Promise<void> => {
         {
             id: `${dpRoot}.mode`,
             name: 'Modus',
-            type: 'string',
+            type: 'number',
             states: '-1:off;0:cool;1:heat;2:auto',
             def: '',
             write: true,

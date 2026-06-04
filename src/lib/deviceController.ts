@@ -15,7 +15,7 @@ export class DeviceController {
     ) {}
 
     public async updateDeviceStatus(): Promise<void> {
-        const { apiLevel, adapter, saveValue, resetOnErrorHandler } = this.store;
+        const { apiLevel, adapter, saveValue } = this.store;
         try {
             const res = this.getTokenAndDevice();
             if (!res) {
@@ -24,15 +24,11 @@ export class DeviceController {
 
             const payload = apiLevel < 3 ? { device_code: res.device } : { deviceCode: res.device };
 
-            const { data, error } = await this.apiClient.request<DeviceStatus>(
+            const data = await this.apiClient.request<DeviceStatus>(
                 this.store.getUpdateDeviceStatusSUrl(),
                 payload,
                 res.token,
             );
-            if (!data || error) {
-                await this.store.resetOnErrorHandler();
-                return;
-            }
 
             adapter.log.debug(`DeviceStatus: ${JSON.stringify(data)}`);
 
@@ -62,29 +58,24 @@ export class DeviceController {
             await saveValue('errorLevel', 0);
             await this.updateDeviceDetails();
         } catch (error: unknown) {
-            await resetOnErrorHandler();
+            await this.store.resetOnErrorHandler();
             errorLogger('Error in updateDeviceStatus', error, adapter);
         }
     }
 
     public async updateDeviceDetails(): Promise<void> {
-        const { product, resetOnErrorHandler, saveValue, adapter } = this.store;
+        const { product, saveValue, adapter } = this.store;
         try {
             const token = this.tokenManager.getValidTokenOrNull();
             if (!token || !product) {
                 return;
             }
 
-            const { data, error } = await this.apiClient.request<DeviceDetails>(
+            const data = await this.apiClient.request<DeviceDetails>(
                 this.store.getSUrlUpdateDeviceId(),
                 this.getProtocolCodes(product),
                 token,
             );
-
-            if (!data || error) {
-                await resetOnErrorHandler();
-                return;
-            }
 
             adapter.log.debug(`DeviceDetails: ${JSON.stringify(data)}`);
 
@@ -128,7 +119,7 @@ export class DeviceController {
             await saveValue('info.connection', true);
         } catch (error: unknown) {
             errorLogger('Error updateDeviceDetails', error, adapter);
-            void resetOnErrorHandler();
+            await this.store.resetOnErrorHandler();
         }
     }
 
@@ -140,18 +131,13 @@ export class DeviceController {
                 return;
             }
 
-            const { data, status, error } = await this.apiClient.request<UpdateDeviceId>(
+            const data = await this.apiClient.request<UpdateDeviceId>(
                 this.store.getUpdateDeviceIdSUrl(),
                 this.getAxiosUpdateDeviceIdParams(),
                 token,
             );
 
-            adapter.log.debug(`UpdateDeviceID response: ${JSON.stringify(data)}, status: ${status}`);
-
-            if (!data || error) {
-                await resetOnErrorHandler(); // Login-Fehler
-                return;
-            }
+            adapter.log.debug(`UpdateDeviceID response: ${JSON.stringify(data)}`);
 
             if (!data?.object_result?.[0]?.device_code && !data?.objectResult?.[0]?.deviceCode) {
                 await resetOnErrorHandler();
@@ -189,7 +175,7 @@ export class DeviceController {
     }
 
     public async updateDevicePower(mode: TMode): Promise<void> {
-        const { adapter, resetOnErrorHandler, saveValue } = this.store;
+        const { adapter, saveValue } = this.store;
         try {
             const { powerMode, powerOpt } = DeviceController.getPowerMode(mode);
 
@@ -199,15 +185,12 @@ export class DeviceController {
                 return;
             }
 
-            const { data, error } = await this.apiClient.request<MidasData>(
+            const data = await this.apiClient.request<MidasData>(
                 this.store.getSUrl(),
                 this.getAxiosUpdateDevicePowerParams(res.device, powerOpt, 'Power'),
                 res.token,
             );
-            if (!data || error) {
-                await resetOnErrorHandler();
-                return;
-            }
+
             adapter.log.debug(`DeviceStatus: ${JSON.stringify(data)}`);
 
             if (mode >= 0) {
@@ -217,6 +200,7 @@ export class DeviceController {
                 await saveValue('mode', mode);
             }
         } catch (error: any) {
+            await this.store.resetOnErrorHandler();
             errorLogger('Error in updateDevicePower', error, adapter);
         }
     }
@@ -246,20 +230,16 @@ export class DeviceController {
             if (!res) {
                 return;
             }
-            const { data, error } = await this.apiClient.request<MidasData>(
+            const data = await this.apiClient.request<MidasData>(
                 this.store.getSUrl(),
                 this.getAxiosUpdateDeviceSetTempParams(res.device, sTemperature),
                 res.token,
             );
             adapter.log.debug(`DeviceStatus: ${JSON.stringify(data)}`);
 
-            if (error) {
-                await resetOnErrorHandler();
-                return;
-            }
-
             await saveValue('tempSet', numericTemperature);
         } catch (error: any) {
+            await resetOnErrorHandler();
             errorLogger('Error in updateDeviceSetTemp', error, adapter);
         }
     }
@@ -272,20 +252,17 @@ export class DeviceController {
             if (!res) {
                 return;
             }
-            const { data, error } = await this.apiClient.request<MidasData>(
+            const data = await this.apiClient.request<MidasData>(
                 this.store.getSUrl(),
                 this.getAxiosUpdateDevicePowerParams(res.device, silentMode, 'Manual-mute'),
                 res.token,
             );
-            if (!data || error) {
-                await resetOnErrorHandler();
-                return;
-            }
 
             adapter.log.debug(`DeviceStatus: ${JSON.stringify(data)}`);
 
             await saveValue('silent', silent);
         } catch (error: any) {
+            await resetOnErrorHandler();
             errorLogger('Error in updateDeviceSilent', error, adapter);
         }
     }
@@ -377,7 +354,7 @@ export class DeviceController {
                     ? `${cloudURL}/app/device/getFaultDataByDeviceCode.json`
                     : `${cloudURL}/app/device/getFaultDataByDeviceCode`;
 
-            const { data, error } = await this.apiClient.request<MidasData>(
+            const data = await this.apiClient.request<MidasData>(
                 sURL,
                 {
                     device_code: res.device,
@@ -385,11 +362,6 @@ export class DeviceController {
                 },
                 res.token,
             );
-
-            if (!data || error) {
-                await resetOnErrorHandler();
-                return;
-            }
 
             await saveValue('error', true);
             await saveValue(
@@ -399,6 +371,7 @@ export class DeviceController {
             await saveValue('errorCode', data.objectResult?.[0]?.faultCode ?? data.object_result?.[0]?.fault_code);
             await saveValue('errorLevel', data.objectResult?.[0]?.errorLevel ?? data.object_result?.[0]?.error_level);
         } catch (error: any) {
+            await resetOnErrorHandler();
             errorLogger('Error in updateDeviceErrorMsg', error, adapter);
         }
     }
@@ -411,19 +384,17 @@ export class DeviceController {
             if (!res) {
                 return;
             }
-            const { data, error } = await this.apiClient.request<MidasData>(
+            const data = await this.apiClient.request<MidasData>(
                 this.store.getSUrl(),
                 this.getAxiosUpdateDevicePowerParams(res.device, mode, 'Mode'),
                 res.token,
             );
-            if (!data || error) {
-                await resetOnErrorHandler();
-                return;
-            }
+
             adapter.log.debug(`DeviceStatus: ${JSON.stringify(data)}`);
 
             await saveValue('mode', mode);
         } catch (error: any) {
+            await resetOnErrorHandler();
             errorLogger('Error in updateDeviceMode', error, adapter);
         }
     }
