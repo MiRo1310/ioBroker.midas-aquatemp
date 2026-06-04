@@ -85,6 +85,7 @@ export class Store {
         if (useDeviceMac) {
             this.device = deviceMac ?? this.device;
         }
+        this.setupEndpoints();
     }
 
     public setTokenManager(tokenManager: TokenManager): void {
@@ -143,7 +144,63 @@ export class Store {
         await this.saveValue('rawJSON', null);
     }
 
+    public getSUrl(): string {
+        return this.apiLevel < 3 ? `${this.cloudURL}/app/device/control.json` : `${this.cloudURL}/app/device/control`;
+    }
+
+    public getSUrlUpdateDeviceId(): string {
+        return this.apiLevel < 3
+            ? `${this.cloudURL}/app/device/getDataByCode.json`
+            : `${this.cloudURL}/app/device/getDataByCode`;
+    }
+
+    public getOptionsAndSUrl(): {
+        sUrl: string;
+        options: {
+            userName?: string;
+            user_name?: string;
+            password: string;
+            type: string;
+        };
+    } {
+        const options = { password: this.encryptedPassword, type: '2' };
+        return this.apiLevel < 3
+            ? {
+                  sUrl: `${this.cloudURL}/app/user/login.json`,
+                  options: {
+                      user_name: this.username,
+                      ...options,
+                  },
+              }
+            : {
+                  sUrl: `${this.cloudURL}/app/user/login`,
+                  options: {
+                      userName: this.username,
+                      ...options,
+                  },
+              };
+    }
+
+    public getUpdateDeviceStatusSUrl(): string {
+        return this.apiLevel < 3
+            ? `${this.cloudURL}/app/device/getDeviceStatus.json`
+            : `${this.cloudURL}/app/device/getDeviceStatus`;
+    }
+
+    public getUpdateDeviceIdSUrl(): string {
+        return this.apiLevel < 3
+            ? `${this.cloudURL}/app/device/deviceList.json`
+            : `${this.cloudURL}/app/device/deviceList`;
+    }
+
     private encryptPassword(password: string): string {
         return createHash('md5').update(password).digest('hex');
+    }
+
+    private setupEndpoints(): void {
+        this.cloudURL =
+            this.apiLevel == 3
+                ? 'https://cloud.linked-go.com:449/crmservice/api'
+                : 'https://cloud.linked-go.com/cloudservice/api';
     }
 }

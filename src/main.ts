@@ -8,7 +8,6 @@ import type { TMode } from './lib/store';
 import { Store } from './lib/store';
 import * as utils from '@iobroker/adapter-core';
 import { createObjects } from './lib/createState';
-import { setupEndpoints } from './lib/endPoints';
 import { isDefined, isStateValue } from './lib/utils';
 import { errorLogger } from './lib/logging';
 import { DeviceController } from './lib/deviceController';
@@ -54,8 +53,6 @@ export class MidasAquatemp extends utils.Adapter {
         }
 
         this.log.debug(`API-Level: ${this.config.selectApi}`);
-
-        setupEndpoints(store);
 
         await createObjects(store);
         this.log.info('Objects created');

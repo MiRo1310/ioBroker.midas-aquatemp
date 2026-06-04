@@ -35,7 +35,6 @@ module.exports = __toCommonJS(main_exports);
 var import_store = require("./lib/store");
 var utils = __toESM(require("@iobroker/adapter-core"));
 var import_createState = require("./lib/createState");
-var import_endPoints = require("./lib/endPoints");
 var import_utils = require("./lib/utils");
 var import_logging = require("./lib/logging");
 var import_deviceController = require("./lib/deviceController");
@@ -76,7 +75,6 @@ class MidasAquatemp extends utils.Adapter {
       store.setMode(currentMode);
     }
     this.log.debug(`API-Level: ${this.config.selectApi}`);
-    (0, import_endPoints.setupEndpoints)(store);
     await (0, import_createState.createObjects)(store);
     this.log.info("Objects created");
     await store.clearStateValues();

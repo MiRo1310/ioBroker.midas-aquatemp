@@ -1,17 +1,25 @@
 import { expect } from 'chai';
-import { describe, it } from 'mocha';
+import { beforeEach, describe, it } from 'mocha';
 
-import {
-    findCodeVal,
-    isApiSuccess,
-    isDefined,
-    isStateValue,
-    isToken,
-    parseIntOrNull,
-    parseNumberOrNull,
-} from '../../src/lib/utils.ts';
+import { findCodeVal, isDefined, isStateValue, parseIntOrNull, parseNumberOrNull } from '../../src/lib/utils.ts';
+import { TokenManager } from '../../src/lib/tokenManager.ts';
+import { Store } from '../../src/lib/store.ts';
+import type { MidasAquatemp } from '../../src/main.ts';
+import { ApiClient } from '../../src/lib/axios.ts';
+import { utils } from '@iobroker/testing';
+
+const { adapter } = utils.unit.createMocks({});
 
 describe('utils.ts', () => {
+    let tokenManager: TokenManager;
+    let storeV3: Store;
+    let apiClient: ApiClient;
+    beforeEach(() => {
+        storeV3 = new Store(adapter as unknown as MidasAquatemp, 'user@test.com', 'pass', 0, undefined, 3);
+        apiClient = new ApiClient(storeV3);
+        tokenManager = new TokenManager(storeV3, apiClient);
+    });
+
     describe('isDefined', () => {
         it('returns false for undefined and null', () => {
             expect(isDefined(undefined)).to.be.false;
@@ -40,30 +48,32 @@ describe('utils.ts', () => {
         });
     });
 
-    describe('isToken', () => {
-        it('returns true only for non-empty strings', () => {
-            expect(isToken('token')).to.be.true;
-            expect(isToken('')).to.be.false;
-            expect(isToken(undefined)).to.be.false;
-            expect(isToken(null)).to.be.false;
-        });
+    it('returns valid token or null', () => {
+        (tokenManager as any).token = 'token';
+        expect(tokenManager.getValidTokenOrNull()).to.be.equal('token');
+        (tokenManager as any).token = '';
+        expect(tokenManager.getValidTokenOrNull()).to.be.null;
+        (tokenManager as any).token = undefined;
+        expect(tokenManager.getValidTokenOrNull()).to.be.null;
+        (tokenManager as any).token = null;
+        expect(tokenManager.getValidTokenOrNull()).to.be.null;
     });
 
     describe('isApiSuccess', () => {
         it('treats undefined and null as success', () => {
-            expect(isApiSuccess(undefined)).to.be.true;
-            expect(isApiSuccess(null as any)).to.be.true;
+            expect(ApiClient.isApiSuccess(undefined)).to.be.true;
+            expect(ApiClient.isApiSuccess(null as any)).to.be.true;
         });
 
         it('treats 0 values as success', () => {
-            expect(isApiSuccess(0)).to.be.true;
-            expect(isApiSuccess('0')).to.be.true;
+            expect(ApiClient.isApiSuccess(0)).to.be.true;
+            expect(ApiClient.isApiSuccess('0')).to.be.true;
         });
 
         it('treats non-zero and invalid values as failure', () => {
-            expect(isApiSuccess(1)).to.be.false;
-            expect(isApiSuccess('5')).to.be.false;
-            expect(isApiSuccess('abc')).to.be.false;
+            expect(ApiClient.isApiSuccess(1)).to.be.false;
+            expect(ApiClient.isApiSuccess('5')).to.be.false;
+            expect(ApiClient.isApiSuccess('abc')).to.be.false;
         });
     });
 

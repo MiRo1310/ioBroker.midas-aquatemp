@@ -58,6 +58,7 @@ class Store {
     if (useDeviceMac) {
       this.device = deviceMac != null ? deviceMac : this.device;
     }
+    this.setupEndpoints();
   }
   static modes = [-1, 0, 1, 2];
   static AQUATEMP_POOLSANA = "1132174963097280512";
@@ -121,8 +122,39 @@ class Store {
     await this.saveValue("state", false);
     await this.saveValue("rawJSON", null);
   }
+  getSUrl() {
+    return this.apiLevel < 3 ? `${this.cloudURL}/app/device/control.json` : `${this.cloudURL}/app/device/control`;
+  }
+  getSUrlUpdateDeviceId() {
+    return this.apiLevel < 3 ? `${this.cloudURL}/app/device/getDataByCode.json` : `${this.cloudURL}/app/device/getDataByCode`;
+  }
+  getOptionsAndSUrl() {
+    const options = { password: this.encryptedPassword, type: "2" };
+    return this.apiLevel < 3 ? {
+      sUrl: `${this.cloudURL}/app/user/login.json`,
+      options: {
+        user_name: this.username,
+        ...options
+      }
+    } : {
+      sUrl: `${this.cloudURL}/app/user/login`,
+      options: {
+        userName: this.username,
+        ...options
+      }
+    };
+  }
+  getUpdateDeviceStatusSUrl() {
+    return this.apiLevel < 3 ? `${this.cloudURL}/app/device/getDeviceStatus.json` : `${this.cloudURL}/app/device/getDeviceStatus`;
+  }
+  getUpdateDeviceIdSUrl() {
+    return this.apiLevel < 3 ? `${this.cloudURL}/app/device/deviceList.json` : `${this.cloudURL}/app/device/deviceList`;
+  }
   encryptPassword(password) {
     return (0, import_crypto.createHash)("md5").update(password).digest("hex");
+  }
+  setupEndpoints() {
+    this.cloudURL = this.apiLevel == 3 ? "https://cloud.linked-go.com:449/crmservice/api" : "https://cloud.linked-go.com/cloudservice/api";
   }
 }
 // Annotate the CommonJS export names for ESM import in node:

@@ -38,6 +38,9 @@
 		"sourceMap": true,
 		"inlineSourceMap": false
 	},
+	"ts-node": {
+		"transpileOnly": true
+	},
 	"include": ["src/**/*.ts", "test/**/*.ts"],
 	"exclude": ["build/**", "node_modules/**", "widgets/**"]
 }

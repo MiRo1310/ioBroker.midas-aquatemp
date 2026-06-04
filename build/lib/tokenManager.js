@@ -21,7 +21,6 @@ __export(tokenManager_exports, {
   TokenManager: () => TokenManager
 });
 module.exports = __toCommonJS(tokenManager_exports);
-var import_endPoints = require("./endPoints");
 var import_logging = require("./logging");
 var import_utils = require("./utils");
 class TokenManager {
@@ -43,7 +42,7 @@ class TokenManager {
         return;
       }
       adapter.log.debug("Request token");
-      const { sUrl, options } = (0, import_endPoints.getOptionsAndSUrl)(this.store);
+      const { sUrl, options } = this.store.getOptionsAndSUrl();
       const { data, error } = await this.apiClient.request(sUrl, options);
       if (error || !data) {
         adapter.log.error(`Login-error: ${JSON.stringify(data)}`);

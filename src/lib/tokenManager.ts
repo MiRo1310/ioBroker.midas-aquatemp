@@ -1,4 +1,3 @@
-import { getOptionsAndSUrl } from './endPoints';
 import type { Store } from './store';
 import { errorLogger } from './logging';
 import type { RequestToken } from '../types/types';
@@ -29,7 +28,7 @@ export class TokenManager {
             }
 
             adapter.log.debug('Request token');
-            const { sUrl, options } = getOptionsAndSUrl(this.store);
+            const { sUrl, options } = this.store.getOptionsAndSUrl();
 
             const { data, error } = await this.apiClient.request<RequestToken>(sUrl, options);
 

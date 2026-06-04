@@ -4,18 +4,17 @@ import { beforeEach, describe, it } from 'mocha';
 
 import { Store } from '../../src/lib/store.ts';
 import type { MidasAquatemp } from '../../src/main.ts';
+import { TokenManager } from '../../src/lib/tokenManager.ts';
+import { ApiClient } from '../../src/lib/axios.ts';
+import { utils } from '@iobroker/testing';
 
-const mockAdapter = {
-    setObjectNotExists: async () => {},
-    setState: async () => {},
-    log: { warn: () => {}, error: () => {}, info: () => {}, debug: () => {}, silly: () => {} },
-} as unknown as MidasAquatemp;
+const { adapter } = utils.unit.createMocks({});
 
 describe('Store', () => {
     let store: Store;
 
     beforeEach(() => {
-        store = new Store(mockAdapter, 'user@test.com', 'password123', 0);
+        store = new Store(adapter as unknown as MidasAquatemp, 'user@test.com', 'password123', 0);
     });
 
     describe('getDpRoot', () => {
@@ -24,7 +23,7 @@ describe('Store', () => {
         });
 
         it('includes instance number in the path', () => {
-            const s = new Store(mockAdapter, 'user', 'pass', 5);
+            const s = new Store(adapter as unknown as MidasAquatemp, 'user', 'pass', 5);
             expect(s.getDpRoot()).to.equal('midas-aquatemp.5');
         });
     });
@@ -40,8 +39,8 @@ describe('Store', () => {
         });
 
         it('different passwords produce different hashes', () => {
-            const s1 = new Store(mockAdapter, 'user', 'pass1', 0);
-            const s2 = new Store(mockAdapter, 'user', 'pass2', 0);
+            const s1 = new Store(adapter as unknown as MidasAquatemp, 'user', 'pass1', 0);
+            const s2 = new Store(adapter as unknown as MidasAquatemp, 'user', 'pass2', 0);
             expect(s1.encryptedPassword).to.not.equal(s2.encryptedPassword);
         });
     });
@@ -88,39 +87,47 @@ describe('Store', () => {
         });
 
         it('applies custom interval', () => {
-            const s = new Store(mockAdapter, 'u', 'p', 0, 30000);
+            const s = new Store(adapter as unknown as MidasAquatemp, 'u', 'p', 0, 30000);
             expect(s.interval).to.equal(30000);
         });
 
         it('applies custom apiLevel', () => {
-            const s = new Store(mockAdapter, 'u', 'p', 0, undefined, 2);
+            const s = new Store(adapter as unknown as MidasAquatemp, 'u', 'p', 0, undefined, 2);
             expect(s.apiLevel).to.equal(2);
         });
 
         it('sets device from deviceMac when useDeviceMac is true', () => {
             const mac = 'AA:BB:CC:DD:EE:FF';
-            const s = new Store(mockAdapter, 'u', 'p', 0, undefined, 3, true, mac);
+            const s = new Store(adapter as unknown as MidasAquatemp, 'u', 'p', 0, undefined, 3, true, mac);
             expect(s.device).to.equal(mac);
             expect(s.useDeviceMac).to.be.true;
         });
 
         it('ignores deviceMac when useDeviceMac is false', () => {
-            const s = new Store(mockAdapter, 'u', 'p', 0, undefined, 3, false, 'AA:BB:CC');
+            const s = new Store(adapter as unknown as MidasAquatemp, 'u', 'p', 0, undefined, 3, false, 'AA:BB:CC');
             expect(s.device).to.be.undefined;
         });
     });
 
     describe('resetOnErrorHandler', () => {
+        let tokenManager: TokenManager;
+        let storeV3: Store;
+        beforeEach(() => {
+            storeV3 = new Store(adapter as unknown as MidasAquatemp, 'user@test.com', 'pass', 0, undefined, 3);
+            const apiClient = new ApiClient(storeV3);
+            tokenManager = new TokenManager(storeV3, apiClient);
+        });
+
         it('clears token, device and reachable flag', async () => {
-            store.token = 'some-token';
-            store.device = 'device-123';
-            store.reachable = true;
+            (tokenManager as any).token = 'some-token';
+            storeV3.device = 'device-123';
+            storeV3.reachable = true;
 
-            await store.resetOnErrorHandler();
-
-            expect(store.token).to.be.null;
-            expect(store.device).to.equal('');
-            expect(store.reachable).to.be.false;
+            await storeV3.resetOnErrorHandler();
+            console.log(tokenManager.getValidTokenOrNull());
+            expect(tokenManager.getValidTokenOrNull()).to.be.null;
+            expect(storeV3.device).to.equal('');
+            expect(storeV3.reachable).to.be.false;
         });
     });
 });

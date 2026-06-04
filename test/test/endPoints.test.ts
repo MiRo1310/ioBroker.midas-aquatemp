@@ -1,35 +1,20 @@
 import { expect } from 'chai';
 import { beforeEach, describe, it } from 'mocha';
-
-import {
-    getOptionsAndSUrl,
-    getSUrl,
-    getSUrlUpdateDeviceId,
-    getUpdateDeviceIdSUrl,
-    getUpdateDeviceStatusSUrl,
-    setupEndpoints,
-} from '../../src/lib/endPoints.ts';
 import { Store } from '../../src/lib/store.ts';
 import type { MidasAquatemp } from '../../src/main.ts';
+import { utils } from '@iobroker/testing';
 
-const mockAdapter = {
-    setObjectNotExists: async () => {},
-    setState: async () => {},
-    log: { warn: () => {}, error: () => {}, info: () => {}, debug: () => {}, silly: () => {} },
-} as unknown as MidasAquatemp;
+const { adapter } = utils.unit.createMocks({});
 
-describe('endPoints.ts', () => {
+describe('Store endpoint methods', () => {
     let storeV3: Store;
     let storeV2: Store;
-
     beforeEach(() => {
-        storeV3 = new Store(mockAdapter, 'user@test.com', 'pass', 0, undefined, 3);
-        storeV2 = new Store(mockAdapter, 'user@test.com', 'pass', 0, undefined, 2);
-        setupEndpoints(storeV3);
-        setupEndpoints(storeV2);
+        storeV3 = new Store(adapter as unknown as MidasAquatemp, 'user@test.com', 'pass', 0, undefined, 3);
+        storeV2 = new Store(adapter as unknown as MidasAquatemp, 'user@test.com', 'pass', 0, undefined, 2);
     });
 
-    describe('setupEndpoints', () => {
+    describe('cloudURL (set in constructor)', () => {
         it('sets v3 cloud URL with port 449 and crmservice path', () => {
             expect(storeV3.cloudURL).to.equal('https://cloud.linked-go.com:449/crmservice/api');
         });
@@ -41,11 +26,11 @@ describe('endPoints.ts', () => {
 
     describe('getSUrl (device control)', () => {
         it('appends .json for API v2', () => {
-            expect(getSUrl(storeV2).sURL).to.match(/\/control\.json$/);
+            expect(storeV2.getSUrl()).to.match(/\/control\.json$/);
         });
 
         it('uses clean URL for API v3', () => {
-            const url = getSUrl(storeV3).sURL;
+            const url = storeV3.getSUrl();
             expect(url).to.match(/\/control$/);
             expect(url).to.not.include('.json');
         });
@@ -53,11 +38,11 @@ describe('endPoints.ts', () => {
 
     describe('getSUrlUpdateDeviceId (getDataByCode)', () => {
         it('appends .json for API v2', () => {
-            expect(getSUrlUpdateDeviceId(storeV2).sURL).to.match(/\/getDataByCode\.json$/);
+            expect(storeV2.getSUrlUpdateDeviceId()).to.match(/\/getDataByCode\.json$/);
         });
 
         it('uses clean URL for API v3', () => {
-            const url = getSUrlUpdateDeviceId(storeV3).sURL;
+            const url = storeV3.getSUrlUpdateDeviceId();
             expect(url).to.match(/\/getDataByCode$/);
             expect(url).to.not.include('.json');
         });
@@ -65,11 +50,11 @@ describe('endPoints.ts', () => {
 
     describe('getUpdateDeviceStatusSUrl', () => {
         it('appends .json for API v2', () => {
-            expect(getUpdateDeviceStatusSUrl(storeV2).sURL).to.match(/\/getDeviceStatus\.json$/);
+            expect(storeV2.getUpdateDeviceStatusSUrl()).to.match(/\/getDeviceStatus\.json$/);
         });
 
         it('uses clean URL for API v3', () => {
-            const url = getUpdateDeviceStatusSUrl(storeV3).sURL;
+            const url = storeV3.getUpdateDeviceStatusSUrl();
             expect(url).to.match(/\/getDeviceStatus$/);
             expect(url).to.not.include('.json');
         });
@@ -77,11 +62,11 @@ describe('endPoints.ts', () => {
 
     describe('getUpdateDeviceIdSUrl (deviceList)', () => {
         it('appends .json for API v2', () => {
-            expect(getUpdateDeviceIdSUrl(storeV2).sURL).to.match(/\/deviceList\.json$/);
+            expect(storeV2.getUpdateDeviceIdSUrl()).to.match(/\/deviceList\.json$/);
         });
 
         it('uses clean URL for API v3', () => {
-            const url = getUpdateDeviceIdSUrl(storeV3).sURL;
+            const url = storeV3.getUpdateDeviceIdSUrl();
             expect(url).to.match(/\/deviceList$/);
             expect(url).to.not.include('.json');
         });
@@ -89,14 +74,14 @@ describe('endPoints.ts', () => {
 
     describe('getOptionsAndSUrl (login)', () => {
         it('uses user_name field and .json URL for API v2', () => {
-            const { options, sUrl } = getOptionsAndSUrl(storeV2);
+            const { options, sUrl } = storeV2.getOptionsAndSUrl();
             expect(options).to.have.property('user_name', 'user@test.com');
             expect(options).to.not.have.property('userName');
             expect(sUrl).to.match(/\/login\.json$/);
         });
 
         it('uses userName field and clean URL for API v3', () => {
-            const { options, sUrl } = getOptionsAndSUrl(storeV3);
+            const { options, sUrl } = storeV3.getOptionsAndSUrl();
             expect(options).to.have.property('userName', 'user@test.com');
             expect(options).to.not.have.property('user_name');
             expect(sUrl).to.match(/\/login$/);
@@ -104,11 +89,11 @@ describe('endPoints.ts', () => {
         });
 
         it('always sends encrypted password and type "2"', () => {
-            const { options: v3Options } = getOptionsAndSUrl(storeV3);
+            const { options: v3Options } = storeV3.getOptionsAndSUrl();
             expect(v3Options.password).to.match(/^[a-f0-9]{32}$/);
             expect(v3Options.type).to.equal('2');
 
-            const { options: v2Options } = getOptionsAndSUrl(storeV2);
+            const { options: v2Options } = storeV2.getOptionsAndSUrl();
             expect(v2Options.password).to.match(/^[a-f0-9]{32}$/);
             expect(v2Options.type).to.equal('2');
         });
