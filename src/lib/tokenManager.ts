@@ -19,36 +19,39 @@ export class TokenManager {
         this.deviceController = deviceController;
     }
 
-    public async fetchToken(): Promise<void> {
-        const { logger } = this.store;
+    public async ensureValidToken(): Promise<void> {
         try {
             if (this.isValidToken()) {
                 return;
             }
-
-            logger.debug('Request token');
-            const { sUrl, options } = this.store.getOptionsAndSUrl();
-
-            const data = await this.apiClient.request<RequestToken>(sUrl, options);
-
-            const token = data?.object_result?.['x-token'] ?? data?.objectResult?.['x-token'] ?? null;
-
-            this.token = token;
-
-            if (token) {
-                logger.debug('Login ok! Token');
-            } else {
-                logger.error(`Login-error: ${JSON.stringify(data)}`);
-                await this.store.resetOnError();
-            }
+            await this.fetchToken();
         } catch (error) {
             await this.store.resetAndHandleErrorWithSentry('Error in getToken', error);
         }
     }
 
-    public updateToken = async (): Promise<void> => {
+    private async fetchToken(): Promise<void> {
+        const { logger } = this.store;
+        logger.debug('Request token');
+        const { sUrl, options } = this.store.getOptionsAndSUrl();
+
+        const data = await this.apiClient.request<RequestToken>(sUrl, options);
+
+        const token = data?.object_result?.['x-token'] ?? data?.objectResult?.['x-token'] ?? null;
+
+        this.token = token;
+
+        if (token) {
+            logger.debug('Login successfully!');
+        } else {
+            logger.error(`Login-error: ${JSON.stringify(data)}`);
+            await this.store.resetOnError();
+        }
+    }
+
+    public updateTokenAndDeviceId = async (): Promise<void> => {
         try {
-            await this.fetchToken();
+            await this.ensureValidToken();
 
             if (!this.isValidToken()) {
                 return;

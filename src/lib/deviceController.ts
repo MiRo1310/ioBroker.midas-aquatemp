@@ -15,50 +15,45 @@ export class DeviceController {
 
     public async updateDeviceStatus(): Promise<void> {
         const { apiLevel, logger } = this.store;
-        try {
-            const res = this.getTokenAndDevice();
-            if (!res) {
-                return;
-            }
 
-            const payload = apiLevel < 3 ? { device_code: res.device } : { deviceCode: res.device };
-
-            const data = await this.apiClient.request<DeviceStatus>(
-                this.store.getUpdateDeviceStatusSUrl(),
-                payload,
-                res.token,
-            );
-
-            logger.debug(`DeviceStatus: ${JSON.stringify(data)}`);
-
-            const status = apiLevel < 3 ? data.object_result?.status : data.objectResult?.status;
-            const isReachable = status === 'ONLINE';
-            this.store.reachable = isReachable;
-            await this.store.saveValue('info.connection', isReachable);
-
-            if (!isReachable) {
-                return;
-            }
-
-            const isFault =
-                apiLevel < 3
-                    ? data.object_result?.is_fault
-                    : (data.objectResult?.is_fault ?? data.objectResult?.isFault);
-            if (isFault === true) {
-                await this.store.saveValue('error', true);
-                await this.updateDeviceDetails();
-                await this.updateDeviceErrorMsg();
-                return;
-            }
-
-            await this.store.saveValue('error', false);
-            await this.store.saveValue('errorMessage', '');
-            await this.store.saveValue('errorCode', '');
-            await this.store.saveValue('errorLevel', 0);
-            await this.updateDeviceDetails();
-        } catch (error: unknown) {
-            await this.store.resetAndHandleErrorWithSentry('Error in updateDeviceStatus', error);
+        const res = this.getTokenAndDevice();
+        if (!res) {
+            return;
         }
+
+        const payload = apiLevel < 3 ? { device_code: res.device } : { deviceCode: res.device };
+
+        const data = await this.apiClient.request<DeviceStatus>(
+            this.store.getUpdateDeviceStatusSUrl(),
+            payload,
+            res.token,
+        );
+
+        logger.debug(`DeviceStatus: ${JSON.stringify(data)}`);
+
+        const status = apiLevel < 3 ? data.object_result?.status : data.objectResult?.status;
+        const isReachable = status === 'ONLINE';
+        this.store.reachable = isReachable;
+        await this.store.saveValue('info.connection', isReachable);
+
+        if (!isReachable) {
+            return;
+        }
+
+        const isFault =
+            apiLevel < 3 ? data.object_result?.is_fault : (data.objectResult?.is_fault ?? data.objectResult?.isFault);
+        if (isFault === true) {
+            await this.store.saveValue('error', true);
+            await this.updateDeviceDetails();
+            await this.updateDeviceErrorMsg();
+            return;
+        }
+
+        await this.store.saveValue('error', false);
+        await this.store.saveValue('errorMessage', '');
+        await this.store.saveValue('errorCode', '');
+        await this.store.saveValue('errorLevel', 0);
+        await this.updateDeviceDetails();
     }
 
     public async updateDeviceDetails(): Promise<void> {
@@ -373,23 +368,19 @@ export class DeviceController {
     private async updateDeviceMode(mode: TMode): Promise<void> {
         const { logger, saveValue } = this.store;
 
-        try {
-            const res = this.getTokenAndDevice();
-            if (!res) {
-                return;
-            }
-            const data = await this.apiClient.request<MidasData>(
-                this.store.getSUrl(),
-                this.getAxiosUpdateDevicePowerParams(res.device, mode, 'Mode'),
-                res.token,
-            );
-
-            logger.debug(`DeviceStatus: ${JSON.stringify(data)}`);
-
-            await saveValue('mode', mode);
-        } catch (error: any) {
-            await this.store.resetAndHandleErrorWithSentry('Error in updateDeviceMode', error);
+        const res = this.getTokenAndDevice();
+        if (!res) {
+            return;
         }
+        const data = await this.apiClient.request<MidasData>(
+            this.store.getSUrl(),
+            this.getAxiosUpdateDevicePowerParams(res.device, mode, 'Mode'),
+            res.token,
+        );
+
+        logger.debug(`DeviceStatus: ${JSON.stringify(data)}`);
+
+        await saveValue('mode', mode);
     }
 
     private static getSensorCodes(isPoolsana: boolean): {

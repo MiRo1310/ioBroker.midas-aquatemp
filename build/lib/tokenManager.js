@@ -33,31 +33,34 @@ class TokenManager {
   setDeviceController(deviceController) {
     this.deviceController = deviceController;
   }
-  async fetchToken() {
-    var _a, _b, _c, _d;
-    const { logger, resetOnError } = this.store;
+  async ensureValidToken() {
     try {
       if (this.isValidToken()) {
         return;
       }
-      logger.debug("Request token");
-      const { sUrl, options } = this.store.getOptionsAndSUrl();
-      const data = await this.apiClient.request(sUrl, options);
-      const token = (_d = (_c = (_a = data == null ? void 0 : data.object_result) == null ? void 0 : _a["x-token"]) != null ? _c : (_b = data == null ? void 0 : data.objectResult) == null ? void 0 : _b["x-token"]) != null ? _d : null;
-      this.token = token;
-      if (token) {
-        logger.debug("Login ok! Token");
-      } else {
-        logger.error(`Login-error: ${JSON.stringify(data)}`);
-        await resetOnError();
-      }
+      await this.fetchToken();
     } catch (error) {
       await this.store.resetAndHandleErrorWithSentry("Error in getToken", error);
     }
   }
-  updateToken = async () => {
+  async fetchToken() {
+    var _a, _b, _c, _d;
+    const { logger } = this.store;
+    logger.debug("Request token");
+    const { sUrl, options } = this.store.getOptionsAndSUrl();
+    const data = await this.apiClient.request(sUrl, options);
+    const token = (_d = (_c = (_a = data == null ? void 0 : data.object_result) == null ? void 0 : _a["x-token"]) != null ? _c : (_b = data == null ? void 0 : data.objectResult) == null ? void 0 : _b["x-token"]) != null ? _d : null;
+    this.token = token;
+    if (token) {
+      logger.debug("Login successfully!");
+    } else {
+      logger.error(`Login-error: ${JSON.stringify(data)}`);
+      await this.store.resetOnError();
+    }
+  }
+  updateTokenAndDeviceId = async () => {
     try {
-      await this.fetchToken();
+      await this.ensureValidToken();
       if (!this.isValidToken()) {
         return;
       }

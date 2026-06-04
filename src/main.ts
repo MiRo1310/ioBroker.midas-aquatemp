@@ -62,11 +62,11 @@ export class MidasAquatemp extends utils.Adapter {
         this.log.info('Objects created');
 
         await store.clearStateValues();
-        await tokenManager.updateToken();
+        await tokenManager.updateTokenAndDeviceId();
 
         this.updateInterval = this.setInterval(async () => {
             try {
-                await tokenManager.updateToken();
+                await tokenManager.updateTokenAndDeviceId();
                 const mode = await this.getStateAsync(`${dpRoot}.mode`);
 
                 if (!mode?.ack && isDefined(mode?.val) && store.device) {
@@ -88,7 +88,7 @@ export class MidasAquatemp extends utils.Adapter {
 
         this.tokenRefreshInterval = this.setInterval(async function () {
             tokenManager.resetToken();
-            await tokenManager.updateToken();
+            await tokenManager.updateTokenAndDeviceId();
         }, MidasAquatemp.tokenRefreshIntervalTime);
 
         this.on('stateChange', async (id, state) => {
@@ -106,7 +106,7 @@ export class MidasAquatemp extends utils.Adapter {
                 if (!isRelevantId || !store.device) {
                     return;
                 }
-                await tokenManager.fetchToken();
+                await tokenManager.ensureValidToken();
 
                 if (id === `${dpRoot}.mode`) {
                     this.log.debug(`Mode: ${JSON.stringify(state)}`);

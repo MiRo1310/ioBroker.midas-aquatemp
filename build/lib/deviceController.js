@@ -32,45 +32,41 @@ class DeviceController {
   }
   async updateDeviceStatus() {
     var _a, _b, _c, _d, _e, _f;
-    const { apiLevel, adapter, saveValue } = this.store;
-    try {
-      const res = this.getTokenAndDevice();
-      if (!res) {
-        return;
-      }
-      const payload = apiLevel < 3 ? { device_code: res.device } : { deviceCode: res.device };
-      const data = await this.apiClient.request(
-        this.store.getUpdateDeviceStatusSUrl(),
-        payload,
-        res.token
-      );
-      adapter.log.debug(`DeviceStatus: ${JSON.stringify(data)}`);
-      const status = apiLevel < 3 ? (_a = data.object_result) == null ? void 0 : _a.status : (_b = data.objectResult) == null ? void 0 : _b.status;
-      const isReachable = status === "ONLINE";
-      this.store.reachable = isReachable;
-      await saveValue("info.connection", isReachable);
-      if (!isReachable) {
-        return;
-      }
-      const isFault = apiLevel < 3 ? (_c = data.object_result) == null ? void 0 : _c.is_fault : (_f = (_d = data.objectResult) == null ? void 0 : _d.is_fault) != null ? _f : (_e = data.objectResult) == null ? void 0 : _e.isFault;
-      if (isFault === true) {
-        await saveValue("error", true);
-        await this.updateDeviceDetails();
-        await this.updateDeviceErrorMsg();
-        return;
-      }
-      await saveValue("error", false);
-      await saveValue("errorMessage", "");
-      await saveValue("errorCode", "");
-      await saveValue("errorLevel", 0);
-      await this.updateDeviceDetails();
-    } catch (error) {
-      await this.store.resetAndHandleErrorWithSentry("Error in updateDeviceStatus", error);
+    const { apiLevel, logger } = this.store;
+    const res = this.getTokenAndDevice();
+    if (!res) {
+      return;
     }
+    const payload = apiLevel < 3 ? { device_code: res.device } : { deviceCode: res.device };
+    const data = await this.apiClient.request(
+      this.store.getUpdateDeviceStatusSUrl(),
+      payload,
+      res.token
+    );
+    logger.debug(`DeviceStatus: ${JSON.stringify(data)}`);
+    const status = apiLevel < 3 ? (_a = data.object_result) == null ? void 0 : _a.status : (_b = data.objectResult) == null ? void 0 : _b.status;
+    const isReachable = status === "ONLINE";
+    this.store.reachable = isReachable;
+    await this.store.saveValue("info.connection", isReachable);
+    if (!isReachable) {
+      return;
+    }
+    const isFault = apiLevel < 3 ? (_c = data.object_result) == null ? void 0 : _c.is_fault : (_f = (_d = data.objectResult) == null ? void 0 : _d.is_fault) != null ? _f : (_e = data.objectResult) == null ? void 0 : _e.isFault;
+    if (isFault === true) {
+      await this.store.saveValue("error", true);
+      await this.updateDeviceDetails();
+      await this.updateDeviceErrorMsg();
+      return;
+    }
+    await this.store.saveValue("error", false);
+    await this.store.saveValue("errorMessage", "");
+    await this.store.saveValue("errorCode", "");
+    await this.store.saveValue("errorLevel", 0);
+    await this.updateDeviceDetails();
   }
   async updateDeviceDetails() {
     var _a, _b;
-    const { product, saveValue, adapter } = this.store;
+    const { product, logger } = this.store;
     try {
       const token = this.tokenManager.getValidTokenOrNull();
       if (!token || !product) {
@@ -81,12 +77,12 @@ class DeviceController {
         this.getProtocolCodes(product),
         token
       );
-      adapter.log.debug(`DeviceDetails: ${JSON.stringify(data)}`);
+      logger.debug(`DeviceDetails: ${JSON.stringify(data)}`);
       const responseValue = (_a = data.object_result) != null ? _a : data.objectResult;
       if (!responseValue || responseValue.length === 0) {
         return;
       }
-      await saveValue("rawJSON", JSON.stringify(responseValue));
+      await this.store.saveValue("rawJSON", JSON.stringify(responseValue));
       const isPoolsana = product === import_store.Store.AQUATEMP_POOLSANA;
       const powerOn = (0, import_utils.findCodeVal)(responseValue, "Power") === "1";
       const mode = (0, import_utils.findCodeVal)(responseValue, "Mode");
@@ -100,27 +96,27 @@ class DeviceController {
       };
       const tempSetValue = (0, import_utils.findCodeVal)(responseValue, "Set_Temp");
       const tempSetValueByMode = mode ? (0, import_utils.findCodeVal)(responseValue, modes[parseInt(mode)]) : null;
-      await saveValue(
+      await this.store.saveValue(
         "tempSet",
         (_b = tempSetValue ? parseFloat(tempSetValue) : null) != null ? _b : tempSetValueByMode ? parseFloat(tempSetValueByMode) : null
       );
       if (powerOn) {
         await this.savePowerOnSensors(responseValue, isPoolsana);
       } else {
-        await saveValue("consumption", 0);
-        await saveValue("rotor", 0);
+        await this.store.saveValue("consumption", 0);
+        await this.store.saveValue("rotor", 0);
       }
-      await saveValue("silent", (0, import_utils.findCodeVal)(responseValue, "Manual-mute") === "1");
-      await saveValue("state", powerOn);
-      await saveValue("mode", powerOn && mode ? parseInt(mode) : -1);
-      await saveValue("info.connection", true);
+      await this.store.saveValue("silent", (0, import_utils.findCodeVal)(responseValue, "Manual-mute") === "1");
+      await this.store.saveValue("state", powerOn);
+      await this.store.saveValue("mode", powerOn && mode ? parseInt(mode) : -1);
+      await this.store.saveValue("info.connection", true);
     } catch (error) {
       await this.store.resetAndHandleErrorWithSentry("Error updateDeviceDetails", error);
     }
   }
   async updateDeviceID() {
     var _a, _b, _c, _d, _e, _f, _g, _h, _i, _j, _k, _l, _m, _n, _o, _p, _q, _r, _s;
-    const { adapter, resetOnError, saveValue } = this.store;
+    const { logger, resetOnError } = this.store;
     try {
       const token = this.tokenManager.getValidTokenOrNull();
       if (!token) {
@@ -131,10 +127,10 @@ class DeviceController {
         this.getAxiosUpdateDeviceIdParams(),
         token
       );
-      adapter.log.debug(`UpdateDeviceID response: ${JSON.stringify(data)}`);
+      logger.debug(`UpdateDeviceID response: ${JSON.stringify(data)}`);
       if (!((_b = (_a = data == null ? void 0 : data.object_result) == null ? void 0 : _a[0]) == null ? void 0 : _b.device_code) && !((_d = (_c = data == null ? void 0 : data.objectResult) == null ? void 0 : _c[0]) == null ? void 0 : _d.deviceCode)) {
         await resetOnError();
-        adapter.log.error(
+        logger.error(
           "No device code found. Maybe the token is not valid. Please check if there are not two usages of the same account. In the next loop the token will be refreshed."
         );
         return;
@@ -145,15 +141,15 @@ class DeviceController {
       this.store.product = product;
       const isReachable = ((_s = (_p = (_o = data.object_result) == null ? void 0 : _o[0]) == null ? void 0 : _p.device_status) != null ? _s : (_r = (_q = data.objectResult) == null ? void 0 : _q[0]) == null ? void 0 : _r.deviceStatus) == "ONLINE";
       this.store.reachable = isReachable;
-      adapter.log.debug(`device: ${device}, product: ${product}, reachable: ${isReachable}`);
-      await saveValue("DeviceCode", device);
-      await saveValue("ProductCode", product);
+      logger.debug(`device: ${device}, product: ${product}, reachable: ${isReachable}`);
+      await this.store.saveValue("DeviceCode", device);
+      await this.store.saveValue("ProductCode", product);
       if (!isReachable || !device) {
-        adapter.log.debug("Device not reachable");
+        logger.debug("Device not reachable");
         void resetOnError();
         return;
       }
-      await saveValue("info.connection", true);
+      await this.store.saveValue("info.connection", true);
       if (device != "" && product) {
         await this.updateDeviceStatus();
       }
@@ -162,7 +158,7 @@ class DeviceController {
     }
   }
   async updateDevicePower(mode) {
-    const { adapter, saveValue } = this.store;
+    const { logger } = this.store;
     try {
       const { powerOpt } = DeviceController.getPowerMode(mode);
       const res = this.getTokenAndDevice();
@@ -175,33 +171,33 @@ class DeviceController {
         this.getAxiosUpdateDevicePowerParams(res.device, powerOpt, "Power"),
         res.token
       );
-      adapter.log.debug(`DeviceStatus: ${JSON.stringify(data)}`);
+      logger.debug(`DeviceStatus: ${JSON.stringify(data)}`);
       if (mode >= 0) {
         this.store.setMode(mode);
         await this.updateDeviceMode(mode);
       } else {
-        await saveValue("mode", mode);
+        await this.store.saveValue("mode", mode);
       }
     } catch (error) {
       await this.store.resetAndHandleErrorWithSentry("Error in updateDevicePower", error);
     }
   }
   async updateDeviceSetTemp(temperature) {
-    const { adapter, getDpRoot, saveValue } = this.store;
+    const { logger, getDpRoot, adapter } = this.store;
     try {
       const numericTemperature = typeof temperature === "number" ? temperature : parseFloat(String(temperature).replace(",", "."));
       if (!Number.isFinite(numericTemperature)) {
-        adapter.log.warn(`Invalid set temperature: ${temperature}`);
+        logger.warn(`Invalid set temperature: ${temperature}`);
         return;
       }
       const sTemperature = numericTemperature.toString().replace(",", ".");
       const result = await adapter.getStateAsync(`${getDpRoot()}.mode`);
       if (!(result == null ? void 0 : result.val)) {
-        adapter.log.warn(`Invalid mode: ${result == null ? void 0 : result.val}`);
+        logger.warn(`Invalid mode: ${result == null ? void 0 : result.val}`);
         return;
       }
       if (String(result == null ? void 0 : result.val) === "-1") {
-        adapter.log.debug(`Mode set to: ${result == null ? void 0 : result.val}`);
+        logger.debug(`Mode set to: ${result == null ? void 0 : result.val}`);
         return;
       }
       const res = this.getTokenAndDevice();
@@ -213,14 +209,14 @@ class DeviceController {
         this.getAxiosUpdateDeviceSetTempParams(res.device, sTemperature),
         res.token
       );
-      adapter.log.debug(`DeviceStatus: ${JSON.stringify(data)}`);
-      await saveValue("tempSet", numericTemperature);
+      logger.debug(`DeviceStatus: ${JSON.stringify(data)}`);
+      await this.store.saveValue("tempSet", numericTemperature);
     } catch (error) {
       await this.store.resetAndHandleErrorWithSentry("Error in updateDeviceSetTemp", error);
     }
   }
   async updateDeviceSilent(silent) {
-    const { logger, saveValue } = this.store;
+    const { logger } = this.store;
     try {
       const silentMode = silent ? "1" : "0";
       const res = this.getTokenAndDevice();
@@ -233,7 +229,7 @@ class DeviceController {
         res.token
       );
       logger.debug(`DeviceStatus: ${JSON.stringify(data)}`);
-      await saveValue("silent", silent);
+      await this.store.saveValue("silent", silent);
     } catch (error) {
       await this.store.resetAndHandleErrorWithSentry("Error in updateDeviceSilent", error);
     }
@@ -311,21 +307,17 @@ class DeviceController {
   }
   async updateDeviceMode(mode) {
     const { logger, saveValue } = this.store;
-    try {
-      const res = this.getTokenAndDevice();
-      if (!res) {
-        return;
-      }
-      const data = await this.apiClient.request(
-        this.store.getSUrl(),
-        this.getAxiosUpdateDevicePowerParams(res.device, mode, "Mode"),
-        res.token
-      );
-      logger.debug(`DeviceStatus: ${JSON.stringify(data)}`);
-      await saveValue("mode", mode);
-    } catch (error) {
-      await this.store.resetAndHandleErrorWithSentry("Error in updateDeviceMode", error);
+    const res = this.getTokenAndDevice();
+    if (!res) {
+      return;
     }
+    const data = await this.apiClient.request(
+      this.store.getSUrl(),
+      this.getAxiosUpdateDevicePowerParams(res.device, mode, "Mode"),
+      res.token
+    );
+    logger.debug(`DeviceStatus: ${JSON.stringify(data)}`);
+    await saveValue("mode", mode);
   }
   static getSensorCodes(isPoolsana) {
     return {

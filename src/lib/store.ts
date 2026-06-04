@@ -57,16 +57,16 @@ export class Store {
     public static readonly AQUATEMP_POOLSANA = '1132174963097280512'; //Midas/Poolsana InverPro
     public static readonly AQUATEMP_OTHER1 = '1442284873216843776';
     public readonly instance: number;
+    public readonly apiLevel: number = 3;
+    public readonly useDeviceMac: boolean = false;
+    public readonly encryptedPassword: string;
     public cloudURL: string | null = null;
-    public apiLevel = 3;
     public device?: string;
     public product: string | null = null;
     public reachable = false;
-    public useDeviceMac = false;
     private mode: TMode = 2;
-    public readonly encryptedPassword: string;
-    private tokenManager?: TokenManager;
     public readonly logger: Logger;
+    private tokenManager?: TokenManager;
 
     constructor(
         public readonly adapter: MidasAquatemp,

@@ -65,16 +65,16 @@ class Store {
   //Midas/Poolsana InverPro
   static AQUATEMP_OTHER1 = "1442284873216843776";
   instance;
-  cloudURL = null;
   apiLevel = 3;
+  useDeviceMac = false;
+  encryptedPassword;
+  cloudURL = null;
   device;
   product = null;
   reachable = false;
-  useDeviceMac = false;
   mode = 2;
-  encryptedPassword;
-  tokenManager;
   logger;
+  tokenManager;
   setTokenManager(tokenManager) {
     this.tokenManager = tokenManager;
   }
@@ -90,7 +90,7 @@ class Store {
   };
   async resetAndHandleErrorWithSentry(title, e) {
     await this.resetOnError();
-    this.logger.errorLogger(title, e);
+    this.logger.errorHandler(title, e);
   }
   setMode(mode) {
     this.mode = mode;
@@ -117,7 +117,7 @@ class Store {
       });
       await this.adapter.setState(dp, value != null ? value : null, true);
     } catch (err) {
-      this.logger.errorLogger("Error in saveValue", err);
+      this.logger.errorHandler("Error in saveValue", err);
     }
   };
   async clearStateValues() {

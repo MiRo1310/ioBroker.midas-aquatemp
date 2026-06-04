@@ -81,10 +81,10 @@ class MidasAquatemp extends utils.Adapter {
     await (0, import_createState.createObjects)(store);
     this.log.info("Objects created");
     await store.clearStateValues();
-    await tokenManager.updateToken();
+    await tokenManager.updateTokenAndDeviceId();
     this.updateInterval = this.setInterval(async () => {
       try {
-        await tokenManager.updateToken();
+        await tokenManager.updateTokenAndDeviceId();
         const mode = await this.getStateAsync(`${dpRoot}.mode`);
         if (!(mode == null ? void 0 : mode.ack) && (0, import_utils.isDefined)(mode == null ? void 0 : mode.val) && store.device) {
           const modeVal = parseInt(String(mode.val));
@@ -98,12 +98,12 @@ class MidasAquatemp extends utils.Adapter {
           await deviceController.updateDeviceSilent(!!(silent == null ? void 0 : silent.val));
         }
       } catch (error) {
-        store.logger.errorLogger("Error in updateInterval", error);
+        store.logger.errorHandler("Error in updateInterval", error);
       }
     }, this.interval * 1e3);
     this.tokenRefreshInterval = this.setInterval(async function() {
       tokenManager.resetToken();
-      await tokenManager.updateToken();
+      await tokenManager.updateTokenAndDeviceId();
     }, MidasAquatemp.tokenRefreshIntervalTime);
     this.on("stateChange", async (id, state) => {
       try {
@@ -114,7 +114,7 @@ class MidasAquatemp extends utils.Adapter {
         if (!isRelevantId || !store.device) {
           return;
         }
-        await tokenManager.fetchToken();
+        await tokenManager.ensureValidToken();
         if (id === `${dpRoot}.mode`) {
           this.log.debug(`Mode: ${JSON.stringify(state)}`);
           if (!(0, import_utils.isStateValue)(state)) {
@@ -156,7 +156,7 @@ class MidasAquatemp extends utils.Adapter {
           await this.setState(id, { ack: true });
         }
       } catch (error) {
-        store.logger.errorLogger(`Error in stateChange for ${id}`, error);
+        store.logger.errorHandler(`Error in stateChange for ${id}`, error);
       }
     });
     await this.subscribeStatesAsync(`${dpRoot}.mode`);

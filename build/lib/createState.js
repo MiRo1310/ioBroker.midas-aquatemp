@@ -445,7 +445,7 @@ const createObjects = async (store) => {
       });
     }
   } catch (error) {
-    logger.errorLogger("Error in createObjects", error);
+    logger.errorHandler("Error in createObjects", error);
   }
 };
 // Annotate the CommonJS export names for ESM import in node:

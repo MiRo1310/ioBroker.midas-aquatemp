@@ -31,12 +31,17 @@ class Logger {
   debug(msg) {
     this.adapter.log.debug(msg);
   }
+  warn(msg) {
+    this.adapter.log.warn(msg);
+  }
   info(msg) {
     this.adapter.log.info(msg);
   }
-  errorLogger(title, e) {
+  errorHandler(title, e, useSentry = true) {
     var _a, _b;
-    this.sendToSentry(e);
+    if (useSentry) {
+      this.sendToSentry(e);
+    }
     this.adapter.log.error(title);
     this.error(`Error message: ${e.message}`);
     this.error(`Error stack: ${e.stack}`);
