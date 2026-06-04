@@ -168,10 +168,10 @@ class DeviceController {
   async updateDevicePower(mode) {
     const { adapter, saveValue } = this.store;
     try {
-      const { powerMode, powerOpt } = DeviceController.getPowerMode(mode);
+      const { powerOpt } = DeviceController.getPowerMode(mode);
       const res = this.getTokenAndDevice();
-      if (!(0, import_utils.isDefined)(powerOpt) || !(0, import_utils.isDefined)(powerMode) || !res) {
-        this.store.adapter.log.warn(`Invalid value(s) : ${mode}, ${res == null ? void 0 : res.token}, ${res == null ? void 0 : res.device}`);
+      if (!res) {
+        this.store.adapter.log.warn(`Invalid values getTokenAndDevice`);
         return;
       }
       const data = await this.apiClient.request(
@@ -385,7 +385,7 @@ class DeviceController {
           powerMode: 2
         };
       default:
-        return { powerOpt: null, powerMode: null };
+        return { powerOpt: 0, powerMode: -1 };
     }
   }
 }
