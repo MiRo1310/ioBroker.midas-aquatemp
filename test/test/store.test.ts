@@ -120,4 +120,42 @@ describe('Store', () => {
             expect(storeV3.reachable).to.be.false;
         });
     });
+
+    describe('resetDeviceOnly', () => {
+        let tokenManager: TokenManager;
+        let storeV3: Store;
+        beforeEach(() => {
+            storeV3 = new Store(adapter as unknown as MidasAquatemp, 'user@test.com', 'pass', 0, 3);
+            const apiClient = new ApiClient(storeV3);
+            tokenManager = new TokenManager(storeV3, apiClient);
+        });
+
+        it('clears device and reachable but keeps the token', async () => {
+            (tokenManager as any).token = 'some-token';
+            storeV3.device = 'device-123';
+            storeV3.reachable = true;
+
+            await storeV3.resetDeviceOnly();
+
+            expect(tokenManager.getValidTokenOrNull()).to.equal('some-token');
+            expect(storeV3.device).to.equal('');
+            expect(storeV3.reachable).to.be.false;
+        });
+    });
+
+    describe('clearStateValues', () => {
+        it('sets initial error=true, consumption=0, state=false, rawJSON=null', async () => {
+            await store.clearStateValues();
+
+            const error = await adapter.getStateAsync('midas-aquatemp.0.error');
+            const consumption = await adapter.getStateAsync('midas-aquatemp.0.consumption');
+            const state = await adapter.getStateAsync('midas-aquatemp.0.state');
+            const rawJSON = await adapter.getStateAsync('midas-aquatemp.0.rawJSON');
+
+            expect(error?.val).to.be.true;
+            expect(consumption?.val).to.equal(0);
+            expect(state?.val).to.be.false;
+            expect(rawJSON?.val).to.be.null;
+        });
+    });
 });

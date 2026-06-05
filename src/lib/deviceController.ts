@@ -11,6 +11,7 @@ export class DeviceController {
         private readonly store: Store,
         private readonly tokenManager: TokenManager,
         private readonly apiClient: ApiClient,
+        private apiType: 'default' | 'legacy' | null = null,
     ) {}
 
     public async updateDeviceStatus(): Promise<void> {
@@ -122,22 +123,40 @@ export class DeviceController {
             if (!token) {
                 return;
             }
-
-            const data = await this.apiClient.request<UpdateDeviceId>(
-                this.store.getUpdateDeviceIdSUrl(),
-                this.getAxiosUpdateDeviceIdParams(),
-                token,
-            );
-
+            let data: UpdateDeviceId = {} as UpdateDeviceId;
+            if (!this.apiType || this.apiType === 'default') {
+                data = await this.apiClient.request<UpdateDeviceId>(
+                    this.store.getUpdateDeviceIdSUrl(),
+                    this.getAxiosUpdateDeviceIdParams(),
+                    token,
+                );
+            }
             logger.debug(`UpdateDeviceID response: ${JSON.stringify(data)}`);
 
-            if (!data?.object_result?.[0]?.device_code && !data?.objectResult?.[0]?.deviceCode) {
-                await resetOnError();
+            if (!this.isResult(data) && (!this.apiType || this.apiType === 'legacy')) {
+                logger.debug('No device code with standard format, retrying with legacy body wrapper...');
+                data = await this.apiClient.request<UpdateDeviceId>(
+                    this.store.getUpdateDeviceIdSUrl(),
+                    this.getAxiosUpdateDeviceIdParamsLegacy(),
+                    token,
+                );
+                logger.debug(`UpdateDeviceID legacy response: ${JSON.stringify(data)}`);
+                if (this.isResult(data)) {
+                    this.apiType = 'legacy';
+                }
+            } else {
+                this.apiType = 'default';
+            }
+
+            if (!this.isResult(data)) {
+                this.apiType = null;
+                await this.store.resetDeviceOnly();
                 logger.error(
-                    'No device code found. Maybe the token is not valid. Please check if there are not two usages of the same account. In the next loop the token will be refreshed.',
+                    `No device code found in API response. Check that the device is registered under this account and the product ID is in the supported list. Response: ${JSON.stringify(data?.object_result ?? data?.objectResult)}`,
                 );
                 return;
             }
+
             const device = data.object_result?.[0].device_code ?? data.objectResult?.[0]?.deviceCode;
             this.store.device = device;
             const product = data.object_result?.[0]?.product_id ?? data.objectResult?.[0]?.productId ?? null;
@@ -163,6 +182,10 @@ export class DeviceController {
         } catch (error: any) {
             await this.store.resetAndHandleErrorWithSentry('Error in updateDeviceID', error);
         }
+    }
+
+    private isResult(data: UpdateDeviceId): boolean {
+        return !!(data?.object_result?.[0]?.device_code || data?.objectResult?.[0]?.deviceCode);
     }
 
     public async updateDevicePower(mode: TMode): Promise<void> {
@@ -263,6 +286,10 @@ export class DeviceController {
 
     private getAxiosUpdateDeviceIdParams(): { product_ids?: string[]; productIds?: string[] } {
         return this.store.apiLevel < 3 ? { product_ids: PRODUCT_IDS } : { productIds: PRODUCT_IDS };
+    }
+
+    private getAxiosUpdateDeviceIdParamsLegacy(): { body: { productIds: string[] } } {
+        return { body: { productIds: PRODUCT_IDS } };
     }
 
     private getProtocolCodes(productId?: string): {

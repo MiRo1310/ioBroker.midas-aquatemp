@@ -88,6 +88,11 @@ class Store {
     this.reachable = false;
     await this.saveValue("info.connection", false);
   };
+  resetDeviceOnly = async () => {
+    this.device = "";
+    this.reachable = false;
+    await this.saveValue("info.connection", false);
+  };
   async resetAndHandleErrorWithSentry(title, e) {
     await this.resetOnError();
     this.logger.errorHandler(title, e);

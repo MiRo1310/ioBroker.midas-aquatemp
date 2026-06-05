@@ -24,6 +24,33 @@ function makeApiClient(shouldThrow = false): ApiClient & { callCount: number } {
     return mock;
 }
 
+const deviceResponse = {
+    error_code: '0',
+    objectResult: [{ deviceCode: 'DEV001', deviceStatus: 'ONLINE' }],
+};
+const emptyResponse = { error_code: '0', objectResult: [] };
+
+function makeSequentialApiClient(
+    ...responses: (object | Error)[]
+): ApiClient & { callCount: number; calledWith: unknown[] } {
+    let i = 0;
+    const mock = {
+        callCount: 0,
+        calledWith: [] as unknown[],
+        request: (_url: string, params: unknown) => {
+            mock.callCount++;
+            mock.calledWith.push(params);
+            const res = responses[i] ?? responses[responses.length - 1];
+            i++;
+            if (res instanceof Error) {
+                throw res;
+            }
+            return res;
+        },
+    } as unknown as ApiClient & { callCount: number; calledWith: unknown[] };
+    return mock;
+}
+
 describe('DeviceController', () => {
     let store: Store;
     let tokenManager: TokenManager;
@@ -110,6 +137,81 @@ describe('DeviceController', () => {
 
             await controller.updateDeviceSilent(true);
 
+            expect(store.device).to.equal('');
+            expect(store.reachable).to.be.false;
+        });
+    });
+
+    describe('updateDeviceID', () => {
+        it('makes no API call when token is missing', async () => {
+            (tokenManager as any).token = null;
+            const client = makeSequentialApiClient(emptyResponse);
+            controller = new DeviceController(store, tokenManager, client);
+            await controller.updateDeviceID();
+            expect(client.callCount).to.equal(0);
+        });
+
+        it('sets device and apiType=default when default format succeeds', async () => {
+            const client = makeSequentialApiClient(deviceResponse);
+            controller = new DeviceController(store, tokenManager, client);
+            await controller.updateDeviceID();
+            expect(store.device).to.equal('DEV001');
+            expect((controller as any).apiType).to.equal('default');
+        });
+
+        it('falls back to legacy format when default returns no device, sets apiType=legacy', async () => {
+            const client = makeSequentialApiClient(emptyResponse, deviceResponse);
+            controller = new DeviceController(store, tokenManager, client);
+            await controller.updateDeviceID();
+            expect(client.callCount).to.equal(2);
+            expect(store.device).to.equal('DEV001');
+            expect((controller as any).apiType).to.equal('legacy');
+        });
+
+        it('legacy format receives body-wrapped params', async () => {
+            const client = makeSequentialApiClient(emptyResponse, deviceResponse);
+            controller = new DeviceController(store, tokenManager, client);
+            await controller.updateDeviceID();
+            const legacyParams = client.calledWith[1] as any;
+            expect(legacyParams).to.have.property('body');
+            expect(legacyParams.body).to.have.property('productIds');
+        });
+
+        it('calls resetDeviceOnly and sets apiType=null when both formats fail', async () => {
+            const client = makeSequentialApiClient(emptyResponse, emptyResponse);
+            controller = new DeviceController(store, tokenManager, client);
+            store.reachable = true;
+            store.device = 'OLD_DEVICE';
+            await controller.updateDeviceID();
+            expect(store.device).to.equal('');
+            expect(store.reachable).to.be.false;
+            expect((controller as any).apiType).to.be.null;
+        });
+
+        it('skips legacy call when apiType=default is already cached', async () => {
+            const client = makeSequentialApiClient(deviceResponse);
+            controller = new DeviceController(store, tokenManager, client);
+            (controller as any).apiType = 'default';
+            await controller.updateDeviceID();
+            expect(client.callCount).to.equal(1);
+        });
+
+        it('skips default call and uses legacy directly when apiType=legacy is cached', async () => {
+            const client = makeSequentialApiClient(deviceResponse);
+            controller = new DeviceController(store, tokenManager, client);
+            (controller as any).apiType = 'legacy';
+            await controller.updateDeviceID();
+            expect(client.callCount).to.equal(1);
+            const params = client.calledWith[0] as any;
+            expect(params).to.have.property('body');
+        });
+
+        it('resets on API exception and does not set device', async () => {
+            const client = makeSequentialApiClient(new Error('network error'));
+            controller = new DeviceController(store, tokenManager, client);
+            store.device = 'OLD_DEVICE';
+            store.reachable = true;
+            await controller.updateDeviceID();
             expect(store.device).to.equal('');
             expect(store.reachable).to.be.false;
         });

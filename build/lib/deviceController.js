@@ -25,10 +25,11 @@ var import_store = require("./store");
 var import_axiosParameter = require("./axiosParameter");
 var import_utils = require("./utils");
 class DeviceController {
-  constructor(store, tokenManager, apiClient) {
+  constructor(store, tokenManager, apiClient, apiType = null) {
     this.store = store;
     this.tokenManager = tokenManager;
     this.apiClient = apiClient;
+    this.apiType = apiType;
   }
   async updateDeviceStatus() {
     var _a, _b, _c, _d, _e, _f;
@@ -115,31 +116,49 @@ class DeviceController {
     }
   }
   async updateDeviceID() {
-    var _a, _b, _c, _d, _e, _f, _g, _h, _i, _j, _k, _l, _m, _n, _o, _p, _q, _r, _s;
+    var _a, _b, _c, _d, _e, _f, _g, _h, _i, _j, _k, _l, _m, _n, _o, _p;
     const { logger, resetOnError } = this.store;
     try {
       const token = this.tokenManager.getValidTokenOrNull();
       if (!token) {
         return;
       }
-      const data = await this.apiClient.request(
-        this.store.getUpdateDeviceIdSUrl(),
-        this.getAxiosUpdateDeviceIdParams(),
-        token
-      );
+      let data = {};
+      if (!this.apiType || this.apiType === "default") {
+        data = await this.apiClient.request(
+          this.store.getUpdateDeviceIdSUrl(),
+          this.getAxiosUpdateDeviceIdParams(),
+          token
+        );
+      }
       logger.debug(`UpdateDeviceID response: ${JSON.stringify(data)}`);
-      if (!((_b = (_a = data == null ? void 0 : data.object_result) == null ? void 0 : _a[0]) == null ? void 0 : _b.device_code) && !((_d = (_c = data == null ? void 0 : data.objectResult) == null ? void 0 : _c[0]) == null ? void 0 : _d.deviceCode)) {
-        await resetOnError();
+      if (!this.isResult(data) && (!this.apiType || this.apiType === "legacy")) {
+        logger.debug("No device code with standard format, retrying with legacy body wrapper...");
+        data = await this.apiClient.request(
+          this.store.getUpdateDeviceIdSUrl(),
+          this.getAxiosUpdateDeviceIdParamsLegacy(),
+          token
+        );
+        logger.debug(`UpdateDeviceID legacy response: ${JSON.stringify(data)}`);
+        if (this.isResult(data)) {
+          this.apiType = "legacy";
+        }
+      } else {
+        this.apiType = "default";
+      }
+      if (!this.isResult(data)) {
+        this.apiType = null;
+        await this.store.resetDeviceOnly();
         logger.error(
-          "No device code found. Maybe the token is not valid. Please check if there are not two usages of the same account. In the next loop the token will be refreshed."
+          `No device code found in API response. Check that the device is registered under this account and the product ID is in the supported list. Response: ${JSON.stringify((_a = data == null ? void 0 : data.object_result) != null ? _a : data == null ? void 0 : data.objectResult)}`
         );
         return;
       }
-      const device = (_h = (_e = data.object_result) == null ? void 0 : _e[0].device_code) != null ? _h : (_g = (_f = data.objectResult) == null ? void 0 : _f[0]) == null ? void 0 : _g.deviceCode;
+      const device = (_e = (_b = data.object_result) == null ? void 0 : _b[0].device_code) != null ? _e : (_d = (_c = data.objectResult) == null ? void 0 : _c[0]) == null ? void 0 : _d.deviceCode;
       this.store.device = device;
-      const product = (_n = (_m = (_j = (_i = data.object_result) == null ? void 0 : _i[0]) == null ? void 0 : _j.product_id) != null ? _m : (_l = (_k = data.objectResult) == null ? void 0 : _k[0]) == null ? void 0 : _l.productId) != null ? _n : null;
+      const product = (_k = (_j = (_g = (_f = data.object_result) == null ? void 0 : _f[0]) == null ? void 0 : _g.product_id) != null ? _j : (_i = (_h = data.objectResult) == null ? void 0 : _h[0]) == null ? void 0 : _i.productId) != null ? _k : null;
       this.store.product = product;
-      const isReachable = ((_s = (_p = (_o = data.object_result) == null ? void 0 : _o[0]) == null ? void 0 : _p.device_status) != null ? _s : (_r = (_q = data.objectResult) == null ? void 0 : _q[0]) == null ? void 0 : _r.deviceStatus) == "ONLINE";
+      const isReachable = ((_p = (_m = (_l = data.object_result) == null ? void 0 : _l[0]) == null ? void 0 : _m.device_status) != null ? _p : (_o = (_n = data.objectResult) == null ? void 0 : _n[0]) == null ? void 0 : _o.deviceStatus) == "ONLINE";
       this.store.reachable = isReachable;
       logger.debug(`device: ${device}, product: ${product}, reachable: ${isReachable}`);
       await this.store.saveValue("DeviceCode", device);
@@ -156,6 +175,10 @@ class DeviceController {
     } catch (error) {
       await this.store.resetAndHandleErrorWithSentry("Error in updateDeviceID", error);
     }
+  }
+  isResult(data) {
+    var _a, _b, _c, _d;
+    return !!(((_b = (_a = data == null ? void 0 : data.object_result) == null ? void 0 : _a[0]) == null ? void 0 : _b.device_code) || ((_d = (_c = data == null ? void 0 : data.objectResult) == null ? void 0 : _c[0]) == null ? void 0 : _d.deviceCode));
   }
   async updateDevicePower(mode) {
     const { logger } = this.store;
@@ -241,6 +264,9 @@ class DeviceController {
   }
   getAxiosUpdateDeviceIdParams() {
     return this.store.apiLevel < 3 ? { product_ids: import_axiosParameter.PRODUCT_IDS } : { productIds: import_axiosParameter.PRODUCT_IDS };
+  }
+  getAxiosUpdateDeviceIdParamsLegacy() {
+    return { body: { productIds: import_axiosParameter.PRODUCT_IDS } };
   }
   getProtocolCodes(productId) {
     const codes = productId === import_store.Store.AQUATEMP_POOLSANA ? import_axiosParameter.CODES_POOLSANA : import_axiosParameter.CODES_OTHER;

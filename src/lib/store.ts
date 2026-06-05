@@ -103,6 +103,12 @@ export class Store {
         await this.saveValue('info.connection', false);
     };
 
+    public resetDeviceOnly = async (): Promise<void> => {
+        this.device = '';
+        this.reachable = false;
+        await this.saveValue('info.connection', false);
+    };
+
     public async resetAndHandleErrorWithSentry(title: string, e: any): Promise<void> {
         await this.resetOnError();
         this.logger.errorHandler(title, e);
