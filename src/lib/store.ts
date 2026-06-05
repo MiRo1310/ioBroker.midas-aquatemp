@@ -1,6 +1,6 @@
 import type { MidasAquatemp } from '../main';
 import { createHash } from 'crypto';
-import { Logger } from './logging';
+import { Logger } from './loggingController';
 import type { TokenManager } from './tokenManager';
 
 export type TMode = -1 | 0 | 1 | 2;

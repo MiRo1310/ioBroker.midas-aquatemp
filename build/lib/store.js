@@ -22,7 +22,7 @@ __export(store_exports, {
 });
 module.exports = __toCommonJS(store_exports);
 var import_crypto = require("crypto");
-var import_logging = require("./logging");
+var import_loggingController = require("./loggingController");
 const states = {
   error: "boolean",
   mode: "number",
@@ -58,7 +58,7 @@ class Store {
       this.device = deviceMac != null ? deviceMac : this.device;
     }
     this.setupEndpoints();
-    this.logger = new import_logging.Logger(this.adapter);
+    this.logger = new import_loggingController.Logger(this.adapter);
   }
   static modes = [-1, 0, 1, 2];
   static AQUATEMP_POOLSANA = "1132174963097280512";

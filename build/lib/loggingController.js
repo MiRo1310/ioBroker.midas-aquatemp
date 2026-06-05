@@ -16,11 +16,11 @@ var __copyProps = (to, from, except, desc) => {
   return to;
 };
 var __toCommonJS = (mod) => __copyProps(__defProp({}, "__esModule", { value: true }), mod);
-var logging_exports = {};
-__export(logging_exports, {
+var loggingController_exports = {};
+__export(loggingController_exports, {
   Logger: () => Logger
 });
-module.exports = __toCommonJS(logging_exports);
+module.exports = __toCommonJS(loggingController_exports);
 class Logger {
   constructor(adapter) {
     this.adapter = adapter;
@@ -66,4 +66,4 @@ class Logger {
 0 && (module.exports = {
   Logger
 });
-//# sourceMappingURL=logging.js.map
+//# sourceMappingURL=loggingController.js.map

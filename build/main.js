@@ -110,8 +110,8 @@ class MidasAquatemp extends utils.Adapter {
         if (!state || state.ack) {
           return;
         }
-        const isRelevantId = id === `${dpRoot}.mode` || id === `${dpRoot}.silent` || id === `${dpRoot}.tempSet` || id === `${dpRoot}.state`;
-        if (!isRelevantId || !store.device) {
+        const relevantIds = [`${dpRoot}.mode`, `${dpRoot}.silent`, `${dpRoot}.tempSet`, `${dpRoot}.state`];
+        if (!relevantIds.includes(id) || !store.device) {
           return;
         }
         await tokenManager.ensureValidToken();
@@ -122,7 +122,7 @@ class MidasAquatemp extends utils.Adapter {
             return;
           }
           const mode = Number(state.val);
-          if (!Number.isFinite(mode) || !Number.isInteger(mode) || !store.isValidMode(mode)) {
+          if (!store.isValidMode(mode)) {
             this.log.warn(
               `Ignoring unsupported mode value for ${id}: ${JSON.stringify(state.val)} (allowed: -1, 0, 1, 2)`
             );
