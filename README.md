@@ -9,21 +9,26 @@
 
 [![NPM](https://nodei.co/npm/iobroker.midas-aquatemp.png?downloads=true)](https://nodei.co/npm/iobroker.midas-aquatemp/)
 
-**Tests:** ![Test and Release](https://github.com/Miro1310/ioBroker.midas-aquatemp/workflows/Test%20and%20Release/badge.svg)
+**Tests:
+** ![Test and Release](https://github.com/Miro1310/ioBroker.midas-aquatemp/workflows/Test%20and%20Release/badge.svg)
 
-**This adapter uses Sentry libraries to automatically report exceptions and code errors to the developers.** For more details and instructions on disabling error reporting, please refer to the [Sentry-Plugin Documentation](https://github.com/ioBroker/plugin-sentry#plugin-sentry)! Use of Sentry reporting starts with js-controller 3.0.
+**This adapter uses Sentry libraries to automatically report exceptions and code errors to the developers.** For more
+details and instructions on disabling error reporting, please refer to
+the [Sentry-Plugin Documentation](https://github.com/ioBroker/plugin-sentry#plugin-sentry)! Use of Sentry reporting
+starts with js-controller 3.0.
 
 ## midas-aquatemp adapter for ioBroker
 
 ## Documentation
 
--   Please create a second account only to use this with this adapter.
--   Than add username and password in the adapter ui.
--   Choose your api-level
+- Please create a second account only to use this with this adapter.
+- Than add username and password in the adapter ui.
+- Choose your api-level
 
-If this don´t work you can add the device mac, which you can find in the app and check use device mac. This skips a part of the code, but should still work, maybe with a few limitations.
+If this don´t work you can add the device mac, which you can find in the app and check use device mac. This skips a part
+of the code, but should still work, maybe with a few limitations.
 
--   flowSwitch does not work for all devices
+- flowSwitch does not work for all devices
 
 ### TLS notes
 
@@ -42,7 +47,9 @@ When insecure mode is active, the adapter logs a warning.
 
 ### Supported devices
 
--   Poolsana InverterPro Series (17, 21) with Wifi-Adapter for Mida Inverter-heater
+- Poolsana InverterPro Series (17, 21) with Wifi-Adapter for Mida Inverter-heater
+- Poolsana Prime 8
+- XPS Pool-Wärmepumpe XPS-50, 5kW, COP5,1, bis zu 16m³
 
 If you have problems, contact us.
 
@@ -78,46 +85,46 @@ If you have problems, contact us.
 
 ### 1.2.4 (2025-06-01)
 
--   Fix: Error in updateDeviceID: No device code found
+- Fix: Error in updateDeviceID: No device code found
 
 ### 1.2.3 (2025-06-01)
 
--   FEAT: Add types, fix some errors
+- FEAT: Add types, fix some errors
 
 ### 1.2.2 (2025-05-31)
 
--   FIX: Reported errors by sentry
+- FIX: Reported errors by sentry
 
 ### 1.2.1 (2025-05-24)
 
--   FIX: #50 Cannot read properties of undefined
+- FIX: #50 Cannot read properties of undefined
 
 ### 1.2.0 (2025-05-21)
 
--   FEAT: Add sentry to the adapter
--   FIX: #24 Silent mode cannot be disabled
--   FIX: #44 Cannot read properties of undefined (reading 'description')
--   FEAT: Update dependencies and migrate to eslint 9
+- FEAT: Add sentry to the adapter
+- FIX: #24 Silent mode cannot be disabled
+- FIX: #44 Cannot read properties of undefined (reading 'description')
+- FEAT: Update dependencies and migrate to eslint 9
 
 ### 1.1.1 (2024-08-11)
 
--   FIX: #17 state change mode
+- FIX: #17 state change mode
 
 ### 1.1.0 (2024-08-06)
 
--   FEAT: Remove isPoolsana check
--   FEAT: #16 Add flowSwitch
+- FEAT: Remove isPoolsana check
+- FEAT: #16 Add flowSwitch
 
 ### 1.0.0 (2024-07-24)
 
--   FEAT: Add writeable states
--   FEAT: Data is also updated when the heating is off
--   FIX: Get token
--   FIX: #7 Error with useStore()
+- FEAT: Add writeable states
+- FEAT: Data is also updated when the heating is off
+- FIX: Get token
+- FIX: #7 Error with useStore()
 
 ### 0.0.1 (11.07.2024)
 
--   (Miro1310) initial release
+- (Miro1310) initial release
 
 ## License
 

@@ -5,7 +5,7 @@ export interface CreateObjects {
     role: string;
     unit?: string;
     def?: any;
-    states?: string;
+    states?: Record<string, string>;
     write?: boolean;
 }
 

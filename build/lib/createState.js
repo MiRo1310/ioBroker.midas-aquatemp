@@ -182,8 +182,7 @@ const createObjects = async (store) => {
       id: `${dpRoot}.mode`,
       name: "Modus",
       type: "number",
-      states: "-1:off;0:cool;1:heat;2:auto",
-      def: "",
+      states: { "-1": "off", 0: "cool", 1: "heat", 2: "auto" },
       write: true,
       role: "state"
     },
@@ -436,11 +435,11 @@ const createObjects = async (store) => {
     }
   ];
   try {
-    for (const { id, name, role, unit, type, def, write, states } of objects) {
+    for (const { id, name, role, unit, type, def, write = false, states } of objects) {
       logger.debug(`Create object: ${id}`);
       await adapter.extendObject(id, {
         type: "state",
-        common: { read: true, write: write || false, type, unit, role, name, def, states },
+        common: { read: true, write, type, unit, role, name, def, states },
         native: {}
       });
     }
