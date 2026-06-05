@@ -438,7 +438,7 @@ const createObjects = async (store) => {
   try {
     for (const { id, name, role, unit, type, def, write, states } of objects) {
       logger.debug(`Create object: ${id}`);
-      await adapter.setObjectNotExistsAsync(id, {
+      await adapter.extendObject(id, {
         type: "state",
         common: { read: true, write: write || false, type, unit, role, name, def, states },
         native: {}
