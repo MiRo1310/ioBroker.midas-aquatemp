@@ -111,7 +111,7 @@ class DeviceController {
     }
   }
   async fetchDevice() {
-    var _a, _b, _c, _d, _e, _f, _g, _h, _i, _j, _k, _l, _m, _n, _o, _p;
+    var _a, _b, _c, _d, _e, _f, _g, _h, _i, _j, _k, _l, _m, _n, _o, _p, _q;
     const { logger, resetOnError } = this.store;
     try {
       const token = this.tokenManager.getValidTokenOrNull();
@@ -168,8 +168,10 @@ class DeviceController {
         await this.updateDeviceStatus();
       }
     } catch (error) {
-      await this.store.resetDeviceOnly();
-      this.store.logger.errorHandler("Error in fetchDevice", error);
+      await this.store.resetOnError();
+      this.store.logger.warn(
+        `fetchDevice failed (possible account conflict \u2014 check if the account is used elsewhere): ${(_q = error == null ? void 0 : error.message) != null ? _q : String(error)}`
+      );
     }
   }
   isResult(data) {

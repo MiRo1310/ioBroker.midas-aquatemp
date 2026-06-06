@@ -175,8 +175,10 @@ export class DeviceController {
                 await this.updateDeviceStatus();
             }
         } catch (error: any) {
-            await this.store.resetDeviceOnly();
-            this.store.logger.errorHandler('Error in fetchDevice', error);
+            await this.store.resetOnError();
+            this.store.logger.warn(
+                `fetchDevice failed (possible account conflict — check if the account is used elsewhere): ${error?.message ?? String(error)}`,
+            );
         }
     }
 
