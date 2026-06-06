@@ -1,7 +1,7 @@
 import { type StateKey, Store, type TMode } from './store';
 import type { DeviceDetails, DeviceStatus, MidasData, ObjectResultResponse, UpdateDeviceId } from '../types/types';
 import { CODES_OTHER, CODES_POOLSANA, PRODUCT_IDS } from './axiosParameter';
-import { findCodeVal, isDefined, parseIntOrNull, parseFloatOrNull } from './utils';
+import { findCodeVal, parseIntOrNull, parseFloatOrNull } from './utils';
 import type { TokenManager } from './tokenManager';
 import type { ApiClient } from './apiClient';
 import type { AxiosUpdateDeviceParam, AxiosUpdateDeviceParams } from '../types';
@@ -175,7 +175,8 @@ export class DeviceController {
                 await this.updateDeviceStatus();
             }
         } catch (error: any) {
-            await this.store.resetAndHandleErrorWithSentry('Error in updateDeviceID', error);
+            await this.store.resetDeviceOnly();
+            this.store.logger.errorHandler('Error in fetchDevice', error);
         }
     }
 

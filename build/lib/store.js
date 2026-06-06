@@ -109,7 +109,7 @@ class Store {
   saveValue = async (key, value) => {
     try {
       const dp = `${this.getDpRoot()}.${key}`;
-      await this.adapter.setObjectNotExists(dp, {
+      await this.adapter.extendObject(dp, {
         type: "state",
         common: {
           name: key,

@@ -44,9 +44,8 @@ class MidasAquatemp extends utils.Adapter {
   static tokenRefreshIntervalTime = 36e5;
   updateInterval;
   tokenRefreshInterval;
-  interval = 6e4;
+  interval = 60;
   constructor(options = {}) {
-    var _a;
     super({
       ...options,
       name: "midas-aquatemp"
@@ -54,7 +53,6 @@ class MidasAquatemp extends utils.Adapter {
     this.on("ready", this.onReady.bind(this));
     this.on("unload", this.onUnload.bind(this));
     MidasAquatemp.instance = this;
-    this.interval = (_a = this.config.refresh) != null ? _a : this.interval;
   }
   static getInstance() {
     return MidasAquatemp.instance;
@@ -66,7 +64,12 @@ class MidasAquatemp extends utils.Adapter {
       this.log.error("No instance found.");
       return;
     }
-    const { username, password, selectApi, useDeviceMac, deviceMac } = this.config;
+    const { username, password, selectApi, useDeviceMac, deviceMac, refresh } = this.config;
+    this.interval = refresh != null ? refresh : this.interval;
+    if (username === "" || password === "" || password === void 0) {
+      this.log.error("Empty Username or Password.");
+      return;
+    }
     const store = new import_store.Store(this, username, password, this.instance, selectApi, useDeviceMac, deviceMac);
     const apiClient = new import_apiClient.ApiClient(store);
     const tokenManager = new import_tokenManager.TokenManager(store, apiClient);

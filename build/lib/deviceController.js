@@ -168,7 +168,8 @@ class DeviceController {
         await this.updateDeviceStatus();
       }
     } catch (error) {
-      await this.store.resetAndHandleErrorWithSentry("Error in updateDeviceID", error);
+      await this.store.resetDeviceOnly();
+      this.store.logger.errorHandler("Error in fetchDevice", error);
     }
   }
   isResult(data) {
