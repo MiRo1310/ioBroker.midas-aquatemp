@@ -4,7 +4,7 @@ export const isDefined = <T>(value: T | undefined | null): value is T => value !
 
 export const isStateValue = (state?: IoBrokerState | null): boolean => isDefined(state) && isDefined(state?.val);
 
-export const parseFloatOrNull = (value: string | null): number => {
+export const parseFloatOrNull = (value: string | null | undefined): number => {
     if (value === '' || !isDefined(value)) {
         return 0;
     }
@@ -12,7 +12,7 @@ export const parseFloatOrNull = (value: string | null): number => {
     return Number.isFinite(num) ? num : 0;
 };
 
-export const parseIntOrNull = (value: string | null): number => {
+export const parseIntOrNull = (value: string | null | undefined): number => {
     if (value === '' || !isDefined(value)) {
         return 0;
     }
@@ -20,6 +20,6 @@ export const parseIntOrNull = (value: string | null): number => {
     return Number.isFinite(num) ? num : 0;
 };
 
-export function findCodeVal(result: ObjectResultResponse, code: string): string | null {
-    return result.find(item => item.code === code)?.value ?? null;
+export function findCodeVal(result: ObjectResultResponse, code: string): string | undefined {
+    return result.find(item => item.code === code)?.value;
 }

@@ -32,28 +32,25 @@ class DeviceController {
     this.apiType = apiType;
   }
   async updateDeviceStatus() {
-    var _a, _b, _c, _d, _e, _f;
-    const { apiLevel, logger } = this.store;
     const res = this.getTokenAndDevice();
     if (!res) {
       return;
     }
-    const payload = apiLevel < 3 ? { device_code: res.device } : { deviceCode: res.device };
+    const payload = this.isApiLevelLessThan3() ? { device_code: res.device } : { deviceCode: res.device };
     const data = await this.apiClient.request(
       this.store.getUpdateDeviceStatusSUrl(),
       payload,
       res.token
     );
-    logger.debug(`DeviceStatus: ${JSON.stringify(data)}`);
-    const status = apiLevel < 3 ? (_a = data.object_result) == null ? void 0 : _a.status : (_b = data.objectResult) == null ? void 0 : _b.status;
-    const isReachable = status === "ONLINE";
-    this.store.reachable = isReachable;
-    await this.store.saveValue("info.connection", isReachable);
-    if (!isReachable) {
+    this.store.logger.debug(`Update device status: ${JSON.stringify(data)}`);
+    const isOnline = this.isOnline(data);
+    this.store.isOnline = isOnline;
+    await this.store.saveValue("info.connection", isOnline);
+    if (!isOnline) {
+      this.store.logger.debug("Device is offline");
       return;
     }
-    const isFault = apiLevel < 3 ? (_c = data.object_result) == null ? void 0 : _c.is_fault : (_f = (_d = data.objectResult) == null ? void 0 : _d.is_fault) != null ? _f : (_e = data.objectResult) == null ? void 0 : _e.isFault;
-    if (isFault === true) {
+    if (this.isFault(data)) {
       await this.store.saveValue("error", true);
       await this.updateDeviceDetails();
       await this.updateDeviceErrorMsg();
@@ -64,6 +61,17 @@ class DeviceController {
     await this.store.saveValue("errorCode", "");
     await this.store.saveValue("errorLevel", 0);
     await this.updateDeviceDetails();
+  }
+  isApiLevelLessThan3() {
+    return this.store.apiLevel < 3;
+  }
+  isOnline(data) {
+    var _a, _b;
+    return (this.isApiLevelLessThan3() ? (_a = data.object_result) == null ? void 0 : _a.status : (_b = data.objectResult) == null ? void 0 : _b.status) === "ONLINE";
+  }
+  isFault(data) {
+    var _a, _b, _c, _d;
+    return !!(this.isApiLevelLessThan3() ? (_a = data.object_result) == null ? void 0 : _a.is_fault : (_d = (_b = data.objectResult) == null ? void 0 : _b.is_fault) != null ? _d : (_c = data.objectResult) == null ? void 0 : _c.isFault);
   }
   async updateDeviceDetails() {
     var _a, _b;
@@ -111,8 +119,8 @@ class DeviceController {
     }
   }
   async fetchDevice() {
-    var _a, _b, _c, _d, _e, _f, _g, _h, _i, _j, _k, _l, _m, _n, _o, _p, _q;
-    const { logger, resetOnError } = this.store;
+    var _a, _b, _c, _d, _e, _f, _g;
+    const { logger } = this.store;
     try {
       const token = this.tokenManager.getValidTokenOrNull();
       if (!token) {
@@ -127,7 +135,8 @@ class DeviceController {
         );
       }
       logger.debug(`UpdateDeviceID response: ${JSON.stringify(data)}`);
-      if (!this.isResult(data) && (!this.apiType || this.apiType === "legacy")) {
+      let deviceCode = this.getDeviceCode(data);
+      if (!deviceCode && (!this.apiType || this.apiType === "legacy")) {
         logger.debug("No device code with standard format, retrying with legacy body wrapper...");
         data = await this.apiClient.request(
           this.store.getUpdateDeviceIdSUrl(),
@@ -135,13 +144,14 @@ class DeviceController {
           token
         );
         logger.debug(`UpdateDeviceID legacy response: ${JSON.stringify(data)}`);
-        if (this.isResult(data)) {
+        if (this.getDeviceCode(data)) {
           this.apiType = "legacy";
         }
       } else {
         this.apiType = "default";
       }
-      if (!this.isResult(data)) {
+      deviceCode = this.getDeviceCode(data);
+      if (!deviceCode) {
         this.apiType = null;
         await this.store.resetDeviceOnly();
         logger.error(
@@ -149,34 +159,37 @@ class DeviceController {
         );
         return;
       }
-      const device = (_e = (_b = data.object_result) == null ? void 0 : _b[0].device_code) != null ? _e : (_d = (_c = data.objectResult) == null ? void 0 : _c[0]) == null ? void 0 : _d.deviceCode;
-      this.store.device = device;
-      const product = (_k = (_j = (_g = (_f = data.object_result) == null ? void 0 : _f[0]) == null ? void 0 : _g.product_id) != null ? _j : (_i = (_h = data.objectResult) == null ? void 0 : _h[0]) == null ? void 0 : _i.productId) != null ? _k : null;
-      this.store.product = product;
-      const isReachable = ((_p = (_m = (_l = data.object_result) == null ? void 0 : _l[0]) == null ? void 0 : _m.device_status) != null ? _p : (_o = (_n = data.objectResult) == null ? void 0 : _n[0]) == null ? void 0 : _o.deviceStatus) == "ONLINE";
-      this.store.reachable = isReachable;
-      logger.debug(`device: ${device}, product: ${product}, reachable: ${isReachable}`);
-      await this.store.saveValue("DeviceCode", device);
-      await this.store.saveValue("ProductCode", product);
-      if (!isReachable || !device) {
+      this.store.device = deviceCode;
+      const productId = this.getProductId(data);
+      this.store.product = productId;
+      const isReachable = ((_f = (_c = (_b = data.object_result) == null ? void 0 : _b[0]) == null ? void 0 : _c.device_status) != null ? _f : (_e = (_d = data.objectResult) == null ? void 0 : _d[0]) == null ? void 0 : _e.deviceStatus) === "ONLINE";
+      this.store.isOnline = isReachable;
+      logger.debug(`deviceCode: ${deviceCode}, product: ${productId}, reachable: ${isReachable}`);
+      await this.store.saveValue("DeviceCode", deviceCode);
+      await this.store.saveValue("ProductCode", productId);
+      if (!isReachable) {
         logger.debug("Device not reachable");
-        void resetOnError();
+        await this.store.resetOnError();
         return;
       }
       await this.store.saveValue("info.connection", true);
-      if (device != "" && product) {
+      if (deviceCode != "" && productId) {
         await this.updateDeviceStatus();
       }
     } catch (error) {
       await this.store.resetOnError();
       this.store.logger.warn(
-        `fetchDevice failed (possible account conflict \u2014 check if the account is used elsewhere): ${(_q = error == null ? void 0 : error.message) != null ? _q : String(error)}`
+        `fetchDevice failed (possible account conflict \u2014 check if the account is used elsewhere): ${(_g = error == null ? void 0 : error.message) != null ? _g : String(error)}`
       );
     }
   }
-  isResult(data) {
+  getProductId(data) {
+    var _a, _b, _c, _d, _e;
+    return (_e = (_b = (_a = data.object_result) == null ? void 0 : _a[0]) == null ? void 0 : _b.product_id) != null ? _e : (_d = (_c = data.objectResult) == null ? void 0 : _c[0]) == null ? void 0 : _d.productId;
+  }
+  getDeviceCode(data) {
     var _a, _b, _c, _d;
-    return !!(((_b = (_a = data == null ? void 0 : data.object_result) == null ? void 0 : _a[0]) == null ? void 0 : _b.device_code) || ((_d = (_c = data == null ? void 0 : data.objectResult) == null ? void 0 : _c[0]) == null ? void 0 : _d.deviceCode));
+    return ((_b = (_a = data == null ? void 0 : data.object_result) == null ? void 0 : _a[0]) == null ? void 0 : _b.device_code) || ((_d = (_c = data == null ? void 0 : data.objectResult) == null ? void 0 : _c[0]) == null ? void 0 : _d.deviceCode);
   }
   async updateDevicePower(mode) {
     const { logger } = this.store;
@@ -340,7 +353,14 @@ class DeviceController {
       res.token
     );
     logger.debug(`DeviceStatus: ${JSON.stringify(data)}`);
-    await saveValue("mode", mode);
+    if (this.isSuccess(data)) {
+      await saveValue("mode", mode);
+    } else {
+      logger.error("Error in updateDeviceMode");
+    }
+  }
+  isSuccess(data) {
+    return data.isReusltSuc;
   }
   static getSensorCodes(isPoolsana) {
     return {

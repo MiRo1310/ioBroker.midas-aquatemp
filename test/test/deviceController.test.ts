@@ -101,12 +101,12 @@ describe('DeviceController', () => {
             controller = new DeviceController(store, tokenManager, apiClient);
 
             store.device = 'DEVICE_CODE';
-            store.reachable = true;
+            store.isOnline = true;
 
             await controller.updateDevicePower(1);
 
             expect(store.device).to.equal('DEVICE_CODE');
-            expect(store.reachable).to.be.true;
+            expect(store.isOnline).to.be.true;
         });
     });
 
@@ -133,12 +133,12 @@ describe('DeviceController', () => {
             apiClient = makeApiClient(true);
             controller = new DeviceController(store, tokenManager, apiClient);
             store.device = 'DEVICE_CODE';
-            store.reachable = true;
+            store.isOnline = true;
 
             await controller.updateDeviceSilent(true);
 
             expect(store.device).to.equal('DEVICE_CODE');
-            expect(store.reachable).to.be.true;
+            expect(store.isOnline).to.be.true;
         });
     });
 
@@ -180,11 +180,11 @@ describe('DeviceController', () => {
         it('calls resetDeviceOnly and sets apiType=null when both formats fail', async () => {
             const client = makeSequentialApiClient(emptyResponse, emptyResponse);
             controller = new DeviceController(store, tokenManager, client);
-            store.reachable = true;
+            store.isOnline = true;
             store.device = 'OLD_DEVICE';
             await controller.fetchDevice();
             expect(store.device).to.equal('');
-            expect(store.reachable).to.be.false;
+            expect(store.isOnline).to.be.false;
             expect((controller as any).apiType).to.be.null;
         });
 
@@ -210,10 +210,10 @@ describe('DeviceController', () => {
             const client = makeSequentialApiClient(new Error('network error'));
             controller = new DeviceController(store, tokenManager, client);
             store.device = 'OLD_DEVICE';
-            store.reachable = true;
+            store.isOnline = true;
             await controller.fetchDevice();
             expect(store.device).to.equal('');
-            expect(store.reachable).to.be.false;
+            expect(store.isOnline).to.be.false;
         });
     });
 
@@ -249,12 +249,12 @@ describe('DeviceController', () => {
             apiClient = makeApiClient(true);
             controller = new DeviceController(store, tokenManager, apiClient);
             store.device = 'DEVICE_CODE';
-            store.reachable = true;
+            store.isOnline = true;
 
             await controller.updateDeviceSetTemp(25);
 
             expect(store.device).to.equal('DEVICE_CODE');
-            expect(store.reachable).to.be.true;
+            expect(store.isOnline).to.be.true;
         });
     });
 });

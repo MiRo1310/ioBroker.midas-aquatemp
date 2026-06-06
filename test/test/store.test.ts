@@ -112,12 +112,12 @@ describe('Store', () => {
         it('clears token, device and reachable flag', async () => {
             (tokenManager as any).token = 'some-token';
             storeV3.device = 'device-123';
-            storeV3.reachable = true;
+            storeV3.isOnline = true;
 
             await storeV3.resetOnError();
             expect(tokenManager.getValidTokenOrNull()).to.be.null;
             expect(storeV3.device).to.equal('');
-            expect(storeV3.reachable).to.be.false;
+            expect(storeV3.isOnline).to.be.false;
         });
     });
 
@@ -133,13 +133,13 @@ describe('Store', () => {
         it('clears device and reachable but keeps the token', async () => {
             (tokenManager as any).token = 'some-token';
             storeV3.device = 'device-123';
-            storeV3.reachable = true;
+            storeV3.isOnline = true;
 
             await storeV3.resetDeviceOnly();
 
             expect(tokenManager.getValidTokenOrNull()).to.equal('some-token');
             expect(storeV3.device).to.equal('');
-            expect(storeV3.reachable).to.be.false;
+            expect(storeV3.isOnline).to.be.false;
         });
     });
 

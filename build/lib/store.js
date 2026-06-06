@@ -47,8 +47,8 @@ class Store {
   encryptedPassword;
   cloudURL = null;
   device;
-  product = null;
-  reachable = false;
+  product;
+  isOnline = false;
   mode = 2;
   logger;
   tokenManager;
@@ -62,12 +62,12 @@ class Store {
     var _a;
     (_a = this.tokenManager) == null ? void 0 : _a.resetToken();
     this.device = "";
-    this.reachable = false;
+    this.isOnline = false;
     await this.saveValue("info.connection", false);
   };
   resetDeviceOnly = async () => {
     this.device = "";
-    this.reachable = false;
+    this.isOnline = false;
     await this.saveValue("info.connection", false);
   };
   async resetAndHandleErrorWithSentry(title, e) {

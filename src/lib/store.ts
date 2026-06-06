@@ -38,8 +38,8 @@ export class Store {
     public readonly encryptedPassword: string;
     public cloudURL: string | null = null;
     public device?: string;
-    public product: string | null = null;
-    public reachable = false;
+    public product?: string;
+    public isOnline = false;
     private mode: TMode = 2;
     public readonly logger: Logger;
     private tokenManager?: TokenManager;
@@ -75,13 +75,13 @@ export class Store {
     public resetOnError = async (): Promise<void> => {
         this.tokenManager?.resetToken();
         this.device = '';
-        this.reachable = false;
+        this.isOnline = false;
         await this.saveValue('info.connection', false);
     };
 
     public resetDeviceOnly = async (): Promise<void> => {
         this.device = '';
-        this.reachable = false;
+        this.isOnline = false;
         await this.saveValue('info.connection', false);
     };
 
