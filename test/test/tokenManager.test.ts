@@ -67,4 +67,105 @@ describe('TokenManager', () => {
             expect(tokenManager.getValidTokenOrNull()).to.be.null;
         });
     });
+
+    describe('ensureValidToken', () => {
+        it('makes no API call when token is already valid', async () => {
+            let callCount = 0;
+            const client = {
+                request: () => {
+                    callCount++;
+                    return { error_code: '0' };
+                },
+            } as unknown as ApiClient;
+            tokenManager = new TokenManager(store, client);
+            (tokenManager as any).token = 'existing-token';
+
+            await tokenManager.ensureValidToken();
+
+            expect(callCount).to.equal(0);
+        });
+
+        it('calls login API and sets token when token is null', async () => {
+            const client = {
+                request: () => ({ error_code: '0', objectResult: { 'x-token': 'fresh-token' } }),
+            } as unknown as ApiClient;
+            tokenManager = new TokenManager(store, client);
+
+            await tokenManager.ensureValidToken();
+
+            expect(tokenManager.getValidTokenOrNull()).to.equal('fresh-token');
+        });
+
+        it('keeps token null when login returns no token', async () => {
+            const client = {
+                request: () => ({ error_code: '0', objectResult: {} }),
+            } as unknown as ApiClient;
+            tokenManager = new TokenManager(store, client);
+
+            await tokenManager.ensureValidToken();
+
+            expect(tokenManager.getValidTokenOrNull()).to.be.null;
+        });
+    });
+
+    describe('updateTokenAndDeviceId', () => {
+        it('does not call fetchDevice when token stays invalid after login', async () => {
+            let fetchDeviceCalled = false;
+            const client = {
+                request: () => ({ error_code: '0', objectResult: {} }),
+            } as unknown as ApiClient;
+            tokenManager = new TokenManager(store, client);
+            tokenManager.setDeviceController({
+                fetchDevice: () => {
+                    fetchDeviceCalled = true;
+                },
+                updateDeviceStatus: async () => {},
+            } as any);
+
+            await tokenManager.updateTokenAndDeviceId();
+
+            expect(fetchDeviceCalled).to.be.false;
+        });
+
+        it('calls fetchDevice when token is valid', async () => {
+            let fetchDeviceCalled = false;
+            const client = {
+                request: () => ({ error_code: '0', objectResult: { 'x-token': 'token' } }),
+            } as unknown as ApiClient;
+            tokenManager = new TokenManager(store, client);
+            tokenManager.setDeviceController({
+                fetchDevice: () => {
+                    fetchDeviceCalled = true;
+                },
+                updateDeviceStatus: async () => {},
+            } as any);
+
+            await tokenManager.updateTokenAndDeviceId();
+
+            expect(fetchDeviceCalled).to.be.true;
+        });
+
+        it('calls updateDeviceStatus instead of fetchDevice when useDeviceMac is true', async () => {
+            let fetchDeviceCalled = false;
+            let updateStatusCalled = false;
+            const storeWithMac = new Store(adapter as unknown as MidasAquatemp, 'user', 'pass', 0, 3, true, 'AA:BB:CC');
+            const client = {
+                request: () => ({ error_code: '0', objectResult: { 'x-token': 'token' } }),
+            } as unknown as ApiClient;
+            tokenManager = new TokenManager(storeWithMac, client);
+            tokenManager.setDeviceController({
+                fetchDevice: () => {
+                    fetchDeviceCalled = true;
+                },
+                updateDeviceStatus: () => {
+                    updateStatusCalled = true;
+                },
+            } as any);
+
+            await tokenManager.updateTokenAndDeviceId();
+
+            expect(fetchDeviceCalled).to.be.false;
+            expect(updateStatusCalled).to.be.true;
+        });
+    });
 });
