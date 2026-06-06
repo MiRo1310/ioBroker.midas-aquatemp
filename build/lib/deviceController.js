@@ -88,10 +88,10 @@ class DeviceController {
       const powerOn = (0, import_utils.findCodeVal)(responseValue, "Power") === "1";
       const mode = (0, import_utils.findCodeVal)(responseValue, "Mode");
       const modes = {
-        1: "R02",
-        // Heiz-Modus (-> R02)
         0: "R01",
         // Kühl-Modus (-> R01)
+        1: "R02",
+        // Heiz-Modus (-> R02)
         2: "R03"
         // Auto-Modus (-> R03)
       };
@@ -99,7 +99,7 @@ class DeviceController {
       const tempSetValueByMode = mode ? (0, import_utils.findCodeVal)(responseValue, modes[parseInt(mode)]) : null;
       await this.store.saveValue(
         "tempSet",
-        (_b = tempSetValue ? parseFloat(tempSetValue) : null) != null ? _b : tempSetValueByMode ? parseFloat(tempSetValueByMode) : null
+        (_b = tempSetValueByMode ? parseFloat(tempSetValueByMode) : null) != null ? _b : tempSetValue ? parseFloat(tempSetValue) : null
       );
       await this.saveSensors(responseValue, isPoolsana);
       await this.store.saveValue("silent", (0, import_utils.findCodeVal)(responseValue, "Manual-mute") === "1");

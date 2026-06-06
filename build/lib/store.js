@@ -23,29 +23,6 @@ __export(store_exports, {
 module.exports = __toCommonJS(store_exports);
 var import_crypto = require("crypto");
 var import_loggingController = require("./loggingController");
-const states = {
-  error: "boolean",
-  mode: "number",
-  errorLevel: "number",
-  errorCode: "string",
-  errorMessage: "string",
-  DeviceCode: "string",
-  ProductCode: "string",
-  rawJSON: "string",
-  "info.connection": "boolean",
-  consumption: "number",
-  state: "boolean",
-  suctionTemp: "number",
-  tempIn: "number",
-  tempOut: "number",
-  tempSet: "number",
-  coilTemp: "number",
-  ambient: "number",
-  voltage: "number",
-  rotor: "number",
-  silent: "boolean",
-  flowSwitch: "boolean"
-};
 class Store {
   constructor(adapter, username, password, instance, apiLevel, useDeviceMac, deviceMac) {
     this.adapter = adapter;
@@ -107,23 +84,8 @@ class Store {
     return Store.modes.includes(curr);
   }
   saveValue = async (key, value) => {
-    try {
-      const dp = `${this.getDpRoot()}.${key}`;
-      await this.adapter.extendObject(dp, {
-        type: "state",
-        common: {
-          name: key,
-          type: states[key],
-          role: "value",
-          read: true,
-          write: false
-        },
-        native: {}
-      });
-      await this.adapter.setState(dp, value != null ? value : null, true);
-    } catch (err) {
-      this.logger.errorHandler("Error in saveValue", err);
-    }
+    const dp = `${this.getDpRoot()}.${key}`;
+    await this.adapter.setState(dp, value != null ? value : null, true);
   };
   async clearStateValues() {
     await this.saveValue("error", true);

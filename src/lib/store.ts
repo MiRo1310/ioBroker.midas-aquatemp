@@ -28,30 +28,6 @@ export type StateKey =
     | 'flowSwitch'
     | 'state';
 
-const states: Record<StateKey, ioBroker.CommonType> = {
-    error: 'boolean',
-    mode: 'number',
-    errorLevel: 'number',
-    errorCode: 'string',
-    errorMessage: 'string',
-    DeviceCode: 'string',
-    ProductCode: 'string',
-    rawJSON: 'string',
-    'info.connection': 'boolean',
-    consumption: 'number',
-    state: 'boolean',
-    suctionTemp: 'number',
-    tempIn: 'number',
-    tempOut: 'number',
-    tempSet: 'number',
-    coilTemp: 'number',
-    ambient: 'number',
-    voltage: 'number',
-    rotor: 'number',
-    silent: 'boolean',
-    flowSwitch: 'boolean',
-};
-
 export class Store {
     static readonly modes: TMode[] = [-1, 0, 1, 2];
     public static readonly AQUATEMP_POOLSANA = '1132174963097280512'; //Midas/Poolsana InverPro
@@ -127,25 +103,8 @@ export class Store {
     }
 
     public saveValue = async (key: StateKey, value?: ioBroker.StateValue): Promise<void> => {
-        try {
-            const dp = `${this.getDpRoot()}.${key}`;
-
-            await this.adapter.extendObject(dp, {
-                type: 'state',
-                common: {
-                    name: key,
-                    type: states[key],
-                    role: 'value',
-                    read: true,
-                    write: false,
-                },
-                native: {},
-            });
-
-            await this.adapter.setState(dp, value ?? null, true);
-        } catch (err: any) {
-            this.logger.errorHandler('Error in saveValue', err);
-        }
+        const dp = `${this.getDpRoot()}.${key}`;
+        await this.adapter.setState(dp, value ?? null, true);
     };
 
     public async clearStateValues(): Promise<void> {

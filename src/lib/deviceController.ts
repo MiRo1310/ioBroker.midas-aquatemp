@@ -85,8 +85,8 @@ export class DeviceController {
 
             const mode = findCodeVal(responseValue, 'Mode');
             const modes = {
-                1: 'R02', // Heiz-Modus (-> R02)
                 0: 'R01', // Kühl-Modus (-> R01)
+                1: 'R02', // Heiz-Modus (-> R02)
                 2: 'R03', // Auto-Modus (-> R03)
             };
             const tempSetValue = findCodeVal(responseValue, 'Set_Temp');
@@ -96,8 +96,8 @@ export class DeviceController {
 
             await this.store.saveValue(
                 'tempSet',
-                (tempSetValue ? parseFloat(tempSetValue) : null) ??
-                    (tempSetValueByMode ? parseFloat(tempSetValueByMode) : null),
+                (tempSetValueByMode ? parseFloat(tempSetValueByMode) : null) ??
+                    (tempSetValue ? parseFloat(tempSetValue) : null),
             );
 
             await this.saveSensors(responseValue, isPoolsana);
