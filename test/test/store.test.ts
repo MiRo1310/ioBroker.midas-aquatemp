@@ -19,12 +19,12 @@ describe('Store', () => {
 
     describe('getDpRoot', () => {
         it('returns correct data point root path for instance 0', () => {
-            expect(store.getDpRoot()).to.equal('midas-aquatemp.0');
+            expect(store.getStateIdByKey('mode')).to.equal('midas-aquatemp.0.mode');
         });
 
         it('includes instance number in the path', () => {
             const s = new Store(adapter as unknown as MidasAquatemp, 'user', 'pass', 5);
-            expect(s.getDpRoot()).to.equal('midas-aquatemp.5');
+            expect(s.getStateIdByKey('state')).to.equal('midas-aquatemp.5.state');
         });
     });
 

@@ -119,7 +119,7 @@ class DeviceController {
     }
   }
   async fetchDevice() {
-    var _a, _b, _c, _d, _e, _f, _g;
+    var _a, _b;
     const { logger } = this.store;
     try {
       const token = this.tokenManager.getValidTokenOrNull();
@@ -162,13 +162,13 @@ class DeviceController {
       this.store.device = deviceCode;
       const productId = this.getProductId(data);
       this.store.product = productId;
-      const isReachable = ((_f = (_c = (_b = data.object_result) == null ? void 0 : _b[0]) == null ? void 0 : _c.device_status) != null ? _f : (_e = (_d = data.objectResult) == null ? void 0 : _d[0]) == null ? void 0 : _e.deviceStatus) === "ONLINE";
-      this.store.isOnline = isReachable;
-      logger.debug(`deviceCode: ${deviceCode}, product: ${productId}, reachable: ${isReachable}`);
+      const isOnline = this.isDeviceStatusOnline(data);
+      this.store.isOnline = isOnline;
+      logger.debug(`deviceCode: ${deviceCode}, product: ${productId}, online: ${isOnline}`);
       await this.store.saveValue("DeviceCode", deviceCode);
       await this.store.saveValue("ProductCode", productId);
-      if (!isReachable) {
-        logger.debug("Device not reachable");
+      if (!isOnline) {
+        logger.debug("Device is offline");
         await this.store.resetOnError();
         return;
       }
@@ -179,7 +179,7 @@ class DeviceController {
     } catch (error) {
       await this.store.resetOnError();
       this.store.logger.warn(
-        `fetchDevice failed (possible account conflict \u2014 check if the account is used elsewhere): ${(_g = error == null ? void 0 : error.message) != null ? _g : String(error)}`
+        `fetchDevice failed (possible account conflict \u2014 check if the account is used elsewhere): ${(_b = error == null ? void 0 : error.message) != null ? _b : String(error)}`
       );
     }
   }
@@ -190,6 +190,10 @@ class DeviceController {
   getDeviceCode(data) {
     var _a, _b, _c, _d;
     return ((_b = (_a = data == null ? void 0 : data.object_result) == null ? void 0 : _a[0]) == null ? void 0 : _b.device_code) || ((_d = (_c = data == null ? void 0 : data.objectResult) == null ? void 0 : _c[0]) == null ? void 0 : _d.deviceCode);
+  }
+  isDeviceStatusOnline(data) {
+    var _a, _b, _c, _d, _e;
+    return ((_e = (_b = (_a = data.object_result) == null ? void 0 : _a[0]) == null ? void 0 : _b.device_status) != null ? _e : (_d = (_c = data.objectResult) == null ? void 0 : _c[0]) == null ? void 0 : _d.deviceStatus) === "ONLINE";
   }
   async updateDevicePower(mode) {
     const { logger } = this.store;
@@ -217,7 +221,7 @@ class DeviceController {
     }
   }
   async updateDeviceSetTemp(temperature) {
-    const { logger, getDpRoot, adapter } = this.store;
+    const { logger, adapter } = this.store;
     try {
       const numericTemperature = typeof temperature === "number" ? temperature : parseFloat(String(temperature).replace(",", "."));
       if (!Number.isFinite(numericTemperature)) {
@@ -225,7 +229,7 @@ class DeviceController {
         return;
       }
       const sTemperature = numericTemperature.toString().replace(",", ".");
-      const result = await adapter.getStateAsync(`${getDpRoot()}.mode`);
+      const result = await adapter.getStateAsync(this.store.getStateIdByKey("mode"));
       if (!(result == null ? void 0 : result.val)) {
         logger.warn(`Invalid mode: ${result == null ? void 0 : result.val}`);
         return;
@@ -297,6 +301,7 @@ class DeviceController {
     const tVoltageVal = (0, import_utils.parseFloatOrNull)((0, import_utils.findCodeVal)(responseValue, sensorCodes.tVoltage));
     await this.store.saveValue("consumption", powerVal * tVoltageVal);
     const flowSwitchValue = (0, import_utils.findCodeVal)(responseValue, sensorCodes.flowSwitch);
+    await this.saveSensorNumber("exhaust", responseValue, sensorCodes.exhaust);
     await this.saveSensorNumber("suctionTemp", responseValue, sensorCodes.tSuction);
     await this.saveSensorNumber("tempIn", responseValue, sensorCodes.tIn);
     await this.saveSensorNumber("tempOut", responseValue, sensorCodes.tOut);
@@ -364,12 +369,13 @@ class DeviceController {
   }
   static getSensorCodes(isPoolsana) {
     return {
-      tPower: isPoolsana ? "T07" : "T7",
       tSuction: isPoolsana ? "T01" : "T1",
       tIn: isPoolsana ? "T02" : "T2",
       tOut: isPoolsana ? "T03" : "T3",
       tCoil: isPoolsana ? "T04" : "T4",
       tAmb: isPoolsana ? "T05" : "T5",
+      exhaust: isPoolsana ? "T06" : "T6",
+      tPower: isPoolsana ? "T07" : "T7",
       flowSwitch: isPoolsana ? "S03" : "S3",
       tVoltage: "T14",
       tRotor: "T17"

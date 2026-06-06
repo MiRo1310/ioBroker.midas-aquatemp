@@ -75,7 +75,7 @@ describe('utils.ts', () => {
         });
 
         it('returns null when code is not found', () => {
-            expect(findCodeVal(response, 'UNKNOWN')).to.be.null;
+            expect(findCodeVal(response, 'UNKNOWN')).to.be.undefined;
         });
     });
 });

@@ -234,7 +234,7 @@ export class DeviceController {
     }
 
     public async updateDeviceSetTemp(temperature: number): Promise<void> {
-        const { logger, getDpRoot, adapter } = this.store;
+        const { logger, adapter } = this.store;
         try {
             const numericTemperature =
                 typeof temperature === 'number' ? temperature : parseFloat(String(temperature).replace(',', '.'));
@@ -243,7 +243,7 @@ export class DeviceController {
                 return;
             }
             const sTemperature = numericTemperature.toString().replace(',', '.');
-            const result = await adapter.getStateAsync(`${getDpRoot()}.mode`);
+            const result = await adapter.getStateAsync(this.store.getStateIdByKey('mode'));
 
             if (!result?.val) {
                 logger.warn(`Invalid mode: ${result?.val}`);
@@ -350,6 +350,7 @@ export class DeviceController {
 
         const flowSwitchValue = findCodeVal(responseValue, sensorCodes.flowSwitch);
 
+        await this.saveSensorNumber('exhaust', responseValue, sensorCodes.exhaust);
         await this.saveSensorNumber('suctionTemp', responseValue, sensorCodes.tSuction);
         await this.saveSensorNumber('tempIn', responseValue, sensorCodes.tIn);
         await this.saveSensorNumber('tempOut', responseValue, sensorCodes.tOut);
@@ -441,14 +442,16 @@ export class DeviceController {
         flowSwitch: string;
         tVoltage: string;
         tRotor: string;
+        exhaust: string;
     } {
         return {
-            tPower: isPoolsana ? 'T07' : 'T7',
             tSuction: isPoolsana ? 'T01' : 'T1',
             tIn: isPoolsana ? 'T02' : 'T2',
             tOut: isPoolsana ? 'T03' : 'T3',
             tCoil: isPoolsana ? 'T04' : 'T4',
             tAmb: isPoolsana ? 'T05' : 'T5',
+            exhaust: isPoolsana ? 'T06' : 'T6',
+            tPower: isPoolsana ? 'T07' : 'T7',
             flowSwitch: isPoolsana ? 'S03' : 'S3',
             tVoltage: 'T14',
             tRotor: 'T17',

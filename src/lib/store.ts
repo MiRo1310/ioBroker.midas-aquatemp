@@ -26,7 +26,8 @@ export type StateKey =
     | 'tempSet'
     | 'silent'
     | 'flowSwitch'
-    | 'state';
+    | 'state'
+    | 'exhaust';
 
 export class Store {
     static readonly modes: TMode[] = [-1, 0, 1, 2];
@@ -68,7 +69,7 @@ export class Store {
         this.tokenManager = tokenManager;
     }
 
-    public getDpRoot = (): string => {
+    private getDpRoot = (): string => {
         return `midas-aquatemp.${this.instance}`;
     };
 
@@ -103,9 +104,12 @@ export class Store {
     }
 
     public saveValue = async (key: StateKey, value?: ioBroker.StateValue): Promise<void> => {
-        const dp = `${this.getDpRoot()}.${key}`;
-        await this.adapter.setState(dp, value ?? null, true);
+        await this.adapter.setState(this.getStateIdByKey(key), value ?? null, true);
     };
+
+    public getStateIdByKey(key: StateKey): string {
+        return `${this.getDpRoot()}.${key}`;
+    }
 
     public async clearStateValues(): Promise<void> {
         await this.saveValue('error', true);

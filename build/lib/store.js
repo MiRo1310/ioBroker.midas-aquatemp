@@ -84,9 +84,11 @@ class Store {
     return Store.modes.includes(curr);
   }
   saveValue = async (key, value) => {
-    const dp = `${this.getDpRoot()}.${key}`;
-    await this.adapter.setState(dp, value != null ? value : null, true);
+    await this.adapter.setState(this.getStateIdByKey(key), value != null ? value : null, true);
   };
+  getStateIdByKey(key) {
+    return `${this.getDpRoot()}.${key}`;
+  }
   async clearStateValues() {
     await this.saveValue("error", true);
     await this.saveValue("consumption", 0);
