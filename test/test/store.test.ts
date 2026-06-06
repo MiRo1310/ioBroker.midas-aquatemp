@@ -158,4 +158,19 @@ describe('Store', () => {
             expect(rawJSON?.val).to.be.null;
         });
     });
+
+    describe('getStateIdByKey', () => {
+        it('returns correct full path for a simple key', () => {
+            expect(store.getStateIdByKey('mode')).to.equal('midas-aquatemp.0.mode');
+        });
+
+        it('returns correct full path for info.connection', () => {
+            expect(store.getStateIdByKey('info.connection')).to.equal('midas-aquatemp.0.info.connection');
+        });
+
+        it('includes instance number in the path', () => {
+            const store1 = new Store(adapter as unknown as MidasAquatemp, 'user', 'pass', 5);
+            expect(store1.getStateIdByKey('state')).to.equal('midas-aquatemp.5.state');
+        });
+    });
 });

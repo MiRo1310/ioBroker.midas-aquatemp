@@ -257,4 +257,101 @@ describe('DeviceController', () => {
             expect(store.isOnline).to.be.true;
         });
     });
+
+    describe('updateDeviceDetails', () => {
+        // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
+        const makeDetailsResponse = (overrides: Record<string, string> = {}) => {
+            const defaults: Record<string, string> = {
+                Power: '1',
+                Mode: '1',
+                Set_Temp: '25.0',
+                'Manual-mute': '0',
+                T1: '28.0',
+                T2: '20.0',
+                T3: '35.0',
+                T4: '45.0',
+                T5: '22.0',
+                T6: '55.0',
+                T7: '1.5',
+                T14: '230.0',
+                T17: '800',
+                S3: '1',
+            };
+            const codes = { ...defaults, ...overrides };
+            return {
+                error_code: '0',
+                objectResult: Object.entries(codes).map(([code, value]) => ({ code, value })),
+            };
+        };
+
+        beforeEach(() => {
+            store.product = '1186904563333062656';
+        });
+
+        it('makes no API call when token is missing', async () => {
+            (tokenManager as any).token = null;
+            await controller.updateDeviceDetails();
+            expect(apiClient.callCount).to.equal(0);
+        });
+
+        it('makes no API call when product is missing', async () => {
+            store.product = undefined;
+            await controller.updateDeviceDetails();
+            expect(apiClient.callCount).to.equal(0);
+        });
+
+        it('saves state=true and mode from API when power is on', async () => {
+            const client = makeSequentialApiClient(makeDetailsResponse());
+            controller = new DeviceController(store, tokenManager, client);
+
+            await controller.updateDeviceDetails();
+
+            const state = await adapter.getStateAsync('midas-aquatemp.0.state');
+            const mode = await adapter.getStateAsync('midas-aquatemp.0.mode');
+            expect(state?.val).to.be.true;
+            expect(mode?.val).to.equal(1);
+        });
+
+        it('saves state=false and mode=-1 when power is off', async () => {
+            const client = makeSequentialApiClient(makeDetailsResponse({ Power: '0' }));
+            controller = new DeviceController(store, tokenManager, client);
+
+            await controller.updateDeviceDetails();
+
+            const state = await adapter.getStateAsync('midas-aquatemp.0.state');
+            const mode = await adapter.getStateAsync('midas-aquatemp.0.mode');
+            expect(state?.val).to.be.false;
+            expect(mode?.val).to.equal(-1);
+        });
+
+        it('saves silent=true when Manual-mute is 1', async () => {
+            const client = makeSequentialApiClient(makeDetailsResponse({ 'Manual-mute': '1' }));
+            controller = new DeviceController(store, tokenManager, client);
+
+            await controller.updateDeviceDetails();
+
+            const silent = await adapter.getStateAsync('midas-aquatemp.0.silent');
+            expect(silent?.val).to.be.true;
+        });
+
+        it('saves tempSet from API response', async () => {
+            const client = makeSequentialApiClient(makeDetailsResponse({ Set_Temp: '30.5' }));
+            controller = new DeviceController(store, tokenManager, client);
+
+            await controller.updateDeviceDetails();
+
+            const tempSet = await adapter.getStateAsync('midas-aquatemp.0.tempSet');
+            expect(tempSet?.val).to.equal(30.5);
+        });
+
+        it('saves exhaust temperature', async () => {
+            const client = makeSequentialApiClient(makeDetailsResponse({ T6: '58.0' }));
+            controller = new DeviceController(store, tokenManager, client);
+
+            await controller.updateDeviceDetails();
+
+            const exhaust = await adapter.getStateAsync('midas-aquatemp.0.exhaust');
+            expect(exhaust?.val).to.equal(58);
+        });
+    });
 });
