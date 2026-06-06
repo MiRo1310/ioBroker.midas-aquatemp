@@ -100,12 +100,7 @@ export class DeviceController {
                     (tempSetValueByMode ? parseFloat(tempSetValueByMode) : null),
             );
 
-            if (powerOn) {
-                await this.savePowerOnSensors(responseValue, isPoolsana);
-            } else {
-                await this.store.saveValue('consumption', 0);
-                await this.store.saveValue('rotor', 0);
-            }
+            await this.saveSensors(responseValue, isPoolsana);
 
             await this.store.saveValue('silent', findCodeVal(responseValue, 'Manual-mute') === '1');
             await this.store.saveValue('state', powerOn);
@@ -116,7 +111,7 @@ export class DeviceController {
         }
     }
 
-    public async updateDeviceID(): Promise<void> {
+    public async fetchDevice(): Promise<void> {
         const { logger, resetOnError } = this.store;
         try {
             const token = this.tokenManager.getValidTokenOrNull();
@@ -214,7 +209,7 @@ export class DeviceController {
                 await this.store.saveValue('mode', mode);
             }
         } catch (error: any) {
-            await this.store.resetAndHandleErrorWithSentry('Error in updateDevicePower', error);
+            logger.errorHandler('Error in updateDevicePower', error);
         }
     }
 
@@ -252,7 +247,7 @@ export class DeviceController {
 
             await this.store.saveValue('tempSet', numericTemperature);
         } catch (error: any) {
-            await this.store.resetAndHandleErrorWithSentry('Error in updateDeviceSetTemp', error);
+            logger.errorHandler('Error in updateDeviceSetTemp', error);
         }
     }
 
@@ -274,7 +269,7 @@ export class DeviceController {
 
             await this.store.saveValue('silent', silent);
         } catch (error: any) {
-            await this.store.resetAndHandleErrorWithSentry('Error in updateDeviceSilent', error);
+            logger.errorHandler('Error in updateDeviceSilent', error);
         }
     }
 
@@ -325,14 +320,13 @@ export class DeviceController {
             : { deviceCode, protocolCode, value };
     };
 
-    private async savePowerOnSensors(responseValue: ObjectResultResponse, isPoolsana: boolean): Promise<void> {
+    private async saveSensors(responseValue: ObjectResultResponse, isPoolsana: boolean): Promise<void> {
         const sensorCodes = DeviceController.getSensorCodes(isPoolsana);
 
         const powerVal = parseFloatOrNull(findCodeVal(responseValue, sensorCodes.tPower));
         const tVoltageVal = parseFloatOrNull(findCodeVal(responseValue, sensorCodes.tVoltage));
-        const consumptionValue = isDefined(powerVal) && isDefined(tVoltageVal) ? powerVal * tVoltageVal : 0;
 
-        await this.store.saveValue('consumption', consumptionValue);
+        await this.store.saveValue('consumption', powerVal * tVoltageVal);
 
         const flowSwitchValue = findCodeVal(responseValue, sensorCodes.flowSwitch);
 

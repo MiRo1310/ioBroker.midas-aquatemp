@@ -96,7 +96,7 @@ describe('DeviceController', () => {
             expect(store.getMode()).to.equal(1);
         });
 
-        it('resets connection on API error while turning on', async () => {
+        it('keeps connection intact on API error (only logs)', async () => {
             apiClient = makeApiClient(true);
             controller = new DeviceController(store, tokenManager, apiClient);
 
@@ -105,8 +105,8 @@ describe('DeviceController', () => {
 
             await controller.updateDevicePower(1);
 
-            expect(store.device).to.equal('');
-            expect(store.reachable).to.be.false;
+            expect(store.device).to.equal('DEVICE_CODE');
+            expect(store.reachable).to.be.true;
         });
     });
 
@@ -129,7 +129,7 @@ describe('DeviceController', () => {
             expect(state?.val).to.be.false;
         });
 
-        it('resets on API error', async () => {
+        it('keeps connection intact on API error (only logs)', async () => {
             apiClient = makeApiClient(true);
             controller = new DeviceController(store, tokenManager, apiClient);
             store.device = 'DEVICE_CODE';
@@ -137,24 +137,24 @@ describe('DeviceController', () => {
 
             await controller.updateDeviceSilent(true);
 
-            expect(store.device).to.equal('');
-            expect(store.reachable).to.be.false;
+            expect(store.device).to.equal('DEVICE_CODE');
+            expect(store.reachable).to.be.true;
         });
     });
 
-    describe('updateDeviceID', () => {
+    describe('fetchDevice', () => {
         it('makes no API call when token is missing', async () => {
             (tokenManager as any).token = null;
             const client = makeSequentialApiClient(emptyResponse);
             controller = new DeviceController(store, tokenManager, client);
-            await controller.updateDeviceID();
+            await controller.fetchDevice();
             expect(client.callCount).to.equal(0);
         });
 
         it('sets device and apiType=default when default format succeeds', async () => {
             const client = makeSequentialApiClient(deviceResponse);
             controller = new DeviceController(store, tokenManager, client);
-            await controller.updateDeviceID();
+            await controller.fetchDevice();
             expect(store.device).to.equal('DEV001');
             expect((controller as any).apiType).to.equal('default');
         });
@@ -162,7 +162,7 @@ describe('DeviceController', () => {
         it('falls back to legacy format when default returns no device, sets apiType=legacy', async () => {
             const client = makeSequentialApiClient(emptyResponse, deviceResponse);
             controller = new DeviceController(store, tokenManager, client);
-            await controller.updateDeviceID();
+            await controller.fetchDevice();
             expect(client.callCount).to.equal(2);
             expect(store.device).to.equal('DEV001');
             expect((controller as any).apiType).to.equal('legacy');
@@ -171,7 +171,7 @@ describe('DeviceController', () => {
         it('legacy format receives body-wrapped params', async () => {
             const client = makeSequentialApiClient(emptyResponse, deviceResponse);
             controller = new DeviceController(store, tokenManager, client);
-            await controller.updateDeviceID();
+            await controller.fetchDevice();
             const legacyParams = client.calledWith[1] as any;
             expect(legacyParams).to.have.property('body');
             expect(legacyParams.body).to.have.property('productIds');
@@ -182,7 +182,7 @@ describe('DeviceController', () => {
             controller = new DeviceController(store, tokenManager, client);
             store.reachable = true;
             store.device = 'OLD_DEVICE';
-            await controller.updateDeviceID();
+            await controller.fetchDevice();
             expect(store.device).to.equal('');
             expect(store.reachable).to.be.false;
             expect((controller as any).apiType).to.be.null;
@@ -192,7 +192,7 @@ describe('DeviceController', () => {
             const client = makeSequentialApiClient(deviceResponse);
             controller = new DeviceController(store, tokenManager, client);
             (controller as any).apiType = 'default';
-            await controller.updateDeviceID();
+            await controller.fetchDevice();
             expect(client.callCount).to.equal(1);
         });
 
@@ -200,7 +200,7 @@ describe('DeviceController', () => {
             const client = makeSequentialApiClient(deviceResponse);
             controller = new DeviceController(store, tokenManager, client);
             (controller as any).apiType = 'legacy';
-            await controller.updateDeviceID();
+            await controller.fetchDevice();
             expect(client.callCount).to.equal(1);
             const params = client.calledWith[0] as any;
             expect(params).to.have.property('body');
@@ -211,7 +211,7 @@ describe('DeviceController', () => {
             controller = new DeviceController(store, tokenManager, client);
             store.device = 'OLD_DEVICE';
             store.reachable = true;
-            await controller.updateDeviceID();
+            await controller.fetchDevice();
             expect(store.device).to.equal('');
             expect(store.reachable).to.be.false;
         });
@@ -245,7 +245,7 @@ describe('DeviceController', () => {
             expect(state?.val).to.equal(25);
         });
 
-        it('resets on API error', async () => {
+        it('keeps connection intact on API error (only logs)', async () => {
             apiClient = makeApiClient(true);
             controller = new DeviceController(store, tokenManager, apiClient);
             store.device = 'DEVICE_CODE';
@@ -253,8 +253,8 @@ describe('DeviceController', () => {
 
             await controller.updateDeviceSetTemp(25);
 
-            expect(store.device).to.equal('');
-            expect(store.reachable).to.be.false;
+            expect(store.device).to.equal('DEVICE_CODE');
+            expect(store.reachable).to.be.true;
         });
     });
 });

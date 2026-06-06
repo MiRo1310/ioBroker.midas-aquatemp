@@ -47,52 +47,34 @@ export class MidasAquatemp extends utils.Adapter {
         const apiClient = new ApiClient(store);
         const tokenManager = new TokenManager(store, apiClient);
         const deviceController = new DeviceController(store, tokenManager, apiClient);
-        tokenManager.setDeviceController(deviceController);
+        try {
+            tokenManager.setDeviceController(deviceController);
 
-        const dpRoot = store.getDpRoot();
+            const dpRoot = store.getDpRoot();
 
-        const currentMode = parseInt(String((await this.getStateAsync(`${dpRoot}.mode`))?.val));
-        if (store.isValidMode(currentMode)) {
-            store.setMode(currentMode);
-        }
-
-        this.log.debug(`API-Level: ${this.config.selectApi}`);
-
-        await createObjects(store);
-        this.log.info('Objects created');
-
-        await store.clearStateValues();
-        await tokenManager.updateTokenAndDeviceId();
-
-        this.updateInterval = this.setInterval(async () => {
-            try {
-                await tokenManager.updateTokenAndDeviceId();
-                const mode = await this.getStateAsync(`${dpRoot}.mode`);
-
-                if (!mode?.ack && isDefined(mode?.val) && store.device) {
-                    const modeVal = parseInt(String(mode.val));
-                    if (!store.isValidMode(modeVal)) {
-                        return;
-                    }
-                    await deviceController.updateDevicePower(modeVal);
-                }
-
-                const silent = await this.getStateAsync(`${dpRoot}.silent`);
-                if (!silent?.ack && isStateValue(silent) && store.device) {
-                    await deviceController.updateDeviceSilent(!!silent?.val);
-                }
-            } catch (error: any) {
-                store.logger.errorHandler('Error in updateInterval', error);
+            const currentMode = parseInt(String((await this.getStateAsync(`${dpRoot}.mode`))?.val));
+            if (store.isValidMode(currentMode)) {
+                store.setMode(currentMode);
             }
-        }, this.interval * 1000);
 
-        this.tokenRefreshInterval = this.setInterval(async function () {
-            tokenManager.resetToken();
+            this.log.debug(`API-Level: ${this.config.selectApi}`);
+
+            await createObjects(store);
+            this.log.info('Objects created');
+
+            await store.clearStateValues();
             await tokenManager.updateTokenAndDeviceId();
-        }, MidasAquatemp.tokenRefreshIntervalTime);
 
-        this.on('stateChange', async (id, state) => {
-            try {
+            this.updateInterval = this.setInterval(async () => {
+                await tokenManager.updateTokenAndDeviceId();
+            }, this.interval * 1000);
+
+            this.tokenRefreshInterval = this.setInterval(async function () {
+                tokenManager.resetToken();
+                await tokenManager.updateTokenAndDeviceId();
+            }, MidasAquatemp.tokenRefreshIntervalTime);
+
+            this.on('stateChange', async (id, state) => {
                 if (!state || state.ack) {
                     return;
                 }
@@ -153,15 +135,15 @@ export class MidasAquatemp extends utils.Adapter {
                     }
                     await this.setState(id, { ack: true });
                 }
-            } catch (error: any) {
-                store.logger.errorHandler(`Error in stateChange for ${id}`, error);
-            }
-        });
+            });
 
-        await this.subscribeStatesAsync(`${dpRoot}.mode`);
-        await this.subscribeStatesAsync(`${dpRoot}.silent`);
-        await this.subscribeStatesAsync(`${dpRoot}.tempSet`);
-        await this.subscribeStatesAsync(`${dpRoot}.state`);
+            await this.subscribeStatesAsync(`${dpRoot}.mode`);
+            await this.subscribeStatesAsync(`${dpRoot}.silent`);
+            await this.subscribeStatesAsync(`${dpRoot}.tempSet`);
+            await this.subscribeStatesAsync(`${dpRoot}.state`);
+        } catch (error) {
+            store.logger.errorHandler(`Error in onReady`, error);
+        }
     }
 
     /**

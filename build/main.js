@@ -71,42 +71,26 @@ class MidasAquatemp extends utils.Adapter {
     const apiClient = new import_apiClient.ApiClient(store);
     const tokenManager = new import_tokenManager.TokenManager(store, apiClient);
     const deviceController = new import_deviceController.DeviceController(store, tokenManager, apiClient);
-    tokenManager.setDeviceController(deviceController);
-    const dpRoot = store.getDpRoot();
-    const currentMode = parseInt(String((_a = await this.getStateAsync(`${dpRoot}.mode`)) == null ? void 0 : _a.val));
-    if (store.isValidMode(currentMode)) {
-      store.setMode(currentMode);
-    }
-    this.log.debug(`API-Level: ${this.config.selectApi}`);
-    await (0, import_createState.createObjects)(store);
-    this.log.info("Objects created");
-    await store.clearStateValues();
-    await tokenManager.updateTokenAndDeviceId();
-    this.updateInterval = this.setInterval(async () => {
-      try {
-        await tokenManager.updateTokenAndDeviceId();
-        const mode = await this.getStateAsync(`${dpRoot}.mode`);
-        if (!(mode == null ? void 0 : mode.ack) && (0, import_utils.isDefined)(mode == null ? void 0 : mode.val) && store.device) {
-          const modeVal = parseInt(String(mode.val));
-          if (!store.isValidMode(modeVal)) {
-            return;
-          }
-          await deviceController.updateDevicePower(modeVal);
-        }
-        const silent = await this.getStateAsync(`${dpRoot}.silent`);
-        if (!(silent == null ? void 0 : silent.ack) && (0, import_utils.isStateValue)(silent) && store.device) {
-          await deviceController.updateDeviceSilent(!!(silent == null ? void 0 : silent.val));
-        }
-      } catch (error) {
-        store.logger.errorHandler("Error in updateInterval", error);
+    try {
+      tokenManager.setDeviceController(deviceController);
+      const dpRoot = store.getDpRoot();
+      const currentMode = parseInt(String((_a = await this.getStateAsync(`${dpRoot}.mode`)) == null ? void 0 : _a.val));
+      if (store.isValidMode(currentMode)) {
+        store.setMode(currentMode);
       }
-    }, this.interval * 1e3);
-    this.tokenRefreshInterval = this.setInterval(async function() {
-      tokenManager.resetToken();
+      this.log.debug(`API-Level: ${this.config.selectApi}`);
+      await (0, import_createState.createObjects)(store);
+      this.log.info("Objects created");
+      await store.clearStateValues();
       await tokenManager.updateTokenAndDeviceId();
-    }, MidasAquatemp.tokenRefreshIntervalTime);
-    this.on("stateChange", async (id, state) => {
-      try {
+      this.updateInterval = this.setInterval(async () => {
+        await tokenManager.updateTokenAndDeviceId();
+      }, this.interval * 1e3);
+      this.tokenRefreshInterval = this.setInterval(async function() {
+        tokenManager.resetToken();
+        await tokenManager.updateTokenAndDeviceId();
+      }, MidasAquatemp.tokenRefreshIntervalTime);
+      this.on("stateChange", async (id, state) => {
         if (!state || state.ack) {
           return;
         }
@@ -155,14 +139,14 @@ class MidasAquatemp extends utils.Adapter {
           }
           await this.setState(id, { ack: true });
         }
-      } catch (error) {
-        store.logger.errorHandler(`Error in stateChange for ${id}`, error);
-      }
-    });
-    await this.subscribeStatesAsync(`${dpRoot}.mode`);
-    await this.subscribeStatesAsync(`${dpRoot}.silent`);
-    await this.subscribeStatesAsync(`${dpRoot}.tempSet`);
-    await this.subscribeStatesAsync(`${dpRoot}.state`);
+      });
+      await this.subscribeStatesAsync(`${dpRoot}.mode`);
+      await this.subscribeStatesAsync(`${dpRoot}.silent`);
+      await this.subscribeStatesAsync(`${dpRoot}.tempSet`);
+      await this.subscribeStatesAsync(`${dpRoot}.state`);
+    } catch (error) {
+      store.logger.errorHandler(`Error in onReady`, error);
+    }
   }
   /**
    * Is called when adapter shuts down - callback has to be called under any circumstances!

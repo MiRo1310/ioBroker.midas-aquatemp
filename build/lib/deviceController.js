@@ -101,12 +101,7 @@ class DeviceController {
         "tempSet",
         (_b = tempSetValue ? parseFloat(tempSetValue) : null) != null ? _b : tempSetValueByMode ? parseFloat(tempSetValueByMode) : null
       );
-      if (powerOn) {
-        await this.savePowerOnSensors(responseValue, isPoolsana);
-      } else {
-        await this.store.saveValue("consumption", 0);
-        await this.store.saveValue("rotor", 0);
-      }
+      await this.saveSensors(responseValue, isPoolsana);
       await this.store.saveValue("silent", (0, import_utils.findCodeVal)(responseValue, "Manual-mute") === "1");
       await this.store.saveValue("state", powerOn);
       await this.store.saveValue("mode", powerOn && mode ? parseInt(mode) : -1);
@@ -115,7 +110,7 @@ class DeviceController {
       await this.store.resetAndHandleErrorWithSentry("Error updateDeviceDetails", error);
     }
   }
-  async updateDeviceID() {
+  async fetchDevice() {
     var _a, _b, _c, _d, _e, _f, _g, _h, _i, _j, _k, _l, _m, _n, _o, _p;
     const { logger, resetOnError } = this.store;
     try {
@@ -202,7 +197,7 @@ class DeviceController {
         await this.store.saveValue("mode", mode);
       }
     } catch (error) {
-      await this.store.resetAndHandleErrorWithSentry("Error in updateDevicePower", error);
+      logger.errorHandler("Error in updateDevicePower", error);
     }
   }
   async updateDeviceSetTemp(temperature) {
@@ -235,7 +230,7 @@ class DeviceController {
       logger.debug(`DeviceStatus: ${JSON.stringify(data)}`);
       await this.store.saveValue("tempSet", numericTemperature);
     } catch (error) {
-      await this.store.resetAndHandleErrorWithSentry("Error in updateDeviceSetTemp", error);
+      logger.errorHandler("Error in updateDeviceSetTemp", error);
     }
   }
   async updateDeviceSilent(silent) {
@@ -254,7 +249,7 @@ class DeviceController {
       logger.debug(`DeviceStatus: ${JSON.stringify(data)}`);
       await this.store.saveValue("silent", silent);
     } catch (error) {
-      await this.store.resetAndHandleErrorWithSentry("Error in updateDeviceSilent", error);
+      logger.errorHandler("Error in updateDeviceSilent", error);
     }
   }
   getAxiosUpdateDeviceSetTempParams(deviceCode, sTemperature) {
@@ -280,12 +275,11 @@ class DeviceController {
   controlParam = (deviceCode, protocolCode, value) => {
     return this.store.apiLevel < 3 ? { device_code: deviceCode, protocol_code: protocolCode, value } : { deviceCode, protocolCode, value };
   };
-  async savePowerOnSensors(responseValue, isPoolsana) {
+  async saveSensors(responseValue, isPoolsana) {
     const sensorCodes = DeviceController.getSensorCodes(isPoolsana);
     const powerVal = (0, import_utils.parseFloatOrNull)((0, import_utils.findCodeVal)(responseValue, sensorCodes.tPower));
     const tVoltageVal = (0, import_utils.parseFloatOrNull)((0, import_utils.findCodeVal)(responseValue, sensorCodes.tVoltage));
-    const consumptionValue = (0, import_utils.isDefined)(powerVal) && (0, import_utils.isDefined)(tVoltageVal) ? powerVal * tVoltageVal : 0;
-    await this.store.saveValue("consumption", consumptionValue);
+    await this.store.saveValue("consumption", powerVal * tVoltageVal);
     const flowSwitchValue = (0, import_utils.findCodeVal)(responseValue, sensorCodes.flowSwitch);
     await this.saveSensorNumber("suctionTemp", responseValue, sensorCodes.tSuction);
     await this.saveSensorNumber("tempIn", responseValue, sensorCodes.tIn);

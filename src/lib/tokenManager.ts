@@ -64,7 +64,7 @@ export class TokenManager {
                 await this.deviceController.updateDeviceStatus();
                 return;
             }
-            await this.deviceController.updateDeviceID();
+            await this.deviceController.fetchDevice();
         } catch (error: any) {
             await this.store.resetAndHandleErrorWithSentry('Error in updateToken', error);
         }
