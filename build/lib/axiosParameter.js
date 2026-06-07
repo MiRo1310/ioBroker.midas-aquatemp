@@ -45,13 +45,10 @@ const CODES = [
   "Power",
   "Mode",
   "Manual-mute",
-  "T01",
-  "T02",
   "2074",
   "2075",
   "2076",
   "2077",
-  "H03",
   "Set_Temp",
   "R08",
   "R09",
@@ -65,6 +62,9 @@ const CODES = [
   "1159",
   "F17",
   "H02",
+  "H03",
+  "T01",
+  "T02",
   "T04",
   "T05",
   "T06",
@@ -78,8 +78,8 @@ const CODES = [
   "T5",
   "T6",
   "T7",
-  "S03",
-  "S3"
+  "S3",
+  "S03"
 ];
 // Annotate the CommonJS export names for ESM import in node:
 0 && (module.exports = {

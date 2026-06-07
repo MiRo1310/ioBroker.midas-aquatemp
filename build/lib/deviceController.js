@@ -73,7 +73,7 @@ class DeviceController {
     return !!(this.isApiLevelLessThan3() ? (_a = data.object_result) == null ? void 0 : _a.is_fault : (_d = (_b = data.objectResult) == null ? void 0 : _b.is_fault) != null ? _d : (_c = data.objectResult) == null ? void 0 : _c.isFault);
   }
   async updateDeviceDetails() {
-    var _a, _b;
+    var _a, _b, _c;
     const { product, logger } = this.store;
     try {
       const token = this.tokenManager.getValidTokenOrNull();
@@ -105,7 +105,7 @@ class DeviceController {
       const tempSetValueByMode = mode ? (0, import_utils.findCodeVal)(responseValue, modes[parseInt(mode)]) : null;
       await this.store.saveValue(
         "tempSet",
-        (_b = tempSetValueByMode ? parseFloat(tempSetValueByMode) : null) != null ? _b : tempSetValue ? parseFloat(tempSetValue) : null
+        (_c = (_b = this.getTempSetOverride(product, responseValue)) != null ? _b : tempSetValueByMode ? parseFloat(tempSetValueByMode) : null) != null ? _c : tempSetValue ? parseFloat(tempSetValue) : null
       );
       await this.saveSensors(responseValue);
       await this.store.saveValue("silent", (0, import_utils.findCodeVal)(responseValue, "Manual-mute") === "1");
@@ -115,6 +115,12 @@ class DeviceController {
     } catch (error) {
       await this.store.resetAndHandleErrorWithSentry("Error updateDeviceDetails", error);
     }
+  }
+  getTempSetOverride(product, responseValue) {
+    if (product === "1650758828508766208") {
+      return (0, import_utils.parseFloatOrNull)((0, import_utils.findCodeVal)(responseValue, "R01"));
+    }
+    return void 0;
   }
   async fetchDevice() {
     var _a, _b;

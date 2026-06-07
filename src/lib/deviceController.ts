@@ -105,7 +105,8 @@ export class DeviceController {
 
             await this.store.saveValue(
                 'tempSet',
-                (tempSetValueByMode ? parseFloat(tempSetValueByMode) : null) ??
+                this.getTempSetOverride(product, responseValue) ??
+                    (tempSetValueByMode ? parseFloat(tempSetValueByMode) : null) ??
                     (tempSetValue ? parseFloat(tempSetValue) : null),
             );
 
@@ -118,6 +119,13 @@ export class DeviceController {
         } catch (error: unknown) {
             await this.store.resetAndHandleErrorWithSentry('Error updateDeviceDetails', error);
         }
+    }
+
+    private getTempSetOverride(product: string, responseValue: ObjectResultResponse): number | undefined {
+        if (product === '1650758828508766208') {
+            return parseFloatOrNull(findCodeVal(responseValue, 'R01'));
+        }
+        return undefined;
     }
 
     public async fetchDevice(): Promise<void> {

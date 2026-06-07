@@ -38,9 +38,6 @@ class Store {
     this.logger = new import_loggingController.Logger(this.adapter);
   }
   static modes = [-1, 0, 1, 2];
-  static AQUATEMP_POOLSANA = "1132174963097280512";
-  //Midas/Poolsana InverPro
-  static AQUATEMP_OTHER1 = "1442284873216843776";
   instance;
   apiLevel = 3;
   useDeviceMac = false;
