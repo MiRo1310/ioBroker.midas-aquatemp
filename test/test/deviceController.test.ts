@@ -354,4 +354,80 @@ describe('DeviceController', () => {
             expect(exhaust?.val).to.equal(58);
         });
     });
+
+    describe('updateDeviceStatus', () => {
+        const makeStatusResponse = (
+            status: string,
+            fault = false,
+        ): {
+            error_code: '0';
+            objectResult: { status: string; is_fault: boolean };
+        } => ({
+            error_code: '0',
+            objectResult: { status, is_fault: fault },
+        });
+
+        it('makes no API call when token is missing', async () => {
+            (tokenManager as any).token = null;
+            await controller.updateDeviceStatus();
+            expect(apiClient.callCount).to.equal(0);
+        });
+
+        it('makes no API call when device is missing', async () => {
+            store.device = undefined;
+            await controller.updateDeviceStatus();
+            expect(apiClient.callCount).to.equal(0);
+        });
+
+        it('sets isOnline=false and connection=false when device is OFFLINE', async () => {
+            const client = makeSequentialApiClient(makeStatusResponse('OFFLINE'));
+            controller = new DeviceController(store, tokenManager, client);
+            store.isOnline = true;
+
+            await controller.updateDeviceStatus();
+
+            expect(store.isOnline).to.be.false;
+            const connection = await adapter.getStateAsync('midas-aquatemp.0.info.connection');
+            expect(connection?.val).to.be.false;
+            expect(client.callCount).to.equal(1);
+        });
+
+        it('sets isOnline=true and connection=true when device is ONLINE', async () => {
+            store.product = '1186904563333062656';
+            const client = makeSequentialApiClient(makeStatusResponse('ONLINE'), emptyResponse);
+            controller = new DeviceController(store, tokenManager, client);
+
+            await controller.updateDeviceStatus();
+
+            expect(store.isOnline).to.be.true;
+            const connection = await adapter.getStateAsync('midas-aquatemp.0.info.connection');
+            expect(connection?.val).to.be.true;
+        });
+
+        it('saves error=false when ONLINE and no fault', async () => {
+            store.product = '1186904563333062656';
+            const client = makeSequentialApiClient(makeStatusResponse('ONLINE', false), emptyResponse);
+            controller = new DeviceController(store, tokenManager, client);
+
+            await controller.updateDeviceStatus();
+
+            const error = await adapter.getStateAsync('midas-aquatemp.0.error');
+            expect(error?.val).to.be.false;
+        });
+
+        it('saves error=true and makes 3 API calls when fault is reported', async () => {
+            store.product = '1186904563333062656';
+            const client = makeSequentialApiClient(makeStatusResponse('ONLINE', true), emptyResponse, {
+                error_code: '0',
+                objectResult: [],
+            });
+            controller = new DeviceController(store, tokenManager, client);
+
+            await controller.updateDeviceStatus();
+
+            const error = await adapter.getStateAsync('midas-aquatemp.0.error');
+            expect(error?.val).to.be.true;
+            expect(client.callCount).to.equal(3);
+        });
+    });
 });

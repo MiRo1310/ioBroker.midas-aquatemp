@@ -23,3 +23,13 @@ export const parseIntOrNull = (value?: string | null): number => {
 export function findCodeVal(result: ObjectResultResponse, code: string): string | undefined {
     return result.find(item => item.code === code)?.value;
 }
+
+export function findValByCodeArray(result: ObjectResultResponse, codes: string[]): string | undefined {
+    for (const code of codes) {
+        const value = result.find(item => item.code === code)?.value;
+        if (!isDefined(value) || value === '') {
+            continue;
+        }
+        return value;
+    }
+}

@@ -1,7 +1,7 @@
-import { type StateKey, Store, type TMode } from './store';
+import type { StateKey, Store, TMode } from './store';
 import type { DeviceDetails, DeviceStatus, MidasData, ObjectResultResponse, UpdateDeviceId } from '../types/types';
-import { CODES_OTHER, CODES_POOLSANA, PRODUCT_IDS } from './axiosParameter';
-import { findCodeVal, parseIntOrNull, parseFloatOrNull } from './utils';
+import { CODES, PRODUCT_IDS } from './axiosParameter';
+import { findCodeVal, findValByCodeArray, parseFloatOrNull, parseIntOrNull } from './utils';
 import type { TokenManager } from './tokenManager';
 import type { ApiClient } from './apiClient';
 import type { AxiosUpdateDeviceParam, AxiosUpdateDeviceParams } from '../types';
@@ -77,7 +77,7 @@ export class DeviceController {
 
             const data = await this.apiClient.request<DeviceDetails>(
                 this.store.getSUrlUpdateDeviceId(),
-                this.getProtocolCodes(product),
+                this.getProtocolCodes(),
                 token,
             );
 
@@ -90,7 +90,6 @@ export class DeviceController {
 
             await this.store.saveValue('rawJSON', JSON.stringify(responseValue));
 
-            const isPoolsana = product === Store.AQUATEMP_POOLSANA;
             const powerOn = findCodeVal(responseValue, 'Power') === '1';
 
             const mode = findCodeVal(responseValue, 'Mode');
@@ -110,7 +109,7 @@ export class DeviceController {
                     (tempSetValue ? parseFloat(tempSetValue) : null),
             );
 
-            await this.saveSensors(responseValue, isPoolsana);
+            await this.saveSensors(responseValue);
 
             await this.store.saveValue('silent', findCodeVal(responseValue, 'Manual-mute') === '1');
             await this.store.saveValue('state', powerOn);
@@ -300,24 +299,22 @@ export class DeviceController {
     }
 
     private getAxiosUpdateDeviceIdParams(): { product_ids?: string[]; productIds?: string[] } {
-        return this.store.apiLevel < 3 ? { product_ids: PRODUCT_IDS } : { productIds: PRODUCT_IDS };
+        return this.isApiLevelLessThan3() ? { product_ids: PRODUCT_IDS } : { productIds: PRODUCT_IDS };
     }
 
     private getAxiosUpdateDeviceIdParamsLegacy(): { body: { productIds: string[] } } {
         return { body: { productIds: PRODUCT_IDS } };
     }
 
-    private getProtocolCodes(productId?: string): {
+    private getProtocolCodes(): {
         device_code?: string;
         deviceCode?: string;
         protocal_codes?: string[];
         protocalCodes?: string[];
     } {
-        const codes = productId === Store.AQUATEMP_POOLSANA ? CODES_POOLSANA : CODES_OTHER;
-
-        return this.store.apiLevel < 3
-            ? { device_code: this.store.device, protocal_codes: codes }
-            : { deviceCode: this.store.device, protocalCodes: codes };
+        return this.isApiLevelLessThan3()
+            ? { device_code: this.store.device, protocal_codes: CODES }
+            : { deviceCode: this.store.device, protocalCodes: CODES };
     }
 
     private getAxiosUpdateDevicePowerParams(
@@ -340,15 +337,15 @@ export class DeviceController {
             : { deviceCode, protocolCode, value };
     };
 
-    private async saveSensors(responseValue: ObjectResultResponse, isPoolsana: boolean): Promise<void> {
-        const sensorCodes = DeviceController.getSensorCodes(isPoolsana);
+    private async saveSensors(responseValue: ObjectResultResponse): Promise<void> {
+        const sensorCodes = DeviceController.getSensorCodes();
 
-        const powerVal = parseFloatOrNull(findCodeVal(responseValue, sensorCodes.tPower));
-        const tVoltageVal = parseFloatOrNull(findCodeVal(responseValue, sensorCodes.tVoltage));
+        const powerVal = parseFloatOrNull(findValByCodeArray(responseValue, sensorCodes.tPower));
+        const tVoltageVal = parseFloatOrNull(findValByCodeArray(responseValue, sensorCodes.tVoltage));
 
         await this.store.saveValue('consumption', powerVal * tVoltageVal);
 
-        const flowSwitchValue = findCodeVal(responseValue, sensorCodes.flowSwitch);
+        const flowSwitchValue = findValByCodeArray(responseValue, sensorCodes.flowSwitch);
 
         await this.saveSensorNumber('exhaust', responseValue, sensorCodes.exhaust);
         await this.saveSensorNumber('suctionTemp', responseValue, sensorCodes.tSuction);
@@ -367,10 +364,11 @@ export class DeviceController {
     private async saveSensorNumber(
         key: StateKey,
         res: ObjectResultResponse,
-        code: string,
+        code: string[],
         int?: boolean,
     ): Promise<void> {
-        const val = findCodeVal(res, code);
+        const val = findValByCodeArray(res, code);
+
         await this.saveNumberIfValid(key, int ? parseIntOrNull(val) : parseFloatOrNull(val));
     }
 
@@ -432,29 +430,29 @@ export class DeviceController {
         return data.isReusltSuc;
     }
 
-    private static getSensorCodes(isPoolsana: boolean): {
-        tPower: string;
-        tSuction: string;
-        tIn: string;
-        tOut: string;
-        tCoil: string;
-        tAmb: string;
-        flowSwitch: string;
-        tVoltage: string;
-        tRotor: string;
-        exhaust: string;
+    private static getSensorCodes(): {
+        tPower: string[];
+        tSuction: string[];
+        tIn: string[];
+        tOut: string[];
+        tCoil: string[];
+        tAmb: string[];
+        flowSwitch: string[];
+        tVoltage: string[];
+        tRotor: string[];
+        exhaust: string[];
     } {
         return {
-            tSuction: isPoolsana ? 'T01' : 'T1',
-            tIn: isPoolsana ? 'T02' : 'T2',
-            tOut: isPoolsana ? 'T03' : 'T3',
-            tCoil: isPoolsana ? 'T04' : 'T4',
-            tAmb: isPoolsana ? 'T05' : 'T5',
-            exhaust: isPoolsana ? 'T06' : 'T6',
-            tPower: isPoolsana ? 'T07' : 'T7',
-            flowSwitch: isPoolsana ? 'S03' : 'S3',
-            tVoltage: 'T14',
-            tRotor: 'T17',
+            tSuction: ['T01', 'T1'],
+            tIn: ['T02', 'T2'],
+            tOut: ['T03', 'T3'],
+            tCoil: ['T04', 'T4'],
+            tAmb: ['T05', 'T5'],
+            exhaust: ['T06', 'T6'],
+            tPower: ['T07', 'T7'],
+            flowSwitch: ['S03', 'S3'],
+            tVoltage: ['T14'],
+            tRotor: ['T17'],
         };
     }
 

@@ -18,8 +18,7 @@ var __copyProps = (to, from, except, desc) => {
 var __toCommonJS = (mod) => __copyProps(__defProp({}, "__esModule", { value: true }), mod);
 var axiosParameter_exports = {};
 __export(axiosParameter_exports, {
-  CODES_OTHER: () => CODES_OTHER,
-  CODES_POOLSANA: () => CODES_POOLSANA,
+  CODES: () => CODES,
   PRODUCT_IDS: () => PRODUCT_IDS
 });
 module.exports = __toCommonJS(axiosParameter_exports);
@@ -42,7 +41,7 @@ const PRODUCT_IDS = [
   "1650758828508766208",
   "1664085465655808000"
 ];
-const CODES_POOLSANA = [
+const CODES = [
   "Power",
   "Mode",
   "Manual-mute",
@@ -68,47 +67,23 @@ const CODES_POOLSANA = [
   "H02",
   "T04",
   "T05",
+  "T06",
   "T07",
   "T14",
   "T17",
-  "S03"
-];
-const CODES_OTHER = [
-  "Power",
-  "Mode",
-  "Manual-mute",
   "T1",
   "T2",
   "T3",
   "T4",
   "T5",
-  "2074",
-  "2075",
-  "2076",
-  "2077",
-  "H03",
-  "Set_Temp",
-  "R08",
-  "R09",
-  "R10",
-  "R11",
-  "R01",
-  "R02",
-  "R03",
-  "T03",
-  "1158",
-  "1159",
-  "F17",
-  "H02",
+  "T6",
   "T7",
-  "T14",
-  "T17",
+  "S03",
   "S3"
 ];
 // Annotate the CommonJS export names for ESM import in node:
 0 && (module.exports = {
-  CODES_OTHER,
-  CODES_POOLSANA,
+  CODES,
   PRODUCT_IDS
 });
 //# sourceMappingURL=axiosParameter.js.map

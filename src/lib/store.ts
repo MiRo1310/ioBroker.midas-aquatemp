@@ -31,8 +31,6 @@ export type StateKey =
 
 export class Store {
     static readonly modes: TMode[] = [-1, 0, 1, 2];
-    public static readonly AQUATEMP_POOLSANA = '1132174963097280512'; //Midas/Poolsana InverPro
-    public static readonly AQUATEMP_OTHER1 = '1442284873216843776';
     public readonly instance: number;
     public readonly apiLevel: number = 3;
     public readonly useDeviceMac: boolean = false;

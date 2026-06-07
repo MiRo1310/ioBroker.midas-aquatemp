@@ -1,7 +1,14 @@
 import { expect } from 'chai';
 import { describe, it } from 'mocha';
 
-import { findCodeVal, isDefined, isStateValue, parseIntOrNull, parseFloatOrNull } from '../../src/lib/utils.ts';
+import {
+    findCodeVal,
+    findValByCodeArray,
+    isDefined,
+    isStateValue,
+    parseIntOrNull,
+    parseFloatOrNull,
+} from '../../src/lib/utils.ts';
 
 describe('utils.ts', () => {
     describe('isDefined', () => {
@@ -76,6 +83,35 @@ describe('utils.ts', () => {
 
         it('returns null when code is not found', () => {
             expect(findCodeVal(response, 'UNKNOWN')).to.be.undefined;
+        });
+    });
+
+    describe('findValByCodeArray', () => {
+        const response = [
+            { code: 'T01', value: '28.5' },
+            { code: 'T1', value: '30.0' },
+            { code: 'T2', value: '' },
+            { code: 'T3', value: '22.0' },
+        ];
+
+        it('returns the value of the first matching code', () => {
+            expect(findValByCodeArray(response, ['T01', 'T1'])).to.equal('28.5');
+        });
+
+        it('falls back to second code when first is not in result', () => {
+            expect(findValByCodeArray(response, ['MISSING', 'T1'])).to.equal('30.0');
+        });
+
+        it('skips codes with empty string value and tries next', () => {
+            expect(findValByCodeArray(response, ['T2', 'T3'])).to.equal('22.0');
+        });
+
+        it('returns undefined when no code matches', () => {
+            expect(findValByCodeArray(response, ['X', 'Y'])).to.be.undefined;
+        });
+
+        it('returns undefined for empty codes array', () => {
+            expect(findValByCodeArray(response, [])).to.be.undefined;
         });
     });
 });

@@ -21,7 +21,6 @@ __export(deviceController_exports, {
   DeviceController: () => DeviceController
 });
 module.exports = __toCommonJS(deviceController_exports);
-var import_store = require("./store");
 var import_axiosParameter = require("./axiosParameter");
 var import_utils = require("./utils");
 class DeviceController {
@@ -83,7 +82,7 @@ class DeviceController {
       }
       const data = await this.apiClient.request(
         this.store.getSUrlUpdateDeviceId(),
-        this.getProtocolCodes(product),
+        this.getProtocolCodes(),
         token
       );
       logger.debug(`DeviceDetails: ${JSON.stringify(data)}`);
@@ -92,7 +91,6 @@ class DeviceController {
         return;
       }
       await this.store.saveValue("rawJSON", JSON.stringify(responseValue));
-      const isPoolsana = product === import_store.Store.AQUATEMP_POOLSANA;
       const powerOn = (0, import_utils.findCodeVal)(responseValue, "Power") === "1";
       const mode = (0, import_utils.findCodeVal)(responseValue, "Mode");
       const modes = {
@@ -109,7 +107,7 @@ class DeviceController {
         "tempSet",
         (_b = tempSetValueByMode ? parseFloat(tempSetValueByMode) : null) != null ? _b : tempSetValue ? parseFloat(tempSetValue) : null
       );
-      await this.saveSensors(responseValue, isPoolsana);
+      await this.saveSensors(responseValue);
       await this.store.saveValue("silent", (0, import_utils.findCodeVal)(responseValue, "Manual-mute") === "1");
       await this.store.saveValue("state", powerOn);
       await this.store.saveValue("mode", powerOn && mode ? parseInt(mode) : -1);
@@ -278,14 +276,13 @@ class DeviceController {
     };
   }
   getAxiosUpdateDeviceIdParams() {
-    return this.store.apiLevel < 3 ? { product_ids: import_axiosParameter.PRODUCT_IDS } : { productIds: import_axiosParameter.PRODUCT_IDS };
+    return this.isApiLevelLessThan3() ? { product_ids: import_axiosParameter.PRODUCT_IDS } : { productIds: import_axiosParameter.PRODUCT_IDS };
   }
   getAxiosUpdateDeviceIdParamsLegacy() {
     return { body: { productIds: import_axiosParameter.PRODUCT_IDS } };
   }
-  getProtocolCodes(productId) {
-    const codes = productId === import_store.Store.AQUATEMP_POOLSANA ? import_axiosParameter.CODES_POOLSANA : import_axiosParameter.CODES_OTHER;
-    return this.store.apiLevel < 3 ? { device_code: this.store.device, protocal_codes: codes } : { deviceCode: this.store.device, protocalCodes: codes };
+  getProtocolCodes() {
+    return this.isApiLevelLessThan3() ? { device_code: this.store.device, protocal_codes: import_axiosParameter.CODES } : { deviceCode: this.store.device, protocalCodes: import_axiosParameter.CODES };
   }
   getAxiosUpdateDevicePowerParams(deviceCode, value, protocolCode) {
     return {
@@ -295,12 +292,12 @@ class DeviceController {
   controlParam = (deviceCode, protocolCode, value) => {
     return this.store.apiLevel < 3 ? { device_code: deviceCode, protocol_code: protocolCode, value } : { deviceCode, protocolCode, value };
   };
-  async saveSensors(responseValue, isPoolsana) {
-    const sensorCodes = DeviceController.getSensorCodes(isPoolsana);
-    const powerVal = (0, import_utils.parseFloatOrNull)((0, import_utils.findCodeVal)(responseValue, sensorCodes.tPower));
-    const tVoltageVal = (0, import_utils.parseFloatOrNull)((0, import_utils.findCodeVal)(responseValue, sensorCodes.tVoltage));
+  async saveSensors(responseValue) {
+    const sensorCodes = DeviceController.getSensorCodes();
+    const powerVal = (0, import_utils.parseFloatOrNull)((0, import_utils.findValByCodeArray)(responseValue, sensorCodes.tPower));
+    const tVoltageVal = (0, import_utils.parseFloatOrNull)((0, import_utils.findValByCodeArray)(responseValue, sensorCodes.tVoltage));
     await this.store.saveValue("consumption", powerVal * tVoltageVal);
-    const flowSwitchValue = (0, import_utils.findCodeVal)(responseValue, sensorCodes.flowSwitch);
+    const flowSwitchValue = (0, import_utils.findValByCodeArray)(responseValue, sensorCodes.flowSwitch);
     await this.saveSensorNumber("exhaust", responseValue, sensorCodes.exhaust);
     await this.saveSensorNumber("suctionTemp", responseValue, sensorCodes.tSuction);
     await this.saveSensorNumber("tempIn", responseValue, sensorCodes.tIn);
@@ -315,7 +312,7 @@ class DeviceController {
     await this.saveSensorNumber("rotor", responseValue, sensorCodes.tRotor, true);
   }
   async saveSensorNumber(key, res, code, int) {
-    const val = (0, import_utils.findCodeVal)(res, code);
+    const val = (0, import_utils.findValByCodeArray)(res, code);
     await this.saveNumberIfValid(key, int ? (0, import_utils.parseIntOrNull)(val) : (0, import_utils.parseFloatOrNull)(val));
   }
   async updateDeviceErrorMsg() {
@@ -367,18 +364,18 @@ class DeviceController {
   isSuccess(data) {
     return data.isReusltSuc;
   }
-  static getSensorCodes(isPoolsana) {
+  static getSensorCodes() {
     return {
-      tSuction: isPoolsana ? "T01" : "T1",
-      tIn: isPoolsana ? "T02" : "T2",
-      tOut: isPoolsana ? "T03" : "T3",
-      tCoil: isPoolsana ? "T04" : "T4",
-      tAmb: isPoolsana ? "T05" : "T5",
-      exhaust: isPoolsana ? "T06" : "T6",
-      tPower: isPoolsana ? "T07" : "T7",
-      flowSwitch: isPoolsana ? "S03" : "S3",
-      tVoltage: "T14",
-      tRotor: "T17"
+      tSuction: ["T01", "T1"],
+      tIn: ["T02", "T2"],
+      tOut: ["T03", "T3"],
+      tCoil: ["T04", "T4"],
+      tAmb: ["T05", "T5"],
+      exhaust: ["T06", "T6"],
+      tPower: ["T07", "T7"],
+      flowSwitch: ["S03", "S3"],
+      tVoltage: ["T14"],
+      tRotor: ["T17"]
     };
   }
   getTokenAndDevice() {

@@ -19,6 +19,7 @@ var __toCommonJS = (mod) => __copyProps(__defProp({}, "__esModule", { value: tru
 var utils_exports = {};
 __export(utils_exports, {
   findCodeVal: () => findCodeVal,
+  findValByCodeArray: () => findValByCodeArray,
   isDefined: () => isDefined,
   isStateValue: () => isStateValue,
   parseFloatOrNull: () => parseFloatOrNull,
@@ -45,9 +46,20 @@ function findCodeVal(result, code) {
   var _a;
   return (_a = result.find((item) => item.code === code)) == null ? void 0 : _a.value;
 }
+function findValByCodeArray(result, codes) {
+  var _a;
+  for (const code of codes) {
+    const value = (_a = result.find((item) => item.code === code)) == null ? void 0 : _a.value;
+    if (!isDefined(value) || value === "") {
+      continue;
+    }
+    return value;
+  }
+}
 // Annotate the CommonJS export names for ESM import in node:
 0 && (module.exports = {
   findCodeVal,
+  findValByCodeArray,
   isDefined,
   isStateValue,
   parseFloatOrNull,
