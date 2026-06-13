@@ -19,6 +19,7 @@ export class MidasAquatemp extends utils.Adapter {
     private updateInterval?: ioBroker.Interval;
     private tokenRefreshInterval?: ioBroker.Interval;
     private interval: number = 60;
+    private store!: Store;
 
     public constructor(options: Partial<utils.AdapterOptions> = {}) {
         super({
@@ -46,24 +47,24 @@ export class MidasAquatemp extends utils.Adapter {
             this.log.error('Empty Username or Password.');
             return;
         }
-        const store = new Store(this, username, password, this.instance, selectApi, useDeviceMac, deviceMac);
-        const apiClient = new ApiClient(store);
-        const tokenManager = new TokenManager(store, apiClient);
-        const deviceController = new DeviceController(store, tokenManager, apiClient);
+        this.store = new Store(this, username, password, this.instance, selectApi, useDeviceMac, deviceMac);
+        const apiClient = new ApiClient(this.store);
+        const tokenManager = new TokenManager(this.store, apiClient);
+        const deviceController = new DeviceController(this.store, tokenManager, apiClient);
         try {
             tokenManager.setDeviceController(deviceController);
-            const modeId = store.getStateIdByKey('mode');
+            const modeId = this.store.getStateIdByKey('mode');
             const currentMode = parseInt(String((await this.getStateAsync(modeId))?.val));
-            if (store.isValidMode(currentMode)) {
-                store.setMode(currentMode);
+            if (this.store.isValidMode(currentMode)) {
+                this.store.setMode(currentMode);
             }
 
             this.log.info(`API level: ${this.config.selectApi}, refresh interval: ${this.interval}s`);
 
-            await createObjects(store);
+            await createObjects(this.store);
             this.log.info('Objects created');
 
-            await store.clearStateValues();
+            await this.store.clearStateValues();
             await tokenManager.updateTokenAndDeviceId();
 
             this.updateInterval = this.setInterval(async () => {
@@ -81,12 +82,12 @@ export class MidasAquatemp extends utils.Adapter {
                         return;
                     }
 
-                    const silentId = store.getStateIdByKey('silent');
-                    const stateId = store.getStateIdByKey('state');
-                    const tempSetId = store.getStateIdByKey('tempSet');
+                    const silentId = this.store.getStateIdByKey('silent');
+                    const stateId = this.store.getStateIdByKey('state');
+                    const tempSetId = this.store.getStateIdByKey('tempSet');
                     const relevantIds = [modeId, silentId, stateId, tempSetId];
 
-                    if (!relevantIds.includes(id) || !store.device) {
+                    if (!relevantIds.includes(id) || !this.store.device) {
                         return;
                     }
                     await tokenManager.ensureValidToken();
@@ -101,7 +102,7 @@ export class MidasAquatemp extends utils.Adapter {
 
                         const mode = Number(state.val);
 
-                        if (!store.isValidMode(mode)) {
+                        if (!this.store.isValidMode(mode)) {
                             this.log.warn(
                                 `Ignoring unsupported mode value for ${id}: ${JSON.stringify(state.val)} (allowed: -1, 0, 1, 2)`,
                             );
@@ -132,30 +133,33 @@ export class MidasAquatemp extends utils.Adapter {
 
                     if (id === stateId) {
                         this.log.debug(`State: ${JSON.stringify(state)}`);
-                        if (!state.val) {
-                            await deviceController.updateDevicePower(-1);
-                        } else {
-                            const currentMode = parseInt(String(store.getMode()));
-                            await deviceController.updateDevicePower(currentMode >= 0 ? (currentMode as TMode) : 0);
-                        }
+                        await deviceController.updateDevicePower(this.getMode(state));
                         await this.setState(id, { ack: true });
                     }
                 } catch (error) {
                     if (error instanceof ResetError) {
-                        await store.resetAndHandleErrorWithSentry(`Error in stateChange (${id})`, error);
+                        await this.store.resetAndHandleErrorWithSentry(`Error in stateChange (${id})`, error);
                         return;
                     }
-                    store.logger.errorHandler(`Error in stateChange (${id})`, error);
+                    this.store.logger.errorHandler(`Error in stateChange (${id})`, error);
                 }
             });
 
-            await this.subscribeStatesAsync(store.getStateIdByKey('mode'));
-            await this.subscribeStatesAsync(store.getStateIdByKey('silent'));
-            await this.subscribeStatesAsync(store.getStateIdByKey('tempSet'));
-            await this.subscribeStatesAsync(store.getStateIdByKey('state'));
+            await this.subscribeStatesAsync(this.store.getStateIdByKey('mode'));
+            await this.subscribeStatesAsync(this.store.getStateIdByKey('silent'));
+            await this.subscribeStatesAsync(this.store.getStateIdByKey('tempSet'));
+            await this.subscribeStatesAsync(this.store.getStateIdByKey('state'));
         } catch (error) {
-            store.logger.errorHandler(`Error in onReady`, error);
+            this.store.logger.errorHandler(`Error in onReady`, error);
         }
+    }
+
+    private getMode(state: ioBroker.State): TMode {
+        if (!state.val) {
+            return -1;
+        }
+        const currentMode = parseInt(String(this.store.getMode()));
+        return currentMode >= 0 ? (currentMode as TMode) : 0;
     }
 
     /**

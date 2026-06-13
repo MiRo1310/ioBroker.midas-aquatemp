@@ -1,27 +1,28 @@
-import { describe, it } from 'mocha';
 import { expect } from 'chai';
+import { describe, it } from 'mocha';
+import { MidasAquatemp } from '../../src/main.ts';
+import type { TMode } from '../../src/lib/store.ts';
 
-/**
- * This is a dummy TypeScript test file using chai and mocha
- *
- * It's automatically excluded from npm and its build output is excluded from both git and npm.
- * It is advised to test all your modules with accompanying *.test.ts-files
- */
+describe('MidasAquatemp', () => {
+    describe('getMode', () => {
+        const getMode = (MidasAquatemp.prototype as any)['getMode'] as (state: { val: unknown }) => TMode;
 
-describe('module to test => function to test', () => {
-    // initializing logic
-    const expected = 5;
+        function ctx(storedMode: TMode): { store: { getMode: () => TMode } } {
+            return { store: { getMode: () => storedMode } };
+        }
 
-    it(`should return ${expected}`, () => {
-        const result = 5;
-        // assign result a value from functionToTest
-        expect(result).to.equal(expected);
-        // or using the should() syntax
-        result.should.equal(expected);
-    });
-    it('Test', () => {
-        true.should.be.be.true;
+        it('returns -1 when device is turned off (val = false)', () => {
+            expect(getMode.call(ctx(1), { val: false })).to.equal(-1);
+        });
+
+        it('returns stored mode when device is turned on and mode is valid', () => {
+            expect(getMode.call(ctx(0), { val: true })).to.equal(0); // kühlen
+            expect(getMode.call(ctx(1), { val: true })).to.equal(1); // heizen
+            expect(getMode.call(ctx(2), { val: true })).to.equal(2); // auto
+        });
+
+        it('falls back to 0 (kühlen) when device is turned on but stored mode is -1', () => {
+            expect(getMode.call(ctx(-1), { val: true })).to.equal(0);
+        });
     });
 });
-
-// ... more test suites => describe

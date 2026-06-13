@@ -81,7 +81,7 @@ class MidasAquatemp extends utils.Adapter {
       if (store.isValidMode(currentMode)) {
         store.setMode(currentMode);
       }
-      this.log.debug(`API-Level: ${this.config.selectApi}`);
+      this.log.info(`API level: ${this.config.selectApi}, refresh interval: ${this.interval}s`);
       await (0, import_createState.createObjects)(store);
       this.log.info("Objects created");
       await store.clearStateValues();
@@ -94,56 +94,64 @@ class MidasAquatemp extends utils.Adapter {
         await tokenManager.updateTokenAndDeviceId();
       }, MidasAquatemp.tokenRefreshIntervalTime);
       this.on("stateChange", async (id, state) => {
-        if (!state || state.ack) {
-          return;
-        }
-        const silentId = store.getStateIdByKey("silent");
-        const stateId = store.getStateIdByKey("state");
-        const tempSetId = store.getStateIdByKey("tempSet");
-        const relevantIds = [modeId, silentId, stateId, tempSetId];
-        if (!relevantIds.includes(id) || !store.device) {
-          return;
-        }
-        await tokenManager.ensureValidToken();
-        if (id === modeId) {
-          this.log.debug(`Mode: ${JSON.stringify(state)}`);
-          if (!(0, import_utils.isStateValue)(state)) {
-            this.log.warn(`Ignoring invalid mode state payload for ${id}: ${JSON.stringify(state)}`);
+        try {
+          if (!state || state.ack) {
             return;
           }
-          const mode = Number(state.val);
-          if (!store.isValidMode(mode)) {
-            this.log.warn(
-              `Ignoring unsupported mode value for ${id}: ${JSON.stringify(state.val)} (allowed: -1, 0, 1, 2)`
-            );
+          const silentId = store.getStateIdByKey("silent");
+          const stateId = store.getStateIdByKey("state");
+          const tempSetId = store.getStateIdByKey("tempSet");
+          const relevantIds = [modeId, silentId, stateId, tempSetId];
+          if (!relevantIds.includes(id) || !store.device) {
             return;
           }
-          await deviceController.updateDevicePower(mode);
-          await this.setState(id, { ack: true });
-        }
-        if (id === silentId) {
-          this.log.debug(`Silent: ${JSON.stringify(state)}`);
-          if ((0, import_utils.isStateValue)(state)) {
-            await deviceController.updateDeviceSilent(state.val);
+          await tokenManager.ensureValidToken();
+          if (id === modeId) {
+            this.log.debug(`Mode: ${JSON.stringify(state)}`);
+            if (!(0, import_utils.isStateValue)(state)) {
+              this.log.warn(`Ignoring invalid mode state payload for ${id}: ${JSON.stringify(state)}`);
+              return;
+            }
+            const mode = Number(state.val);
+            if (!store.isValidMode(mode)) {
+              this.log.warn(
+                `Ignoring unsupported mode value for ${id}: ${JSON.stringify(state.val)} (allowed: -1, 0, 1, 2)`
+              );
+              return;
+            }
+            await deviceController.updateDevicePower(mode);
+            await this.setState(id, { ack: true });
           }
-          await this.setState(id, { ack: true });
-        }
-        if (id === tempSetId) {
-          this.log.debug(`TempSet: ${JSON.stringify(state)}`);
-          if ((0, import_utils.isStateValue)(state)) {
-            await deviceController.updateDeviceSetTemp(state.val);
+          if (id === silentId) {
+            this.log.debug(`Silent: ${JSON.stringify(state)}`);
+            if ((0, import_utils.isStateValue)(state)) {
+              await deviceController.updateDeviceSilent(state.val);
+            }
+            await this.setState(id, { ack: true });
           }
-          await this.setState(id, { ack: true });
-        }
-        if (id === stateId) {
-          this.log.debug(`State: ${JSON.stringify(state)}`);
-          if (!state.val) {
-            await deviceController.updateDevicePower(-1);
-          } else {
-            const currentMode2 = parseInt(String(store.getMode()));
-            await deviceController.updateDevicePower(currentMode2 >= 0 ? currentMode2 : 0);
+          if (id === tempSetId) {
+            this.log.debug(`TempSet: ${JSON.stringify(state)}`);
+            if ((0, import_utils.isStateValue)(state)) {
+              await deviceController.updateDeviceSetTemp(state.val);
+            }
+            await this.setState(id, { ack: true });
           }
-          await this.setState(id, { ack: true });
+          if (id === stateId) {
+            this.log.debug(`State: ${JSON.stringify(state)}`);
+            if (!state.val) {
+              await deviceController.updateDevicePower(-1);
+            } else {
+              const currentMode2 = parseInt(String(store.getMode()));
+              await deviceController.updateDevicePower(currentMode2 >= 0 ? currentMode2 : 0);
+            }
+            await this.setState(id, { ack: true });
+          }
+        } catch (error) {
+          if (error instanceof import_apiClient.ResetError) {
+            await store.resetAndHandleErrorWithSentry(`Error in stateChange (${id})`, error);
+            return;
+          }
+          store.logger.errorHandler(`Error in stateChange (${id})`, error);
         }
       });
       await this.subscribeStatesAsync(store.getStateIdByKey("mode"));

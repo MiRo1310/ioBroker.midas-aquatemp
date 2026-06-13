@@ -9,13 +9,13 @@ import { utils } from '@iobroker/testing';
 const { adapter } = utils.unit.createMocks({});
 
 // Subclass Logger to intercept the private sendToSentry call without sinon.
-class SpyLogger extends Logger {
-    public sentryCalls = 0;
-
-    protected override sendToSentry(_e: any): void {
-        this.sentryCalls++;
-    }
-}
+// class SpyLogger extends Logger {
+//     public sentryCalls = 0;
+//
+//     protected override sendToSentry(_e: any): void {
+//         this.sentryCalls++;
+//     }
+// }
 
 // SpyLogger must call the protected override — but sendToSentry is private in Logger.
 // Re-expose it by casting to any in the helper below.

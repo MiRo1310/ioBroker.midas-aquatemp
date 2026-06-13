@@ -423,17 +423,13 @@ const createObjects = async (store) => {
       ...booleanState
     }
   ];
-  try {
-    for (const { id, name, role, unit, type, def, write = false, states } of objects) {
-      logger.debug(`Create object: ${id}`);
-      await adapter.extendObject(id, {
-        type: "state",
-        common: { read: true, write, type, unit, role, name, def, states },
-        native: {}
-      });
-    }
-  } catch (error) {
-    logger.errorHandler("Error in createObjects", error);
+  for (const { id, name, role, unit, type, def, write = false, states } of objects) {
+    logger.debug(`Create object: ${id}`);
+    await adapter.extendObject(id, {
+      type: "state",
+      common: { read: true, write, type, unit, role, name, def, states },
+      native: {}
+    });
   }
 };
 // Annotate the CommonJS export names for ESM import in node:

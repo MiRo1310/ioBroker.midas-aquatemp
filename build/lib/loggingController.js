@@ -21,6 +21,7 @@ __export(loggingController_exports, {
   Logger: () => Logger
 });
 module.exports = __toCommonJS(loggingController_exports);
+var import_apiClient = require("./apiClient");
 class Logger {
   constructor(adapter) {
     this.adapter = adapter;
@@ -37,9 +38,18 @@ class Logger {
   info(msg) {
     this.adapter.log.info(msg);
   }
+  shouldSendToSentry(e) {
+    if (e instanceof import_apiClient.ApiError) {
+      return false;
+    }
+    if (e instanceof import_apiClient.ResetError) {
+      return e.sendToSentry;
+    }
+    return true;
+  }
   errorHandler(title, e, useSentry = true) {
     var _a, _b;
-    if (useSentry) {
+    if (useSentry && this.shouldSendToSentry(e)) {
       this.sendToSentry(e);
     }
     this.adapter.log.error(title);
