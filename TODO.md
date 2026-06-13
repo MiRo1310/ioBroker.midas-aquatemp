@@ -4,6 +4,20 @@
 
 ### Code
 
+- [x] **`main.ts` — `silentId`, `stateId`, `tempSetId` einmalig definieren**
+  Werden aktuell bei jedem `stateChange`-Aufruf neu berechnet (Zeilen 85–88). Einmalig vor dem Handler definieren,
+  analog zu `modeId`.
+
+- [ ] **`main.ts` — `if`-Kette auf `else if` umstellen**
+  Im `stateChange`-Handler können nur einer der vier Branches matchen. Aktuell laufen alle vier `if`-Checks immer
+  durch (Zeilen 95/117/126/134).
+
+- [x] **`main.ts` — `subscribeStatesAsync` parallelisieren**
+  Vier unabhängige `await`-Aufrufe (Zeilen 148–151) → `Promise.all` verwenden.
+
+- [x] **`deviceController.ts` — `logger` konsistent verwenden in `updateDevicePower`**
+  `logger` wird am Methodenanfang destrukturiert, Zeile 228 verwendet aber `this.store.logger.warn(...)` direkt.
+
 - [x] **`axiosParameter.ts` — Verantwortung klären**
   Alle Funktionen nehmen `Store` als Parameter. Optionen:
     - Als Methoden in `Store` integrieren (wie `endPoints.ts`)

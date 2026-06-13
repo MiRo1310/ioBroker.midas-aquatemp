@@ -226,7 +226,7 @@ export class DeviceController {
 
         const res = this.getTokenAndDevice();
         if (!res) {
-            this.store.logger.warn('Cannot send power command: no valid token or device available');
+            logger.warn('Cannot send power command: no valid token or device available');
             return;
         }
 

@@ -212,7 +212,7 @@ class DeviceController {
     const { powerOpt } = DeviceController.getPowerMode(mode);
     const res = this.getTokenAndDevice();
     if (!res) {
-      this.store.logger.warn("Cannot send power command: no valid token or device available");
+      logger.warn("Cannot send power command: no valid token or device available");
       return;
     }
     const data = await this.apiClient.request(
