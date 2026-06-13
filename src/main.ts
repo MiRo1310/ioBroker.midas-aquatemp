@@ -58,7 +58,7 @@ export class MidasAquatemp extends utils.Adapter {
                 store.setMode(currentMode);
             }
 
-            this.log.debug(`API-Level: ${this.config.selectApi}`);
+            this.log.info(`API level: ${this.config.selectApi}, refresh interval: ${this.interval}s`);
 
             await createObjects(store);
             this.log.info('Objects created');

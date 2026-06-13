@@ -22,6 +22,7 @@ __export(tokenManager_exports, {
 });
 module.exports = __toCommonJS(tokenManager_exports);
 var import_utils = require("./utils");
+var import_apiClient = require("./apiClient");
 class TokenManager {
   constructor(store, apiClient) {
     this.store = store;
@@ -34,27 +35,27 @@ class TokenManager {
     this.deviceController = deviceController;
   }
   async ensureValidToken() {
+    if (this.isValidToken()) {
+      return;
+    }
     try {
-      if (this.isValidToken()) {
-        return;
-      }
       await this.fetchToken();
     } catch (error) {
-      await this.store.resetAndHandleErrorWithSentry("Error in getToken", error);
+      throw new import_apiClient.ResetError("GetToken", { cause: error, sendToSentry: !(error instanceof import_apiClient.ApiError) });
     }
   }
   async fetchToken() {
     var _a, _b, _c, _d;
     const { logger } = this.store;
-    logger.debug("Request token");
+    logger.debug("Requesting new authentication token");
     const { sUrl, options } = this.store.getOptionsAndSUrl();
     const data = await this.apiClient.request(sUrl, options);
     const token = (_d = (_c = (_a = data == null ? void 0 : data.object_result) == null ? void 0 : _a["x-token"]) != null ? _c : (_b = data == null ? void 0 : data.objectResult) == null ? void 0 : _b["x-token"]) != null ? _d : null;
     this.token = token;
     if (token) {
-      logger.debug("Login successfully!");
+      logger.info("Authentication successful");
     } else {
-      logger.error(`Login-error: ${JSON.stringify(data)}`);
+      logger.error(`Login failed: ${JSON.stringify(data)}`);
       await this.store.resetOnError();
     }
   }
@@ -65,7 +66,7 @@ class TokenManager {
         return;
       }
       if (!this.deviceController) {
-        this.store.logger.debug("DeviceController not set");
+        this.store.logger.warn("DeviceController not set \u2014 cannot update device");
         return;
       }
       if (this.store.useDeviceMac) {

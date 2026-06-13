@@ -29,18 +29,19 @@ export class DeviceController {
             res.token,
         );
 
-        this.store.logger.debug(`Update device status: ${JSON.stringify(data)}`);
+        this.store.logger.debug(`Device status response: ${JSON.stringify(data)}`);
 
         const isOnline = this.isOnline(data);
         this.store.isOnline = isOnline;
         await this.store.saveValue('info.connection', isOnline);
 
         if (!isOnline) {
-            this.store.logger.debug('Device is offline');
+            this.store.logger.warn('Device is offline');
             return;
         }
 
         if (this.isFault(data)) {
+            this.store.logger.warn('Device fault detected, fetching error details');
             await this.store.saveValue('error', true);
             await this.updateDeviceDetails();
             await this.updateDeviceErrorMsg();
@@ -82,7 +83,7 @@ export class DeviceController {
                 token,
             );
 
-            logger.debug(`DeviceDetails: ${JSON.stringify(data)}`);
+            logger.debug(`Device details response: ${JSON.stringify(data)}`);
 
             const responseValue = data.object_result ?? data.objectResult;
             if (!responseValue || responseValue.length === 0) {
@@ -148,16 +149,16 @@ export class DeviceController {
                     token,
                 );
             }
-            logger.debug(`UpdateDeviceID response: ${JSON.stringify(data)}`);
+            logger.debug(`Device list response: ${JSON.stringify(data)}`);
             let deviceCode = this.getDeviceCode(data);
             if (!deviceCode && (!this.apiType || this.apiType === 'legacy')) {
-                logger.debug('No device code with standard format, retrying with legacy body wrapper...');
+                logger.debug('No device found with default format, retrying with legacy format...');
                 data = await this.apiClient.request<UpdateDeviceId>(
                     this.store.getUpdateDeviceIdSUrl(),
                     this.getAxiosUpdateDeviceIdParamsLegacy(),
                     token,
                 );
-                logger.debug(`UpdateDeviceID legacy response: ${JSON.stringify(data)}`);
+                logger.debug(`Device list legacy response: ${JSON.stringify(data)}`);
                 if (this.getDeviceCode(data)) {
                     this.apiType = 'legacy';
                 }
@@ -181,13 +182,13 @@ export class DeviceController {
             const isOnline = this.isDeviceStatusOnline(data);
             this.store.isOnline = isOnline;
 
-            logger.debug(`deviceCode: ${deviceCode}, product: ${productId}, online: ${isOnline}`);
+            logger.info(`Device found: ${deviceCode} (product: ${productId}, online: ${isOnline})`);
 
             await this.store.saveValue('DeviceCode', deviceCode);
             await this.store.saveValue('ProductCode', productId);
 
             if (!isOnline) {
-                logger.debug('Device is offline');
+                logger.warn('Device is offline');
                 await this.store.resetOnError();
                 return;
             }
@@ -225,7 +226,7 @@ export class DeviceController {
 
         const res = this.getTokenAndDevice();
         if (!res) {
-            this.store.adapter.log.warn(`Invalid values getTokenAndDevice`);
+            this.store.logger.warn('Cannot send power command: no valid token or device available');
             return;
         }
 
@@ -235,7 +236,8 @@ export class DeviceController {
             res.token,
         );
 
-        logger.debug(`DeviceStatus: ${JSON.stringify(data)}`);
+        logger.debug(`Power command response: ${JSON.stringify(data)}`);
+        logger.info(`Power set to: ${mode === -1 ? 'OFF' : `ON (mode: ${mode})`}`);
 
         if (mode >= 0) {
             this.store.setMode(mode);
@@ -257,12 +259,12 @@ export class DeviceController {
         const result = await adapter.getStateAsync(this.store.getStateIdByKey('mode'));
 
         if (!result?.val) {
-            logger.warn(`Invalid mode: ${result?.val}`);
+            logger.warn(`Skipping temperature update: current mode is invalid (${result?.val})`);
             return;
         }
 
         if (String(result?.val) === '-1') {
-            logger.debug(`Mode set to: ${result?.val}`);
+            logger.debug('Skipping temperature update: device is off (mode -1)');
             return;
         }
         const res = this.getTokenAndDevice();
@@ -274,7 +276,8 @@ export class DeviceController {
             this.getAxiosUpdateDeviceSetTempParams(res.device, sTemperature),
             res.token,
         );
-        logger.debug(`DeviceStatus: ${JSON.stringify(data)}`);
+        logger.debug(`Temperature command response: ${JSON.stringify(data)}`);
+        logger.info(`Temperature set to: ${numericTemperature}°C`);
 
         await this.store.saveValue('tempSet', numericTemperature);
     }
@@ -292,7 +295,8 @@ export class DeviceController {
             res.token,
         );
 
-        logger.debug(`DeviceStatus: ${JSON.stringify(data)}`);
+        logger.debug(`Silent command response: ${JSON.stringify(data)}`);
+        logger.info(`Silent mode set to: ${silent}`);
 
         await this.store.saveValue('silent', silent);
     }
@@ -423,11 +427,11 @@ export class DeviceController {
             res.token,
         );
 
-        logger.debug(`DeviceStatus: ${JSON.stringify(data)}`);
+        logger.debug(`Mode command response: ${JSON.stringify(data)}`);
         if (this.isSuccess(data)) {
             await saveValue('mode', mode);
         } else {
-            logger.error('Error in updateDeviceMode');
+            logger.error(`Failed to set mode ${mode}: API reported no success`);
         }
     }
 

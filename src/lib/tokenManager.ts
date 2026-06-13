@@ -33,7 +33,7 @@ export class TokenManager {
 
     private async fetchToken(): Promise<void> {
         const { logger } = this.store;
-        logger.debug('Request token');
+        logger.debug('Requesting new authentication token');
         const { sUrl, options } = this.store.getOptionsAndSUrl();
 
         const data = await this.apiClient.request<RequestToken>(sUrl, options);
@@ -43,9 +43,9 @@ export class TokenManager {
         this.token = token;
 
         if (token) {
-            logger.debug('Login successfully!');
+            logger.info('Authentication successful');
         } else {
-            logger.error(`Login-error: ${JSON.stringify(data)}`);
+            logger.error(`Login failed: ${JSON.stringify(data)}`);
             await this.store.resetOnError();
         }
     }
@@ -58,7 +58,7 @@ export class TokenManager {
                 return;
             }
             if (!this.deviceController) {
-                this.store.logger.debug('DeviceController not set');
+                this.store.logger.warn('DeviceController not set — cannot update device');
                 return;
             }
             if (this.store.useDeviceMac) {

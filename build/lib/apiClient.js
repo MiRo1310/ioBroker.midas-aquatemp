@@ -28,11 +28,29 @@ var __toESM = (mod, isNodeMode, target) => (target = mod != null ? __create(__ge
 var __toCommonJS = (mod) => __copyProps(__defProp({}, "__esModule", { value: true }), mod);
 var apiClient_exports = {};
 __export(apiClient_exports, {
-  ApiClient: () => ApiClient
+  ApiClient: () => ApiClient,
+  ApiError: () => ApiError,
+  ResetError: () => ResetError
 });
 module.exports = __toCommonJS(apiClient_exports);
 var import_axios = __toESM(require("axios"));
 var import_https = __toESM(require("https"));
+class ApiError extends Error {
+  constructor(errorCode, url) {
+    super(`API error ${errorCode} for ${url}`);
+    this.errorCode = errorCode;
+    this.name = "ApiError";
+  }
+}
+class ResetError extends Error {
+  sendToSentry;
+  constructor(message, options) {
+    var _a;
+    super(message, options);
+    this.name = "ResetError";
+    this.sendToSentry = (_a = options == null ? void 0 : options.sendToSentry) != null ? _a : true;
+  }
+}
 class ApiClient {
   constructor(store) {
     this.store = store;
@@ -74,7 +92,7 @@ class ApiClient {
     return ApiClient.insecureHttpsAgent;
   }
   async request(url, options, token) {
-    var _a, _b;
+    var _a, _b, _c, _d;
     const tokenHeader = token ? { "x-token": token } : {};
     const result = await import_axios.default.post(url, options, {
       headers: {
@@ -83,7 +101,6 @@ class ApiClient {
       },
       httpsAgent: this.getHttpsAgent(url)
     });
-    this.store.adapter.log.debug(`Status: ${result.status}`);
     if (result.status !== 200) {
       throw new Error(`HTTP error ${result.status} for ${url}`);
     }
@@ -91,8 +108,10 @@ class ApiClient {
       throw new Error("No response returned");
     }
     if (!ApiClient.isApiSuccess((_a = result.data) == null ? void 0 : _a.error_code)) {
-      this.store.adapter.log.debug(`API error for ${url}: ${JSON.stringify(result.data)}`);
-      throw new Error(`API error ${(_b = result.data) == null ? void 0 : _b.error_code} for ${url}`);
+      this.store.adapter.log.warn(
+        `API error ${(_b = result.data) == null ? void 0 : _b.error_code} for ${url}: ${JSON.stringify(result.data)}`
+      );
+      throw new ApiError((_d = (_c = result.data) == null ? void 0 : _c.error_code) != null ? _d : "unknown", url);
     }
     return result.data;
   }
@@ -102,6 +121,8 @@ class ApiClient {
 }
 // Annotate the CommonJS export names for ESM import in node:
 0 && (module.exports = {
-  ApiClient
+  ApiClient,
+  ApiError,
+  ResetError
 });
 //# sourceMappingURL=apiClient.js.map

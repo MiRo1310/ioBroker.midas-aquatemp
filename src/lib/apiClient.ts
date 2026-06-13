@@ -89,8 +89,6 @@ export class ApiClient {
             httpsAgent: this.getHttpsAgent(url),
         });
 
-        this.store.adapter.log.debug(`Status: ${result.status}`);
-
         if (result.status !== 200) {
             throw new Error(`HTTP error ${result.status} for ${url}`);
         }
@@ -100,7 +98,9 @@ export class ApiClient {
         }
 
         if (!ApiClient.isApiSuccess(result.data?.error_code)) {
-            this.store.adapter.log.debug(`API error for ${url}: ${JSON.stringify(result.data)}`);
+            this.store.adapter.log.warn(
+                `API error ${result.data?.error_code} for ${url}: ${JSON.stringify(result.data)}`,
+            );
             throw new ApiError(result.data?.error_code ?? 'unknown', url);
         }
 
