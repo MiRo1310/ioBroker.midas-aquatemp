@@ -47,9 +47,16 @@ When insecure mode is active, the adapter logs a warning.
 
 ### Supported devices
 
-- Poolsana InverterPro Series (17, 21) with Wifi-Adapter for Mida Inverter-heater
+The following devices are confirmed to work with this adapter.
+Other [Midas](https://www.midas-gmbh.de/) / Poolsana devices that use the Linked-Go cloud API may also be compatible, but this cannot be guaranteed.
+
+If your device is not listed and you have successfully used it with this adapter, feel free to open an issue or pull request to add it.
+
+**Confirmed working:**
+
+- Poolsana InverterPro Series (17, 21) with Wifi-Adapter for Midas Inverter-heater
 - Poolsana Prime 8
-- XPS Pool-Wärmepumpe XPS-50, 5kW, COP5,1, bis zu 16m³
+- XPS-50, 5kW, COP5,1, until to 16m³
 
 If you have problems, contact us.
 
