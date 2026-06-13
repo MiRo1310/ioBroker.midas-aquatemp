@@ -8,7 +8,7 @@ import type { TMode } from './lib/store';
 import { Store } from './lib/store';
 import * as utils from '@iobroker/adapter-core';
 import { createObjects } from './lib/createState';
-import { isDefined, isStateValue } from './lib/utils';
+import { isDefined, isStateValue, isRelevantStateId, resolveOnOffMode } from './lib/utils';
 import { DeviceController } from './lib/deviceController';
 import { TokenManager } from './lib/tokenManager';
 import { ApiClient, ResetError } from './lib/apiClient';
@@ -150,11 +150,7 @@ export class MidasAquatemp extends utils.Adapter {
     }
 
     private getMode(state: ioBroker.State): TMode {
-        if (!state.val) {
-            return -1;
-        }
-        const currentMode = parseInt(String(this.store.getMode()));
-        return currentMode >= 0 ? (currentMode as TMode) : 0;
+        return resolveOnOffMode(state.val, this.store.getMode());
     }
 
     /**
@@ -182,7 +178,7 @@ export class MidasAquatemp extends utils.Adapter {
     }
 
     private isRelevant(id: string): boolean {
-        return [this.modeId, this.silentId, this.stateId, this.tempSetId].includes(id) && !!this.store.device;
+        return isRelevantStateId(id, [this.modeId, this.silentId, this.stateId, this.tempSetId], this.store.device);
     }
 }
 let adapter;

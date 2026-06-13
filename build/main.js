@@ -158,11 +158,7 @@ class MidasAquatemp extends utils.Adapter {
     }
   }
   getMode(state) {
-    if (!state.val) {
-      return -1;
-    }
-    const currentMode = parseInt(String(this.store.getMode()));
-    return currentMode >= 0 ? currentMode : 0;
+    return (0, import_utils.resolveOnOffMode)(state.val, this.store.getMode());
   }
   /**
    * Is called when adapter shuts down - callback has to be called under any circumstances!
@@ -186,7 +182,7 @@ class MidasAquatemp extends utils.Adapter {
     this.modeId = this.store.getStateIdByKey("mode");
   }
   isRelevant(id) {
-    return [this.modeId, this.silentId, this.stateId, this.tempSetId].includes(id) && !!this.store.device;
+    return (0, import_utils.isRelevantStateId)(id, [this.modeId, this.silentId, this.stateId, this.tempSetId], this.store.device);
   }
 }
 let adapter;
