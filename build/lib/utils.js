@@ -21,9 +21,11 @@ __export(utils_exports, {
   findCodeVal: () => findCodeVal,
   findValByCodeArray: () => findValByCodeArray,
   isDefined: () => isDefined,
+  isRelevantStateId: () => isRelevantStateId,
   isStateValue: () => isStateValue,
   parseFloatOrNull: () => parseFloatOrNull,
-  parseIntOrNull: () => parseIntOrNull
+  parseIntOrNull: () => parseIntOrNull,
+  resolveOnOffMode: () => resolveOnOffMode
 });
 module.exports = __toCommonJS(utils_exports);
 const isDefined = (value) => value !== void 0 && value !== null;
@@ -46,6 +48,16 @@ function findCodeVal(result, code) {
   var _a;
   return (_a = result.find((item) => item.code === code)) == null ? void 0 : _a.value;
 }
+function resolveOnOffMode(stateVal, storedMode) {
+  if (!stateVal) {
+    return -1;
+  }
+  const currentMode = parseInt(String(storedMode));
+  return currentMode >= 0 ? currentMode : 0;
+}
+function isRelevantStateId(id, knownIds, device) {
+  return knownIds.includes(id) && !!device;
+}
 function findValByCodeArray(result, codes) {
   var _a;
   for (const code of codes) {
@@ -61,8 +73,10 @@ function findValByCodeArray(result, codes) {
   findCodeVal,
   findValByCodeArray,
   isDefined,
+  isRelevantStateId,
   isStateValue,
   parseFloatOrNull,
-  parseIntOrNull
+  parseIntOrNull,
+  resolveOnOffMode
 });
 //# sourceMappingURL=utils.js.map

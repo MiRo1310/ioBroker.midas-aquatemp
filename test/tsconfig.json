@@ -5,7 +5,7 @@
 		"noEmit": true,
 		"rootDir": "..",
 		"ignoreDeprecations": "6.0",
-		"types": ["node", "mocha", "chai"]
+		"types": ["node", "mocha", "chai", "sinon-chai"]
 	},
 	"include": [
 		"../src/**/*.ts",
