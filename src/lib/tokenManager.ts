@@ -3,6 +3,7 @@ import type { RequestToken } from '../types/types';
 import { isDefined } from './utils';
 import type { DeviceController } from './deviceController';
 import type { ApiClient } from './apiClient';
+import { ApiError, ResetError } from './apiClient';
 
 export class TokenManager {
     private token: string | null = null;
@@ -20,13 +21,13 @@ export class TokenManager {
     }
 
     public async ensureValidToken(): Promise<void> {
+        if (this.isValidToken()) {
+            return;
+        }
         try {
-            if (this.isValidToken()) {
-                return;
-            }
             await this.fetchToken();
         } catch (error) {
-            await this.store.resetAndHandleErrorWithSentry('Error in getToken', error);
+            throw new ResetError('GetToken', { cause: error, sendToSentry: !(error instanceof ApiError) });
         }
     }
 

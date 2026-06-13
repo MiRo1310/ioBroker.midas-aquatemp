@@ -1,4 +1,5 @@
 import type { MidasAquatemp } from '../main';
+import { ApiError, ResetError } from './apiClient';
 
 export class Logger {
     constructor(private readonly adapter: MidasAquatemp) {}
@@ -19,8 +20,18 @@ export class Logger {
         this.adapter.log.info(msg);
     }
 
+    private shouldSendToSentry(e: any): boolean {
+        if (e instanceof ApiError) {
+            return false;
+        }
+        if (e instanceof ResetError) {
+            return e.sendToSentry;
+        }
+        return true;
+    }
+
     public errorHandler(title: string, e: any, useSentry = true): void {
-        if (useSentry) {
+        if (useSentry && this.shouldSendToSentry(e)) {
             this.sendToSentry(e);
         }
         this.adapter.log.error(title);

@@ -4,6 +4,7 @@ import { CODES, PRODUCT_IDS } from './axiosParameter';
 import { findCodeVal, findValByCodeArray, parseFloatOrNull, parseIntOrNull } from './utils';
 import type { TokenManager } from './tokenManager';
 import type { ApiClient } from './apiClient';
+import { ApiError, ResetError } from './apiClient';
 import type { AxiosUpdateDeviceParam, AxiosUpdateDeviceParams } from '../types';
 
 export class DeviceController {
@@ -69,12 +70,12 @@ export class DeviceController {
 
     public async updateDeviceDetails(): Promise<void> {
         const { product, logger } = this.store;
-        try {
-            const token = this.tokenManager.getValidTokenOrNull();
-            if (!token || !product) {
-                return;
-            }
+        const token = this.tokenManager.getValidTokenOrNull();
+        if (!token || !product) {
+            return;
+        }
 
+        try {
             const data = await this.apiClient.request<DeviceDetails>(
                 this.store.getSUrlUpdateDeviceId(),
                 this.getProtocolCodes(),
@@ -116,8 +117,11 @@ export class DeviceController {
             await this.store.saveValue('state', powerOn);
             await this.store.saveValue('mode', powerOn && mode ? parseInt(mode) : -1);
             await this.store.saveValue('info.connection', true);
-        } catch (error: unknown) {
-            await this.store.resetAndHandleErrorWithSentry('Error updateDeviceDetails', error);
+        } catch (error) {
+            throw new ResetError('Error updateDeviceDetails', {
+                cause: error,
+                sendToSentry: !(error instanceof ApiError),
+            });
         }
     }
 
@@ -130,11 +134,12 @@ export class DeviceController {
 
     public async fetchDevice(): Promise<void> {
         const { logger } = this.store;
+        const token = this.tokenManager.getValidTokenOrNull();
+        if (!token) {
+            return;
+        }
+
         try {
-            const token = this.tokenManager.getValidTokenOrNull();
-            if (!token) {
-                return;
-            }
             let data: UpdateDeviceId = {} as UpdateDeviceId;
             if (!this.apiType || this.apiType === 'default') {
                 data = await this.apiClient.request<UpdateDeviceId>(
@@ -191,9 +196,12 @@ export class DeviceController {
                 await this.updateDeviceStatus();
             }
         } catch (error: any) {
-            await this.store.resetOnError();
-            this.store.logger.warn(
+            if (error instanceof ResetError) {
+                throw error;
+            }
+            throw new ResetError(
                 `fetchDevice failed (possible account conflict — check if the account is used elsewhere): ${error?.message ?? String(error)}`,
+                { cause: error, sendToSentry: !(error instanceof ApiError) },
             );
         }
     }
@@ -212,92 +220,81 @@ export class DeviceController {
 
     public async updateDevicePower(mode: TMode): Promise<void> {
         const { logger } = this.store;
-        try {
-            const { powerOpt } = DeviceController.getPowerMode(mode);
 
-            const res = this.getTokenAndDevice();
-            if (!res) {
-                this.store.adapter.log.warn(`Invalid values getTokenAndDevice`);
-                return;
-            }
+        const { powerOpt } = DeviceController.getPowerMode(mode);
 
-            const data = await this.apiClient.request<MidasData>(
-                this.store.getSUrl(),
-                this.getAxiosUpdateDevicePowerParams(res.device, powerOpt, 'Power'),
-                res.token,
-            );
+        const res = this.getTokenAndDevice();
+        if (!res) {
+            this.store.adapter.log.warn(`Invalid values getTokenAndDevice`);
+            return;
+        }
 
-            logger.debug(`DeviceStatus: ${JSON.stringify(data)}`);
+        const data = await this.apiClient.request<MidasData>(
+            this.store.getSUrl(),
+            this.getAxiosUpdateDevicePowerParams(res.device, powerOpt, 'Power'),
+            res.token,
+        );
 
-            if (mode >= 0) {
-                this.store.setMode(mode);
-                await this.updateDeviceMode(mode);
-            } else {
-                await this.store.saveValue('mode', mode);
-            }
-        } catch (error: any) {
-            logger.errorHandler('Error in updateDevicePower', error);
+        logger.debug(`DeviceStatus: ${JSON.stringify(data)}`);
+
+        if (mode >= 0) {
+            this.store.setMode(mode);
+            await this.updateDeviceMode(mode);
+        } else {
+            await this.store.saveValue('mode', mode);
         }
     }
 
     public async updateDeviceSetTemp(temperature: number): Promise<void> {
         const { logger, adapter } = this.store;
-        try {
-            const numericTemperature =
-                typeof temperature === 'number' ? temperature : parseFloat(String(temperature).replace(',', '.'));
-            if (!Number.isFinite(numericTemperature)) {
-                logger.warn(`Invalid set temperature: ${temperature}`);
-                return;
-            }
-            const sTemperature = numericTemperature.toString().replace(',', '.');
-            const result = await adapter.getStateAsync(this.store.getStateIdByKey('mode'));
-
-            if (!result?.val) {
-                logger.warn(`Invalid mode: ${result?.val}`);
-                return;
-            }
-
-            if (String(result?.val) === '-1') {
-                logger.debug(`Mode set to: ${result?.val}`);
-                return;
-            }
-            const res = this.getTokenAndDevice();
-            if (!res) {
-                return;
-            }
-            const data = await this.apiClient.request<MidasData>(
-                this.store.getSUrl(),
-                this.getAxiosUpdateDeviceSetTempParams(res.device, sTemperature),
-                res.token,
-            );
-            logger.debug(`DeviceStatus: ${JSON.stringify(data)}`);
-
-            await this.store.saveValue('tempSet', numericTemperature);
-        } catch (error: any) {
-            logger.errorHandler('Error in updateDeviceSetTemp', error);
+        const numericTemperature =
+            typeof temperature === 'number' ? temperature : parseFloat(String(temperature).replace(',', '.'));
+        if (!Number.isFinite(numericTemperature)) {
+            logger.warn(`Invalid set temperature: ${temperature}`);
+            return;
         }
+        const sTemperature = numericTemperature.toString().replace(',', '.');
+        const result = await adapter.getStateAsync(this.store.getStateIdByKey('mode'));
+
+        if (!result?.val) {
+            logger.warn(`Invalid mode: ${result?.val}`);
+            return;
+        }
+
+        if (String(result?.val) === '-1') {
+            logger.debug(`Mode set to: ${result?.val}`);
+            return;
+        }
+        const res = this.getTokenAndDevice();
+        if (!res) {
+            return;
+        }
+        const data = await this.apiClient.request<MidasData>(
+            this.store.getSUrl(),
+            this.getAxiosUpdateDeviceSetTempParams(res.device, sTemperature),
+            res.token,
+        );
+        logger.debug(`DeviceStatus: ${JSON.stringify(data)}`);
+
+        await this.store.saveValue('tempSet', numericTemperature);
     }
 
     public async updateDeviceSilent(silent: boolean): Promise<void> {
         const { logger } = this.store;
-        try {
-            const silentMode = silent ? '1' : '0';
-            const res = this.getTokenAndDevice();
-            if (!res) {
-                return;
-            }
-            const data = await this.apiClient.request<MidasData>(
-                this.store.getSUrl(),
-                this.getAxiosUpdateDevicePowerParams(res.device, silentMode, 'Manual-mute'),
-                res.token,
-            );
-
-            logger.debug(`DeviceStatus: ${JSON.stringify(data)}`);
-
-            await this.store.saveValue('silent', silent);
-        } catch (error: any) {
-            logger.errorHandler('Error in updateDeviceSilent', error);
+        const silentMode = silent ? '1' : '0';
+        const res = this.getTokenAndDevice();
+        if (!res) {
+            return;
         }
+        const data = await this.apiClient.request<MidasData>(
+            this.store.getSUrl(),
+            this.getAxiosUpdateDevicePowerParams(res.device, silentMode, 'Manual-mute'),
+            res.token,
+        );
+
+        logger.debug(`DeviceStatus: ${JSON.stringify(data)}`);
+
+        await this.store.saveValue('silent', silent);
     }
 
     private getAxiosUpdateDeviceSetTempParams(deviceCode: string, sTemperature: string): AxiosUpdateDeviceParams {
@@ -382,16 +379,16 @@ export class DeviceController {
 
     private async updateDeviceErrorMsg(): Promise<void> {
         const { apiLevel, cloudURL, saveValue } = this.store;
-        try {
-            const res = this.getTokenAndDevice();
-            if (!res) {
-                return;
-            }
-            const sURL =
-                apiLevel < 3
-                    ? `${cloudURL}/app/device/getFaultDataByDeviceCode.json`
-                    : `${cloudURL}/app/device/getFaultDataByDeviceCode`;
+        const res = this.getTokenAndDevice();
+        if (!res) {
+            return;
+        }
+        const sURL =
+            apiLevel < 3
+                ? `${cloudURL}/app/device/getFaultDataByDeviceCode.json`
+                : `${cloudURL}/app/device/getFaultDataByDeviceCode`;
 
+        try {
             const data = await this.apiClient.request<MidasData>(
                 sURL,
                 {
@@ -409,7 +406,7 @@ export class DeviceController {
             await saveValue('errorCode', data.objectResult?.[0]?.faultCode ?? data.object_result?.[0]?.fault_code);
             await saveValue('errorLevel', data.objectResult?.[0]?.errorLevel ?? data.object_result?.[0]?.error_level);
         } catch (error: any) {
-            await this.store.resetAndHandleErrorWithSentry('Error in updateDeviceErrorMsg', error);
+            throw new ResetError('UpdateDeviceErrorMsg', { cause: error, sendToSentry: !(error instanceof ApiError) });
         }
     }
 

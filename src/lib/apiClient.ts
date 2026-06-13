@@ -2,6 +2,26 @@ import axios from 'axios';
 import https from 'https';
 import type { Store } from './store';
 
+export class ApiError extends Error {
+    constructor(
+        public readonly errorCode: string | number,
+        url: string,
+    ) {
+        super(`API error ${errorCode} for ${url}`);
+        this.name = 'ApiError';
+    }
+}
+
+export class ResetError extends Error {
+    readonly sendToSentry: boolean;
+
+    constructor(message: string, options?: ErrorOptions & { sendToSentry?: boolean }) {
+        super(message, options);
+        this.name = 'ResetError';
+        this.sendToSentry = options?.sendToSentry ?? true;
+    }
+}
+
 export class ApiClient {
     private static insecureHttpsAgent = new https.Agent({ rejectUnauthorized: false });
     private insecureTlsWarningShown = false;
@@ -81,7 +101,7 @@ export class ApiClient {
 
         if (!ApiClient.isApiSuccess(result.data?.error_code)) {
             this.store.adapter.log.debug(`API error for ${url}: ${JSON.stringify(result.data)}`);
-            throw new Error(`API error ${result.data?.error_code} for ${url}`);
+            throw new ApiError(result.data?.error_code ?? 'unknown', url);
         }
 
         return result.data;

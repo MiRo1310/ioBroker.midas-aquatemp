@@ -11,7 +11,7 @@ import { createObjects } from './lib/createState';
 import { isDefined, isStateValue } from './lib/utils';
 import { DeviceController } from './lib/deviceController';
 import { TokenManager } from './lib/tokenManager';
-import { ApiClient } from './lib/apiClient';
+import { ApiClient, ResetError } from './lib/apiClient';
 
 export class MidasAquatemp extends utils.Adapter {
     private static instance: MidasAquatemp;
@@ -76,68 +76,76 @@ export class MidasAquatemp extends utils.Adapter {
             }, MidasAquatemp.tokenRefreshIntervalTime);
 
             this.on('stateChange', async (id, state) => {
-                if (!state || state.ack) {
-                    return;
-                }
-
-                const silentId = store.getStateIdByKey('silent');
-                const stateId = store.getStateIdByKey('state');
-                const tempSetId = store.getStateIdByKey('tempSet');
-                const relevantIds = [modeId, silentId, stateId, tempSetId];
-
-                if (!relevantIds.includes(id) || !store.device) {
-                    return;
-                }
-                await tokenManager.ensureValidToken();
-
-                if (id === modeId) {
-                    this.log.debug(`Mode: ${JSON.stringify(state)}`);
-
-                    if (!isStateValue(state)) {
-                        this.log.warn(`Ignoring invalid mode state payload for ${id}: ${JSON.stringify(state)}`);
+                try {
+                    if (!state || state.ack) {
                         return;
                     }
 
-                    const mode = Number(state.val);
+                    const silentId = store.getStateIdByKey('silent');
+                    const stateId = store.getStateIdByKey('state');
+                    const tempSetId = store.getStateIdByKey('tempSet');
+                    const relevantIds = [modeId, silentId, stateId, tempSetId];
 
-                    if (!store.isValidMode(mode)) {
-                        this.log.warn(
-                            `Ignoring unsupported mode value for ${id}: ${JSON.stringify(state.val)} (allowed: -1, 0, 1, 2)`,
-                        );
+                    if (!relevantIds.includes(id) || !store.device) {
                         return;
                     }
+                    await tokenManager.ensureValidToken();
 
-                    await deviceController.updateDevicePower(mode);
+                    if (id === modeId) {
+                        this.log.debug(`Mode: ${JSON.stringify(state)}`);
 
-                    await this.setState(id, { ack: true });
-                }
+                        if (!isStateValue(state)) {
+                            this.log.warn(`Ignoring invalid mode state payload for ${id}: ${JSON.stringify(state)}`);
+                            return;
+                        }
 
-                if (id === silentId) {
-                    this.log.debug(`Silent: ${JSON.stringify(state)}`);
+                        const mode = Number(state.val);
 
-                    if (isStateValue(state)) {
-                        await deviceController.updateDeviceSilent(state.val as boolean);
+                        if (!store.isValidMode(mode)) {
+                            this.log.warn(
+                                `Ignoring unsupported mode value for ${id}: ${JSON.stringify(state.val)} (allowed: -1, 0, 1, 2)`,
+                            );
+                            return;
+                        }
+
+                        await deviceController.updateDevicePower(mode);
+
+                        await this.setState(id, { ack: true });
                     }
-                    await this.setState(id, { ack: true });
-                }
 
-                if (id === tempSetId) {
-                    this.log.debug(`TempSet: ${JSON.stringify(state)}`);
-                    if (isStateValue(state)) {
-                        await deviceController.updateDeviceSetTemp(state.val as number);
-                    }
-                    await this.setState(id, { ack: true });
-                }
+                    if (id === silentId) {
+                        this.log.debug(`Silent: ${JSON.stringify(state)}`);
 
-                if (id === stateId) {
-                    this.log.debug(`State: ${JSON.stringify(state)}`);
-                    if (!state.val) {
-                        await deviceController.updateDevicePower(-1);
-                    } else {
-                        const currentMode = parseInt(String(store.getMode()));
-                        await deviceController.updateDevicePower(currentMode >= 0 ? (currentMode as TMode) : 0);
+                        if (isStateValue(state)) {
+                            await deviceController.updateDeviceSilent(state.val as boolean);
+                        }
+                        await this.setState(id, { ack: true });
                     }
-                    await this.setState(id, { ack: true });
+
+                    if (id === tempSetId) {
+                        this.log.debug(`TempSet: ${JSON.stringify(state)}`);
+                        if (isStateValue(state)) {
+                            await deviceController.updateDeviceSetTemp(state.val as number);
+                        }
+                        await this.setState(id, { ack: true });
+                    }
+
+                    if (id === stateId) {
+                        this.log.debug(`State: ${JSON.stringify(state)}`);
+                        if (!state.val) {
+                            await deviceController.updateDevicePower(-1);
+                        } else {
+                            const currentMode = parseInt(String(store.getMode()));
+                            await deviceController.updateDevicePower(currentMode >= 0 ? (currentMode as TMode) : 0);
+                        }
+                        await this.setState(id, { ack: true });
+                    }
+                } catch (error) {
+                    if (error instanceof ResetError) {
+                        await store.resetAndHandleErrorWithSentry(`Error in stateChange (${id})`, error);
+                        return;
+                    }
+                    store.logger.errorHandler(`Error in stateChange (${id})`, error);
                 }
             });
 

@@ -5,6 +5,7 @@ import { DeviceController } from '../../src/lib/deviceController.ts';
 import { Store } from '../../src/lib/store.ts';
 import { TokenManager } from '../../src/lib/tokenManager.ts';
 import type { ApiClient } from '../../src/lib/apiClient.ts';
+import { ResetError } from '../../src/lib/apiClient.ts';
 import type { MidasAquatemp } from '../../src/main.ts';
 import { utils } from '@iobroker/testing';
 
@@ -96,15 +97,21 @@ describe('DeviceController', () => {
             expect(store.getMode()).to.equal(1);
         });
 
-        it('keeps connection intact on API error (only logs)', async () => {
+        it('propagates error on API error (no internal catch)', async () => {
             apiClient = makeApiClient(true);
             controller = new DeviceController(store, tokenManager, apiClient);
 
             store.device = 'DEVICE_CODE';
             store.isOnline = true;
 
-            await controller.updateDevicePower(1);
+            let threw = false;
+            try {
+                await controller.updateDevicePower(1);
+            } catch {
+                threw = true;
+            }
 
+            expect(threw).to.be.true;
             expect(store.device).to.equal('DEVICE_CODE');
             expect(store.isOnline).to.be.true;
         });
@@ -129,14 +136,20 @@ describe('DeviceController', () => {
             expect(state?.val).to.be.false;
         });
 
-        it('keeps connection intact on API error (only logs)', async () => {
+        it('propagates error on API error (no internal catch)', async () => {
             apiClient = makeApiClient(true);
             controller = new DeviceController(store, tokenManager, apiClient);
             store.device = 'DEVICE_CODE';
             store.isOnline = true;
 
-            await controller.updateDeviceSilent(true);
+            let threw = false;
+            try {
+                await controller.updateDeviceSilent(true);
+            } catch {
+                threw = true;
+            }
 
+            expect(threw).to.be.true;
             expect(store.device).to.equal('DEVICE_CODE');
             expect(store.isOnline).to.be.true;
         });
@@ -206,14 +219,21 @@ describe('DeviceController', () => {
             expect(params).to.have.property('body');
         });
 
-        it('resets on API exception and does not set device', async () => {
+        it('throws ResetError on API exception', async () => {
             const client = makeSequentialApiClient(new Error('network error'));
             controller = new DeviceController(store, tokenManager, client);
             store.device = 'OLD_DEVICE';
             store.isOnline = true;
-            await controller.fetchDevice();
-            expect(store.device).to.equal('');
-            expect(store.isOnline).to.be.false;
+
+            let caughtError: unknown;
+            try {
+                await controller.fetchDevice();
+            } catch (e) {
+                caughtError = e;
+            }
+
+            expect(caughtError).to.be.instanceOf(ResetError);
+            expect((caughtError as ResetError).sendToSentry).to.be.true;
         });
     });
 
@@ -245,14 +265,20 @@ describe('DeviceController', () => {
             expect(state?.val).to.equal(25);
         });
 
-        it('keeps connection intact on API error (only logs)', async () => {
+        it('propagates error on API error (no internal catch)', async () => {
             apiClient = makeApiClient(true);
             controller = new DeviceController(store, tokenManager, apiClient);
             store.device = 'DEVICE_CODE';
             store.isOnline = true;
 
-            await controller.updateDeviceSetTemp(25);
+            let threw = false;
+            try {
+                await controller.updateDeviceSetTemp(25);
+            } catch {
+                threw = true;
+            }
 
+            expect(threw).to.be.true;
             expect(store.device).to.equal('DEVICE_CODE');
             expect(store.isOnline).to.be.true;
         });

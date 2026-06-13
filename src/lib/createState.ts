@@ -404,16 +404,12 @@ export const createObjects = async (store: Store): Promise<void> => {
         },
     ];
 
-    try {
-        for (const { id, name, role, unit, type, def, write = false, states } of objects) {
-            logger.debug(`Create object: ${id}`);
-            await adapter.extendObject(id, {
-                type: 'state',
-                common: { read: true, write, type, unit, role, name, def, states },
-                native: {},
-            });
-        }
-    } catch (error: any) {
-        logger.errorHandler('Error in createObjects', error);
+    for (const { id, name, role, unit, type, def, write = false, states } of objects) {
+        logger.debug(`Create object: ${id}`);
+        await adapter.extendObject(id, {
+            type: 'state',
+            common: { read: true, write, type, unit, role, name, def, states },
+            native: {},
+        });
     }
 };
