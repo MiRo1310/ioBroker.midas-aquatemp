@@ -57,8 +57,6 @@ class Logger {
     this.error(`Error stack: ${e.stack}`);
     if (e == null ? void 0 : e.response) {
       this.error(`Server response: ${(_a = e == null ? void 0 : e.response) == null ? void 0 : _a.status}`);
-    }
-    if (e == null ? void 0 : e.response) {
       this.error(`Server status: ${(_b = e == null ? void 0 : e.response) == null ? void 0 : _b.statusText}`);
     }
   }

@@ -38,10 +38,9 @@ export class Logger {
 
         this.error(`Error message: ${e.message}`);
         this.error(`Error stack: ${e.stack}`);
+
         if (e?.response) {
             this.error(`Server response: ${e?.response?.status}`);
-        }
-        if (e?.response) {
             this.error(`Server status: ${e?.response?.statusText}`);
         }
     }

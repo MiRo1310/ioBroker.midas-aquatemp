@@ -71,7 +71,7 @@ export class MidasAquatemp extends utils.Adapter {
             await this.store.clearStateValues();
             await tokenManager.updateTokenAndDeviceId();
 
-            this.updateInterval = this.setInterval(async () => {
+            this.updateInterval = this.setInterval(async function () {
                 await tokenManager.updateTokenAndDeviceId();
             }, this.interval * 1000);
 

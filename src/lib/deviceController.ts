@@ -382,7 +382,7 @@ export class DeviceController {
     }
 
     private async updateDeviceErrorMsg(): Promise<void> {
-        const { apiLevel, cloudURL, saveValue } = this.store;
+        const { apiLevel, cloudURL } = this.store;
         const res = this.getTokenAndDevice();
         if (!res) {
             return;
@@ -402,20 +402,26 @@ export class DeviceController {
                 res.token,
             );
 
-            await saveValue('error', true);
-            await saveValue(
+            await this.store.saveValue('error', true);
+            await this.store.saveValue(
                 'errorMessage',
                 data.objectResult?.[0]?.description ?? data.object_result?.[0]?.description ?? '',
             );
-            await saveValue('errorCode', data.objectResult?.[0]?.faultCode ?? data.object_result?.[0]?.fault_code);
-            await saveValue('errorLevel', data.objectResult?.[0]?.errorLevel ?? data.object_result?.[0]?.error_level);
+            await this.store.saveValue(
+                'errorCode',
+                data.objectResult?.[0]?.faultCode ?? data.object_result?.[0]?.fault_code,
+            );
+            await this.store.saveValue(
+                'errorLevel',
+                data.objectResult?.[0]?.errorLevel ?? data.object_result?.[0]?.error_level,
+            );
         } catch (error: any) {
             throw new ResetError('UpdateDeviceErrorMsg', { cause: error, sendToSentry: !(error instanceof ApiError) });
         }
     }
 
     private async updateDeviceMode(mode: TMode): Promise<void> {
-        const { logger, saveValue } = this.store;
+        const { logger } = this.store;
 
         const res = this.getTokenAndDevice();
         if (!res) {
@@ -429,7 +435,7 @@ export class DeviceController {
 
         logger.debug(`Mode command response: ${JSON.stringify(data)}`);
         if (this.isSuccess(data)) {
-            await saveValue('mode', mode);
+            await this.store.saveValue('mode', mode);
         } else {
             logger.error(`Failed to set mode ${mode}: API reported no success`);
         }

@@ -50,7 +50,7 @@ export class TokenManager {
         }
     }
 
-    public updateTokenAndDeviceId = async (): Promise<void> => {
+    public async updateTokenAndDeviceId(): Promise<void> {
         try {
             await this.ensureValidToken();
 
@@ -69,19 +69,19 @@ export class TokenManager {
         } catch (error: any) {
             await this.store.resetAndHandleErrorWithSentry('Error in updateToken', error);
         }
-    };
+    }
 
-    public resetToken = (): void => {
+    public resetToken(): void {
         this.token = null;
-    };
+    }
 
-    public getValidTokenOrNull = (): string | null => {
+    public getValidTokenOrNull(): string | null {
         if (this.isValidToken()) {
             return this.token;
         }
         this.store.adapter.log.debug('No valid token available');
         return null;
-    };
+    }
 
     private isValidToken(): boolean {
         return isDefined(this.token) && this.token !== '';

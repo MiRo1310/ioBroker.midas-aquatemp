@@ -52,21 +52,21 @@ class Store {
   setTokenManager(tokenManager) {
     this.tokenManager = tokenManager;
   }
-  getDpRoot = () => {
+  getDpRoot() {
     return `midas-aquatemp.${this.instance}`;
-  };
-  resetOnError = async () => {
+  }
+  async resetOnError() {
     var _a;
     (_a = this.tokenManager) == null ? void 0 : _a.resetToken();
     this.device = "";
     this.isOnline = false;
     await this.saveValue("info.connection", false);
-  };
-  resetDeviceOnly = async () => {
+  }
+  async resetDeviceOnly() {
     this.device = "";
     this.isOnline = false;
     await this.saveValue("info.connection", false);
-  };
+  }
   async resetAndHandleErrorWithSentry(title, e) {
     await this.resetOnError();
     this.logger.errorHandler(title, e);
@@ -80,9 +80,9 @@ class Store {
   isValidMode(curr) {
     return Store.modes.includes(curr);
   }
-  saveValue = async (key, value) => {
+  async saveValue(key, value) {
     await this.adapter.setState(this.getStateIdByKey(key), value != null ? value : null, true);
-  };
+  }
   getStateIdByKey(key) {
     return `${this.getDpRoot()}.${key}`;
   }

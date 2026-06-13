@@ -59,7 +59,7 @@ class TokenManager {
       await this.store.resetOnError();
     }
   }
-  updateTokenAndDeviceId = async () => {
+  async updateTokenAndDeviceId() {
     try {
       await this.ensureValidToken();
       if (!this.isValidToken()) {
@@ -77,17 +77,17 @@ class TokenManager {
     } catch (error) {
       await this.store.resetAndHandleErrorWithSentry("Error in updateToken", error);
     }
-  };
-  resetToken = () => {
+  }
+  resetToken() {
     this.token = null;
-  };
-  getValidTokenOrNull = () => {
+  }
+  getValidTokenOrNull() {
     if (this.isValidToken()) {
       return this.token;
     }
     this.store.adapter.log.debug("No valid token available");
     return null;
-  };
+  }
   isValidToken() {
     return (0, import_utils.isDefined)(this.token) && this.token !== "";
   }

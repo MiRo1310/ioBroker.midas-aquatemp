@@ -8,9 +8,23 @@
   Werden aktuell bei jedem `stateChange`-Aufruf neu berechnet (Zeilen 85–88). Einmalig vor dem Handler definieren,
   analog zu `modeId`.
 
-- [ ] **`main.ts` — `if`-Kette auf `else if` umstellen**
+- [x] **`main.ts` — `if`-Kette auf `else if` umstellen**
   Im `stateChange`-Handler können nur einer der vier Branches matchen. Aktuell laufen alle vier `if`-Checks immer
   durch (Zeilen 95/117/126/134).
+
+- [x] **`main.ts` — `tokenRefreshInterval`: `async function` → Arrow-Function**
+  Beide Intervalle verwenden jetzt konsistent `async function`.
+
+- [x] **`loggingController.ts` — `errorHandler`: doppeltes `if (e?.response)` zusammenführen**
+  Zeilen 41–46 prüfen `e?.response` zweimal in getrennten Blöcken. Beide Logs gehören in einen einzigen `if`-Block.
+
+- [x] **`deviceController.ts` — `updateDeviceErrorMsg`: Payload API-Level-bedingt senden**
+  Bewusst so gelassen — beide Feldnamen gleichzeitig senden schadet nicht und vereinfacht den Code.
+
+- [x] **Arrow-Class-Fields Cleanup in `store.ts` und `tokenManager.ts`**
+  `getDpRoot`, `resetOnError`, `resetDeviceOnly`, `saveValue` (store) sowie `updateTokenAndDeviceId`, `resetToken`,
+  `getValidTokenOrNull` (tokenManager) sind Arrow-Class-Fields, werden aber immer mit explizitem Objektbezug
+  aufgerufen — kein Binding-Grund. Reguläre Methoden sind idiomatischer und sparen pro Instanz eine Funktionskopie.
 
 - [x] **`main.ts` — `subscribeStatesAsync` parallelisieren**
   Vier unabhängige `await`-Aufrufe (Zeilen 148–151) → `Promise.all` verwenden.
