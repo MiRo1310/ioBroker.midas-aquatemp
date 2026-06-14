@@ -1,5 +1,5 @@
 import type { MidasAquatemp } from '../main';
-import { createHash } from 'crypto';
+import { createHash } from 'node:crypto';
 import { Logger } from './loggingController';
 import type { TokenManager } from './tokenManager';
 
