@@ -1,5 +1,5 @@
 import axios from 'axios';
-import https from 'https';
+import https from 'node:https';
 import type { Store } from './store';
 
 export class ApiError extends Error {
@@ -27,40 +27,12 @@ export class ApiClient {
     private insecureTlsWarningShown = false;
     constructor(private readonly store: Store) {}
 
-    private parseBooleanEnv(value?: string): boolean {
-        return value === '1' || value === 'true' || value === 'yes' || value === 'on';
-    }
-
-    private getInsecureTlsHostAllowlist(): string[] {
-        return (process.env.MIDAS_AQUATEMP_INSECURE_TLS_HOSTS ?? '')
-            .split(',')
-            .map(host => host.trim().toLowerCase())
-            .filter(Boolean);
-    }
-
     private isInsecureTlsEnabled(): boolean {
-        return (
-            this.store.adapter.config.allowInsecureTls === true ||
-            this.parseBooleanEnv(process.env.MIDAS_AQUATEMP_INSECURE_TLS)
-        );
+        return this.store.adapter.config.allowInsecureTls === true;
     }
 
-    private canUseInsecureTlsForUrl(url: string): boolean {
-        const allowlist = this.getInsecureTlsHostAllowlist();
-        if (allowlist.length === 0) {
-            return true;
-        }
-
-        try {
-            const { hostname } = new URL(url);
-            return allowlist.includes(hostname.toLowerCase());
-        } catch {
-            return false;
-        }
-    }
-
-    private getHttpsAgent(url: string): https.Agent | undefined {
-        if (!this.isInsecureTlsEnabled() || !this.canUseInsecureTlsForUrl(url)) {
+    private getHttpsAgent(): https.Agent | undefined {
+        if (!this.isInsecureTlsEnabled()) {
             return;
         }
 
@@ -86,7 +58,7 @@ export class ApiClient {
                 'Content-Type': 'application/json',
                 ...tokenHeader,
             },
-            httpsAgent: this.getHttpsAgent(url),
+            httpsAgent: this.getHttpsAgent(),
         });
 
         if (result.status !== 200) {

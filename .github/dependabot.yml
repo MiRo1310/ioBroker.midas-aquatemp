@@ -3,20 +3,25 @@ updates:
   - package-ecosystem: npm
     directory: "/"
     schedule:
-      interval: monthly
-      time: "04:00"
+      interval: cron
+      cron: "0 4 * * 1"
       timezone: Europe/Berlin
-    open-pull-requests-limit: 5
+    open-pull-requests-limit: 15
     assignees:
       - Miro1310
     versioning-strategy: increase
+    cooldown:
+      default: 7
+    ignore:
+      - dependency-name: "@types/node"
+        update-types: ["version-update:semver-major"]
 
   - package-ecosystem: github-actions
     directory: "/"
     schedule:
-      interval: monthly
-      time: "04:00"
+      interval: cron
+      cron: "0 4 * * 2"
       timezone: Europe/Berlin
-    open-pull-requests-limit: 5
+    open-pull-requests-limit: 15
     assignees:
       - Miro1310
