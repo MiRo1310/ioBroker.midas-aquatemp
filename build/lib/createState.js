@@ -21,14 +21,33 @@ __export(createState_exports, {
   createObjects: () => createObjects
 });
 module.exports = __toCommonJS(createState_exports);
-var import_store = require("./store");
-var import_logging = require("./logging");
-const createObjects = async (adapter) => {
-  const store = (0, import_store.initStore)();
-  const dpRoot = store.getDpRoot();
+const createObjects = async (store) => {
+  const { logger, adapter } = store;
+  const tempState = {
+    type: "number",
+    role: "value.temperature",
+    unit: "\xB0C",
+    def: 0
+  };
+  const booleanState = {
+    type: "boolean",
+    role: "state",
+    def: false
+  };
+  const stringState = {
+    type: "string",
+    def: "",
+    role: "state"
+  };
+  const powerState = {
+    type: "number",
+    role: "value.power",
+    unit: "W",
+    def: 0
+  };
   const objects = [
     {
-      id: `${dpRoot}.ambient`,
+      id: store.getStateIdByKey("ambient"),
       name: {
         en: "Ambient temperature",
         de: "Umgebungstemperatur",
@@ -42,12 +61,10 @@ const createObjects = async (adapter) => {
         uk: "\u0422\u0435\u043C\u043F\u0435\u0440\u0430\u0442\u0443\u0440\u0430 \u043D\u0430\u0432\u043A\u043E\u043B\u0438\u0448\u043D\u044C\u043E\u0433\u043E \u0441\u0435\u0440\u0435\u0434\u043E\u0432\u0438\u0449\u0430",
         "zh-cn": "\u73AF\u5883\u6E29\u5EA6"
       },
-      type: "number",
-      role: "value.temperature",
-      unit: "\xB0C"
+      ...tempState
     },
     {
-      id: `${dpRoot}.info.connection`,
+      id: store.getStateIdByKey("info.connection"),
       name: {
         en: "Connection",
         de: "Verbindung",
@@ -61,12 +78,10 @@ const createObjects = async (adapter) => {
         uk: "\u041F\u0456\u0434\u043A\u043B\u044E\u0447\u0435\u043D\u043D\u044F",
         "zh-cn": "\u8FDE\u63A5"
       },
-      type: "boolean",
-      role: "state",
-      def: false
+      ...booleanState
     },
     {
-      id: `${dpRoot}.consumption`,
+      id: store.getStateIdByKey("consumption"),
       name: {
         en: "Power consumption",
         de: "Stromverbrauch",
@@ -80,13 +95,10 @@ const createObjects = async (adapter) => {
         uk: "\u0421\u043F\u043E\u0436\u0438\u0432\u0430\u043D\u0430 \u043F\u043E\u0442\u0443\u0436\u043D\u0456\u0441\u0442\u044C",
         "zh-cn": "\u7535\u529B\u6D88\u8017"
       },
-      type: "number",
-      role: "value.power",
-      unit: "W",
-      def: 0
+      ...powerState
     },
     {
-      id: `${dpRoot}.voltage`,
+      id: store.getStateIdByKey("voltage"),
       name: {
         en: "Voltage",
         de: "Spannung",
@@ -106,7 +118,7 @@ const createObjects = async (adapter) => {
       def: 0
     },
     {
-      id: `${dpRoot}.error`,
+      id: store.getStateIdByKey("error"),
       name: {
         en: "Error",
         de: "Fehler",
@@ -120,12 +132,10 @@ const createObjects = async (adapter) => {
         uk: "\u041F\u043E\u043C\u0438\u043B\u043A\u0430",
         "zh-cn": "\u9519\u8BEF"
       },
-      type: "boolean",
-      role: "state",
-      def: false
+      ...booleanState
     },
     {
-      id: `${dpRoot}.errorCode`,
+      id: store.getStateIdByKey("errorCode"),
       name: {
         en: "Error code",
         de: "Fehlercode",
@@ -139,12 +149,10 @@ const createObjects = async (adapter) => {
         uk: "\u041A\u043E\u0434 \u043F\u043E\u043C\u0438\u043B\u043A\u0438",
         "zh-cn": "\u9519\u8BEF\u4EE3\u7801"
       },
-      type: "string",
-      def: "",
-      role: "state"
+      ...stringState
     },
     {
-      id: `${dpRoot}.errorLevel`,
+      id: store.getStateIdByKey("errorLevel"),
       name: {
         en: "Error level",
         de: "Fehlerlevel",
@@ -162,7 +170,7 @@ const createObjects = async (adapter) => {
       role: "state"
     },
     {
-      id: `${dpRoot}.errorMessage`,
+      id: store.getStateIdByKey("errorMessage"),
       name: {
         en: "Errormessage",
         de: "Fehlermeldung",
@@ -176,21 +184,18 @@ const createObjects = async (adapter) => {
         uk: "\u041F\u043E\u043C\u0438\u043B\u043A\u0430",
         "zh-cn": "\u9519\u8BEF\u6D88\u606F"
       },
-      type: "string",
-      def: "",
-      role: "state"
+      ...stringState
     },
     {
-      id: `${dpRoot}.mode`,
+      id: store.getStateIdByKey("mode"),
       name: "Modus",
-      type: "string",
-      states: "-1:off;0:cool;1:heat;2:auto",
-      def: "",
+      type: "number",
+      states: { "-1": "off", 0: "cool", 1: "heat", 2: "auto" },
       write: true,
       role: "state"
     },
     {
-      id: `${dpRoot}.rotor`,
+      id: store.getStateIdByKey("rotor"),
       name: {
         en: "Fan speed",
         de: "L\xFCfterdrehzahl",
@@ -210,7 +215,7 @@ const createObjects = async (adapter) => {
       role: "state"
     },
     {
-      id: `${dpRoot}.silent`,
+      id: store.getStateIdByKey("silent"),
       name: {
         en: "Silent",
         de: "Silent",
@@ -224,13 +229,11 @@ const createObjects = async (adapter) => {
         uk: "\u0421\u0438\u0434\u0456\u043D\u043D\u044F",
         "zh-cn": "\u5B89\u9759"
       },
-      type: "boolean",
-      role: "state",
-      def: false,
+      ...booleanState,
       write: true
     },
     {
-      id: `${dpRoot}.state`,
+      id: store.getStateIdByKey("state"),
       name: {
         en: "Status",
         de: "Status",
@@ -244,12 +247,11 @@ const createObjects = async (adapter) => {
         uk: "\u0421\u0442\u0430\u0442\u0443\u0441 \u043D\u0430 \u0441\u0435\u0440\u0432\u0435\u0440\u0438",
         "zh-cn": "\u72B6\u6001"
       },
-      type: "boolean",
-      role: "state",
-      def: false
+      ...booleanState,
+      write: true
     },
     {
-      id: `${dpRoot}.tempIn`,
+      id: store.getStateIdByKey("tempIn"),
       name: {
         en: "Input temperature",
         de: "Eingangstemperatur",
@@ -263,12 +265,10 @@ const createObjects = async (adapter) => {
         uk: "\u0422\u0435\u043C\u043F\u0435\u0440\u0430\u0442\u0443\u0440\u0430 \u0432\u0432\u0435\u0434\u0435\u043D\u043D\u044F",
         "zh-cn": "\u8F93\u5165\u6E29\u5EA6"
       },
-      type: "number",
-      unit: "\xB0C",
-      role: "value.temperature"
+      ...tempState
     },
     {
-      id: `${dpRoot}.tempOut`,
+      id: store.getStateIdByKey("tempOut"),
       name: {
         en: "Output temperature",
         de: "Ausgangstemperatur",
@@ -282,12 +282,10 @@ const createObjects = async (adapter) => {
         uk: "\u0422\u0435\u043C\u043F\u0435\u0440\u0430\u0442\u0443\u0440\u0430 \u0432\u0438\u0445\u043E\u0434\u0443",
         "zh-cn": "\u8F93\u51FA\u6E29\u5EA6"
       },
-      type: "number",
-      unit: "\xB0C",
-      role: "value.temperature"
+      ...tempState
     },
     {
-      id: `${dpRoot}.tempSet`,
+      id: store.getStateIdByKey("tempSet"),
       name: {
         en: "Should temperature",
         de: "Solltemperatur",
@@ -301,13 +299,11 @@ const createObjects = async (adapter) => {
         uk: "\u0422\u0435\u043C\u043F\u0435\u0440\u0430\u0442\u0443\u0440\u0430",
         "zh-cn": "\u5E94\u5426\u6E29\u5EA6"
       },
-      type: "number",
-      unit: "\xB0C",
-      write: true,
-      role: "value.temperature"
+      ...tempState,
+      write: true
     },
     {
-      id: `${dpRoot}.suctionTemp`,
+      id: store.getStateIdByKey("suctionTemp"),
       name: {
         en: "Air intake temperature",
         de: "Lufteintrittstemperatur",
@@ -321,12 +317,10 @@ const createObjects = async (adapter) => {
         uk: "\u0422\u0435\u043C\u043F\u0435\u0440\u0430\u0442\u0443\u0440\u0430 \u0437\u0430\u0431\u043E\u0440\u0443 \u043F\u043E\u0432\u0456\u0442\u0440\u044F",
         "zh-cn": "\u7A7A\u6C14\u6444\u5165\u6E29\u5EA6"
       },
-      type: "number",
-      unit: "\xB0C",
-      role: "value.temperature"
+      ...tempState
     },
     {
-      id: `${dpRoot}.coilTemp`,
+      id: store.getStateIdByKey("coilTemp"),
       name: {
         en: "Compressor temperature",
         de: "Kompressortemperatur",
@@ -340,12 +334,10 @@ const createObjects = async (adapter) => {
         uk: "\u0422\u0435\u043C\u043F\u0435\u0440\u0430\u0442\u0443\u0440\u0430 \u043A\u043E\u043C\u043F\u0440\u0435\u0441\u043E\u0440\u0430",
         "zh-cn": "\u538B\u7F29\u5668\u6E29\u5EA6"
       },
-      type: "number",
-      unit: "\xB0C",
-      role: "value.temperature"
+      ...tempState
     },
     {
-      id: `${dpRoot}.exhaust`,
+      id: store.getStateIdByKey("exhaust"),
       name: {
         en: "Compressor output",
         de: "Kompressorausgang",
@@ -359,12 +351,10 @@ const createObjects = async (adapter) => {
         uk: "\u041A\u043E\u043C\u043F\u0440\u0435\u0441\u043E\u0440\u0438",
         "zh-cn": "\u538B\u7F29\u5668\u8F93\u51FA"
       },
-      type: "number",
-      unit: "\xB0C",
-      role: "value.temperature"
+      ...tempState
     },
     {
-      id: `${dpRoot}.ProductCode`,
+      id: store.getStateIdByKey("ProductCode"),
       name: {
         en: "Productcode",
         de: "Produktcode",
@@ -378,11 +368,10 @@ const createObjects = async (adapter) => {
         uk: "\u041A\u043E\u0434 \u0442\u043E\u0432\u0430\u0440\u0443",
         "zh-cn": "\u4EA7\u54C1\u4EE3\u7801"
       },
-      type: "string",
-      role: "state"
+      ...stringState
     },
     {
-      id: `${dpRoot}.DeviceCode`,
+      id: store.getStateIdByKey("DeviceCode"),
       name: {
         en: "Device ID",
         de: "Ger\xE4te ID",
@@ -396,11 +385,10 @@ const createObjects = async (adapter) => {
         uk: "\u041A\u043E\u0434 \u043F\u0440\u0438\u0441\u0442\u0440\u043E\u044E",
         "zh-cn": "\u8BBE\u5907\u6807\u8BC6"
       },
-      type: "string",
-      role: "state"
+      ...stringState
     },
     {
-      id: `${dpRoot}.rawJSON`,
+      id: store.getStateIdByKey("rawJSON"),
       name: {
         en: "JSON",
         de: "JSON",
@@ -418,7 +406,7 @@ const createObjects = async (adapter) => {
       role: "state"
     },
     {
-      id: `${dpRoot}.flowSwitch`,
+      id: store.getStateIdByKey("flowSwitch"),
       name: {
         en: "Flow switch",
         de: "Str\xF6mungsschalter",
@@ -432,21 +420,16 @@ const createObjects = async (adapter) => {
         uk: "\u041F\u0435\u0440\u0435\u043C\u0438\u043A\u0430\u0447 \u043F\u043E\u0442\u043E\u043A\u0443",
         "zh-cn": "\u6D41\u7A0B\u5207\u6362"
       },
-      type: "boolean",
-      role: "state"
+      ...booleanState
     }
   ];
-  try {
-    for (const { id, name, role, unit, type, def, write } of objects) {
-      adapter.log.debug(`Create object: ${id}`);
-      await adapter.setObjectNotExistsAsync(id, {
-        type: "state",
-        common: { read: true, write: write || false, type, unit, role, name, def },
-        native: {}
-      });
-    }
-  } catch (error) {
-    (0, import_logging.errorLogger)("Error in createObjects", error, adapter);
+  for (const { id, name, role, unit, type, def, write = false, states } of objects) {
+    logger.debug(`Create object: ${id}`);
+    await adapter.extendObject(id, {
+      type: "state",
+      common: { read: true, write, type, unit, role, name, def, states },
+      native: {}
+    });
   }
 };
 // Annotate the CommonJS export names for ESM import in node:

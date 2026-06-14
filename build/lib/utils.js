@@ -19,19 +19,18 @@ var __toCommonJS = (mod) => __copyProps(__defProp({}, "__esModule", { value: tru
 var utils_exports = {};
 __export(utils_exports, {
   findCodeVal: () => findCodeVal,
-  isApiSuccess: () => isApiSuccess,
+  findValByCodeArray: () => findValByCodeArray,
   isDefined: () => isDefined,
+  isRelevantStateId: () => isRelevantStateId,
   isStateValue: () => isStateValue,
-  isToken: () => isToken,
+  parseFloatOrNull: () => parseFloatOrNull,
   parseIntOrNull: () => parseIntOrNull,
-  parseNumberOrNull: () => parseNumberOrNull
+  resolveOnOffMode: () => resolveOnOffMode
 });
 module.exports = __toCommonJS(utils_exports);
 const isDefined = (value) => value !== void 0 && value !== null;
 const isStateValue = (state) => isDefined(state) && isDefined(state == null ? void 0 : state.val);
-const isToken = (token) => isDefined(token) && token !== "";
-const isApiSuccess = (errorCode) => errorCode === void 0 || errorCode === null || parseInt(String(errorCode), 10) === 0;
-const parseNumberOrNull = (value) => {
+const parseFloatOrNull = (value) => {
   if (value === "" || !isDefined(value)) {
     return 0;
   }
@@ -46,26 +45,38 @@ const parseIntOrNull = (value) => {
   return Number.isFinite(num) ? num : 0;
 };
 function findCodeVal(result, code) {
-  var _a, _b, _c;
-  if (!Array.isArray(code)) {
-    return (_b = (_a = result.find((item) => item.code === code)) == null ? void 0 : _a.value) != null ? _b : null;
+  var _a;
+  return (_a = result.find((item) => item.code === code)) == null ? void 0 : _a.value;
+}
+function resolveOnOffMode(stateVal, storedMode) {
+  if (!stateVal) {
+    return -1;
   }
-  for (let i = 0; i < code.length; i++) {
-    const val = (_c = result.find((item) => item.code === code[i])) == null ? void 0 : _c.value;
-    if (isDefined(val) && val !== "") {
-      return val;
+  const currentMode = parseInt(String(storedMode));
+  return currentMode >= 0 ? currentMode : 0;
+}
+function isRelevantStateId(id, knownIds, device) {
+  return knownIds.includes(id) && !!device;
+}
+function findValByCodeArray(result, codes) {
+  var _a;
+  for (const code of codes) {
+    const value = (_a = result.find((item) => item.code === code)) == null ? void 0 : _a.value;
+    if (!isDefined(value) || value === "") {
+      continue;
     }
+    return value;
   }
-  return null;
 }
 // Annotate the CommonJS export names for ESM import in node:
 0 && (module.exports = {
   findCodeVal,
-  isApiSuccess,
+  findValByCodeArray,
   isDefined,
+  isRelevantStateId,
   isStateValue,
-  isToken,
+  parseFloatOrNull,
   parseIntOrNull,
-  parseNumberOrNull
+  resolveOnOffMode
 });
 //# sourceMappingURL=utils.js.map

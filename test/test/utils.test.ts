@@ -3,12 +3,11 @@ import { describe, it } from 'mocha';
 
 import {
     findCodeVal,
-    isApiSuccess,
+    findValByCodeArray,
     isDefined,
     isStateValue,
-    isToken,
     parseIntOrNull,
-    parseNumberOrNull,
+    parseFloatOrNull,
 } from '../../src/lib/utils.ts';
 
 describe('utils.ts', () => {
@@ -40,51 +39,24 @@ describe('utils.ts', () => {
         });
     });
 
-    describe('isToken', () => {
-        it('returns true only for non-empty strings', () => {
-            expect(isToken('token')).to.be.true;
-            expect(isToken('')).to.be.false;
-            expect(isToken(undefined)).to.be.false;
-            expect(isToken(null)).to.be.false;
-        });
-    });
-
-    describe('isApiSuccess', () => {
-        it('treats undefined and null as success', () => {
-            expect(isApiSuccess(undefined)).to.be.true;
-            expect(isApiSuccess(null as any)).to.be.true;
-        });
-
-        it('treats 0 values as success', () => {
-            expect(isApiSuccess(0)).to.be.true;
-            expect(isApiSuccess('0')).to.be.true;
-        });
-
-        it('treats non-zero and invalid values as failure', () => {
-            expect(isApiSuccess(1)).to.be.false;
-            expect(isApiSuccess('5')).to.be.false;
-            expect(isApiSuccess('abc')).to.be.false;
-        });
-    });
-
-    describe('parseNumberOrNull', () => {
-        it('returns null for empty input', () => {
-            expect(parseNumberOrNull('')).to.equal(0);
+    describe('parseFloatOrNull', () => {
+        it('returns 0 for empty input', () => {
+            expect(parseFloatOrNull('')).to.equal(0);
         });
 
         it('parses decimal values including comma notation', () => {
-            expect(parseNumberOrNull('12.5')).to.equal(12.5);
-            expect(parseNumberOrNull('12,5')).to.equal(12.5);
-            expect(parseNumberOrNull('-2,75')).to.equal(-2.75);
+            expect(parseFloatOrNull('12.5')).to.equal(12.5);
+            expect(parseFloatOrNull('12,5')).to.equal(12.5);
+            expect(parseFloatOrNull('-2,75')).to.equal(-2.75);
         });
 
-        it('returns null for invalid numeric values', () => {
-            expect(parseNumberOrNull('abc')).to.equal(0);
+        it('returns 0 for invalid numeric values', () => {
+            expect(parseFloatOrNull('abc')).to.equal(0);
         });
     });
 
     describe('parseIntOrNull', () => {
-        it('returns null for empty input', () => {
+        it('returns 0 for empty input', () => {
             expect(parseIntOrNull('')).to.equal(0);
         });
 
@@ -93,7 +65,7 @@ describe('utils.ts', () => {
             expect(parseIntOrNull('-3')).to.equal(-3);
         });
 
-        it('returns null for invalid values', () => {
+        it('returns 0 for invalid values', () => {
             expect(parseIntOrNull('abc')).to.equal(0);
         });
     });
@@ -109,13 +81,37 @@ describe('utils.ts', () => {
             expect(findCodeVal(response, 'B')).to.equal('second');
         });
 
-        it('returns first non-empty value for code list', () => {
-            expect(findCodeVal(response, ['A', 'B', 'C'])).to.equal('second');
+        it('returns null when code is not found', () => {
+            expect(findCodeVal(response, 'UNKNOWN')).to.be.undefined;
+        });
+    });
+
+    describe('findValByCodeArray', () => {
+        const response = [
+            { code: 'T01', value: '28.5' },
+            { code: 'T1', value: '30.0' },
+            { code: 'T2', value: '' },
+            { code: 'T3', value: '22.0' },
+        ];
+
+        it('returns the value of the first matching code', () => {
+            expect(findValByCodeArray(response, ['T01', 'T1'])).to.equal('28.5');
         });
 
-        it('returns empty string when no value is found', () => {
-            expect(findCodeVal(response, 'UNKNOWN')).to.equal(null);
-            expect(findCodeVal(response, ['A', 'UNKNOWN'])).to.equal(null);
+        it('falls back to second code when first is not in result', () => {
+            expect(findValByCodeArray(response, ['MISSING', 'T1'])).to.equal('30.0');
+        });
+
+        it('skips codes with empty string value and tries next', () => {
+            expect(findValByCodeArray(response, ['T2', 'T3'])).to.equal('22.0');
+        });
+
+        it('returns undefined when no code matches', () => {
+            expect(findValByCodeArray(response, ['X', 'Y'])).to.be.undefined;
+        });
+
+        it('returns undefined for empty codes array', () => {
+            expect(findValByCodeArray(response, [])).to.be.undefined;
         });
     });
 });

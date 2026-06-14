@@ -1,0 +1,176 @@
+import { createHash } from 'crypto';
+import { expect } from 'chai';
+import { beforeEach, describe, it } from 'mocha';
+
+import { Store } from '../../src/lib/store.ts';
+import type { MidasAquatemp } from '../../src/main.ts';
+import { TokenManager } from '../../src/lib/tokenManager.ts';
+import { ApiClient } from '../../src/lib/apiClient.ts';
+import { utils } from '@iobroker/testing';
+
+const { adapter } = utils.unit.createMocks({});
+
+describe('Store', () => {
+    let store: Store;
+
+    beforeEach(() => {
+        store = new Store(adapter as unknown as MidasAquatemp, 'user@test.com', 'password123', 0);
+    });
+
+    describe('getDpRoot', () => {
+        it('returns correct data point root path for instance 0', () => {
+            expect(store.getStateIdByKey('mode')).to.equal('midas-aquatemp.0.mode');
+        });
+
+        it('includes instance number in the path', () => {
+            const s = new Store(adapter as unknown as MidasAquatemp, 'user', 'pass', 5);
+            expect(s.getStateIdByKey('state')).to.equal('midas-aquatemp.5.state');
+        });
+    });
+
+    describe('encryptedPassword', () => {
+        it('stores password as MD5 hash', () => {
+            const expected = createHash('md5').update('password123').digest('hex');
+            expect(store.encryptedPassword).to.equal(expected);
+        });
+
+        it('produces a 32-character hex string', () => {
+            expect(store.encryptedPassword).to.match(/^[a-f0-9]{32}$/);
+        });
+
+        it('different passwords produce different hashes', () => {
+            const s1 = new Store(adapter as unknown as MidasAquatemp, 'user', 'pass1', 0);
+            const s2 = new Store(adapter as unknown as MidasAquatemp, 'user', 'pass2', 0);
+            expect(s1.encryptedPassword).to.not.equal(s2.encryptedPassword);
+        });
+    });
+
+    describe('setMode / getMode', () => {
+        it('defaults to mode 2 (auto)', () => {
+            expect(store.getMode()).to.equal(2);
+        });
+
+        it('returns the mode that was set', () => {
+            store.setMode(-1);
+            expect(store.getMode()).to.equal(-1);
+
+            store.setMode(0);
+            expect(store.getMode()).to.equal(0);
+
+            store.setMode(1);
+            expect(store.getMode()).to.equal(1);
+        });
+    });
+
+    describe('isValidMode', () => {
+        it('returns true for all valid modes (-1, 0, 1, 2)', () => {
+            expect(store.isValidMode(-1)).to.be.true;
+            expect(store.isValidMode(0)).to.be.true;
+            expect(store.isValidMode(1)).to.be.true;
+            expect(store.isValidMode(2)).to.be.true;
+        });
+
+        it('returns false for invalid modes', () => {
+            expect(store.isValidMode(3)).to.be.false;
+            expect(store.isValidMode(-2)).to.be.false;
+            expect(store.isValidMode(99)).to.be.false;
+        });
+    });
+
+    describe('constructor defaults', () => {
+        it('applies default apiLevel 3', () => {
+            expect(store.apiLevel).to.equal(3);
+        });
+
+        it('applies custom apiLevel', () => {
+            const s = new Store(adapter as unknown as MidasAquatemp, 'u', 'p', 0, 2);
+            expect(s.apiLevel).to.equal(2);
+        });
+
+        it('sets device from deviceMac when useDeviceMac is true', () => {
+            const mac = 'AA:BB:CC:DD:EE:FF';
+            const s = new Store(adapter as unknown as MidasAquatemp, 'u', 'p', 0, 3, true, mac);
+            expect(s.device).to.equal(mac);
+            expect(s.useDeviceMac).to.be.true;
+        });
+
+        it('ignores deviceMac when useDeviceMac is false', () => {
+            const s = new Store(adapter as unknown as MidasAquatemp, 'u', 'p', 0, 3, false, 'AA:BB:CC');
+            expect(s.device).to.be.undefined;
+        });
+    });
+
+    describe('resetOnErrorHandler', () => {
+        let tokenManager: TokenManager;
+        let storeV3: Store;
+        beforeEach(() => {
+            storeV3 = new Store(adapter as unknown as MidasAquatemp, 'user@test.com', 'pass', 0, 3);
+            const apiClient = new ApiClient(storeV3);
+            tokenManager = new TokenManager(storeV3, apiClient);
+        });
+
+        it('clears token, device and reachable flag', async () => {
+            (tokenManager as any).token = 'some-token';
+            storeV3.device = 'device-123';
+            storeV3.isOnline = true;
+
+            await storeV3.resetOnError();
+            expect(tokenManager.getValidTokenOrNull()).to.be.null;
+            expect(storeV3.device).to.equal('');
+            expect(storeV3.isOnline).to.be.false;
+        });
+    });
+
+    describe('resetDeviceOnly', () => {
+        let tokenManager: TokenManager;
+        let storeV3: Store;
+        beforeEach(() => {
+            storeV3 = new Store(adapter as unknown as MidasAquatemp, 'user@test.com', 'pass', 0, 3);
+            const apiClient = new ApiClient(storeV3);
+            tokenManager = new TokenManager(storeV3, apiClient);
+        });
+
+        it('clears device and reachable but keeps the token', async () => {
+            (tokenManager as any).token = 'some-token';
+            storeV3.device = 'device-123';
+            storeV3.isOnline = true;
+
+            await storeV3.resetDeviceOnly();
+
+            expect(tokenManager.getValidTokenOrNull()).to.equal('some-token');
+            expect(storeV3.device).to.equal('');
+            expect(storeV3.isOnline).to.be.false;
+        });
+    });
+
+    describe('clearStateValues', () => {
+        it('sets initial error=true, consumption=0, state=false, rawJSON=null', async () => {
+            await store.clearStateValues();
+
+            const error = await adapter.getStateAsync('midas-aquatemp.0.error');
+            const consumption = await adapter.getStateAsync('midas-aquatemp.0.consumption');
+            const state = await adapter.getStateAsync('midas-aquatemp.0.state');
+            const rawJSON = await adapter.getStateAsync('midas-aquatemp.0.rawJSON');
+
+            expect(error?.val).to.be.true;
+            expect(consumption?.val).to.equal(0);
+            expect(state?.val).to.be.false;
+            expect(rawJSON?.val).to.be.null;
+        });
+    });
+
+    describe('getStateIdByKey', () => {
+        it('returns correct full path for a simple key', () => {
+            expect(store.getStateIdByKey('mode')).to.equal('midas-aquatemp.0.mode');
+        });
+
+        it('returns correct full path for info.connection', () => {
+            expect(store.getStateIdByKey('info.connection')).to.equal('midas-aquatemp.0.info.connection');
+        });
+
+        it('includes instance number in the path', () => {
+            const store1 = new Store(adapter as unknown as MidasAquatemp, 'user', 'pass', 5);
+            expect(store1.getStateIdByKey('state')).to.equal('midas-aquatemp.5.state');
+        });
+    });
+});

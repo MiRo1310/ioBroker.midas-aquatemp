@@ -1,15 +1,11 @@
 import type { IoBrokerState, ObjectResultResponse } from '../types/types';
+import type { TMode } from './store';
 
 export const isDefined = <T>(value: T | undefined | null): value is T => value !== undefined && value !== null;
 
 export const isStateValue = (state?: IoBrokerState | null): boolean => isDefined(state) && isDefined(state?.val);
 
-export const isToken = (token?: string | null): token is string => isDefined(token) && token !== '';
-
-export const isApiSuccess = (errorCode?: string | number): boolean =>
-    errorCode === undefined || errorCode === null || parseInt(String(errorCode), 10) === 0;
-
-export const parseNumberOrNull = (value: string | null): number => {
+export const parseFloatOrNull = (value?: string | null): number => {
     if (value === '' || !isDefined(value)) {
         return 0;
     }
@@ -17,7 +13,7 @@ export const parseNumberOrNull = (value: string | null): number => {
     return Number.isFinite(num) ? num : 0;
 };
 
-export const parseIntOrNull = (value: string | null): number => {
+export const parseIntOrNull = (value?: string | null): number => {
     if (value === '' || !isDefined(value)) {
         return 0;
     }
@@ -25,15 +21,28 @@ export const parseIntOrNull = (value: string | null): number => {
     return Number.isFinite(num) ? num : 0;
 };
 
-export function findCodeVal(result: ObjectResultResponse, code: string | string[]): string | null {
-    if (!Array.isArray(code)) {
-        return result.find(item => item.code === code)?.value ?? null;
+export function findCodeVal(result: ObjectResultResponse, code: string): string | undefined {
+    return result.find(item => item.code === code)?.value;
+}
+
+export function resolveOnOffMode(stateVal: unknown, storedMode: TMode): TMode {
+    if (!stateVal) {
+        return -1;
     }
-    for (let i = 0; i < code.length; i++) {
-        const val = result.find(item => item.code === code[i])?.value;
-        if (isDefined(val) && val !== '') {
-            return val;
+    const currentMode = parseInt(String(storedMode));
+    return currentMode >= 0 ? (currentMode as TMode) : 0;
+}
+
+export function isRelevantStateId(id: string, knownIds: string[], device?: string): boolean {
+    return knownIds.includes(id) && !!device;
+}
+
+export function findValByCodeArray(result: ObjectResultResponse, codes: string[]): string | undefined {
+    for (const code of codes) {
+        const value = result.find(item => item.code === code)?.value;
+        if (!isDefined(value) || value === '') {
+            continue;
         }
+        return value;
     }
-    return null;
 }

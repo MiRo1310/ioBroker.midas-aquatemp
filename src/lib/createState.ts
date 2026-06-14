@@ -1,15 +1,33 @@
 import type { CreateObjects } from '../types';
-import { initStore } from './store';
-import { errorLogger } from './logging';
-import type { MidasAquatemp } from '../main';
+import type { Store } from './store.ts';
 
-export const createObjects = async (adapter: MidasAquatemp): Promise<void> => {
-    const store = initStore();
-    const dpRoot = store.getDpRoot();
-
+export const createObjects = async (store: Store): Promise<void> => {
+    const { logger, adapter } = store;
+    const tempState = {
+        type: 'number',
+        role: 'value.temperature',
+        unit: '°C',
+        def: 0,
+    } as const;
+    const booleanState = {
+        type: 'boolean',
+        role: 'state',
+        def: false,
+    } as const;
+    const stringState = {
+        type: 'string',
+        def: '',
+        role: 'state',
+    } as const;
+    const powerState = {
+        type: 'number',
+        role: 'value.power',
+        unit: 'W',
+        def: 0,
+    } as const;
     const objects: CreateObjects[] = [
         {
-            id: `${dpRoot}.ambient`,
+            id: store.getStateIdByKey('ambient'),
             name: {
                 en: 'Ambient temperature',
                 de: 'Umgebungstemperatur',
@@ -23,12 +41,10 @@ export const createObjects = async (adapter: MidasAquatemp): Promise<void> => {
                 uk: 'Температура навколишнього середовища',
                 'zh-cn': '环境温度',
             },
-            type: 'number',
-            role: 'value.temperature',
-            unit: '°C',
+            ...tempState,
         },
         {
-            id: `${dpRoot}.info.connection`,
+            id: store.getStateIdByKey('info.connection'),
             name: {
                 en: 'Connection',
                 de: 'Verbindung',
@@ -42,12 +58,10 @@ export const createObjects = async (adapter: MidasAquatemp): Promise<void> => {
                 uk: 'Підключення',
                 'zh-cn': '连接',
             },
-            type: 'boolean',
-            role: 'state',
-            def: false,
+            ...booleanState,
         },
         {
-            id: `${dpRoot}.consumption`,
+            id: store.getStateIdByKey('consumption'),
             name: {
                 en: 'Power consumption',
                 de: 'Stromverbrauch',
@@ -61,13 +75,10 @@ export const createObjects = async (adapter: MidasAquatemp): Promise<void> => {
                 uk: 'Споживана потужність',
                 'zh-cn': '电力消耗',
             },
-            type: 'number',
-            role: 'value.power',
-            unit: 'W',
-            def: 0,
+            ...powerState,
         },
         {
-            id: `${dpRoot}.voltage`,
+            id: store.getStateIdByKey('voltage'),
             name: {
                 en: 'Voltage',
                 de: 'Spannung',
@@ -87,7 +98,7 @@ export const createObjects = async (adapter: MidasAquatemp): Promise<void> => {
             def: 0,
         },
         {
-            id: `${dpRoot}.error`,
+            id: store.getStateIdByKey('error'),
             name: {
                 en: 'Error',
                 de: 'Fehler',
@@ -101,12 +112,10 @@ export const createObjects = async (adapter: MidasAquatemp): Promise<void> => {
                 uk: 'Помилка',
                 'zh-cn': '错误',
             },
-            type: 'boolean',
-            role: 'state',
-            def: false,
+            ...booleanState,
         },
         {
-            id: `${dpRoot}.errorCode`,
+            id: store.getStateIdByKey('errorCode'),
             name: {
                 en: 'Error code',
                 de: 'Fehlercode',
@@ -120,12 +129,10 @@ export const createObjects = async (adapter: MidasAquatemp): Promise<void> => {
                 uk: 'Код помилки',
                 'zh-cn': '错误代码',
             },
-            type: 'string',
-            def: '',
-            role: 'state',
+            ...stringState,
         },
         {
-            id: `${dpRoot}.errorLevel`,
+            id: store.getStateIdByKey('errorLevel'),
             name: {
                 en: 'Error level',
                 de: 'Fehlerlevel',
@@ -143,7 +150,7 @@ export const createObjects = async (adapter: MidasAquatemp): Promise<void> => {
             role: 'state',
         },
         {
-            id: `${dpRoot}.errorMessage`,
+            id: store.getStateIdByKey('errorMessage'),
             name: {
                 en: 'Errormessage',
                 de: 'Fehlermeldung',
@@ -157,21 +164,18 @@ export const createObjects = async (adapter: MidasAquatemp): Promise<void> => {
                 uk: 'Помилка',
                 'zh-cn': '错误消息',
             },
-            type: 'string',
-            def: '',
-            role: 'state',
+            ...stringState,
         },
         {
-            id: `${dpRoot}.mode`,
+            id: store.getStateIdByKey('mode'),
             name: 'Modus',
-            type: 'string',
-            states: '-1:off;0:cool;1:heat;2:auto',
-            def: '',
+            type: 'number',
+            states: { '-1': 'off', 0: 'cool', 1: 'heat', 2: 'auto' },
             write: true,
             role: 'state',
         },
         {
-            id: `${dpRoot}.rotor`,
+            id: store.getStateIdByKey('rotor'),
             name: {
                 en: 'Fan speed',
                 de: 'Lüfterdrehzahl',
@@ -191,7 +195,7 @@ export const createObjects = async (adapter: MidasAquatemp): Promise<void> => {
             role: 'state',
         },
         {
-            id: `${dpRoot}.silent`,
+            id: store.getStateIdByKey('silent'),
             name: {
                 en: 'Silent',
                 de: 'Silent',
@@ -205,13 +209,11 @@ export const createObjects = async (adapter: MidasAquatemp): Promise<void> => {
                 uk: 'Сидіння',
                 'zh-cn': '安静',
             },
-            type: 'boolean',
-            role: 'state',
-            def: false,
+            ...booleanState,
             write: true,
         },
         {
-            id: `${dpRoot}.state`,
+            id: store.getStateIdByKey('state'),
             name: {
                 en: 'Status',
                 de: 'Status',
@@ -225,12 +227,11 @@ export const createObjects = async (adapter: MidasAquatemp): Promise<void> => {
                 uk: 'Статус на сервери',
                 'zh-cn': '状态',
             },
-            type: 'boolean',
-            role: 'state',
-            def: false,
+            ...booleanState,
+            write: true,
         },
         {
-            id: `${dpRoot}.tempIn`,
+            id: store.getStateIdByKey('tempIn'),
             name: {
                 en: 'Input temperature',
                 de: 'Eingangstemperatur',
@@ -244,12 +245,10 @@ export const createObjects = async (adapter: MidasAquatemp): Promise<void> => {
                 uk: 'Температура введення',
                 'zh-cn': '输入温度',
             },
-            type: 'number',
-            unit: '°C',
-            role: 'value.temperature',
+            ...tempState,
         },
         {
-            id: `${dpRoot}.tempOut`,
+            id: store.getStateIdByKey('tempOut'),
             name: {
                 en: 'Output temperature',
                 de: 'Ausgangstemperatur',
@@ -263,12 +262,10 @@ export const createObjects = async (adapter: MidasAquatemp): Promise<void> => {
                 uk: 'Температура виходу',
                 'zh-cn': '输出温度',
             },
-            type: 'number',
-            unit: '°C',
-            role: 'value.temperature',
+            ...tempState,
         },
         {
-            id: `${dpRoot}.tempSet`,
+            id: store.getStateIdByKey('tempSet'),
             name: {
                 en: 'Should temperature',
                 de: 'Solltemperatur',
@@ -282,13 +279,11 @@ export const createObjects = async (adapter: MidasAquatemp): Promise<void> => {
                 uk: 'Температура',
                 'zh-cn': '应否温度',
             },
-            type: 'number',
-            unit: '°C',
+            ...tempState,
             write: true,
-            role: 'value.temperature',
         },
         {
-            id: `${dpRoot}.suctionTemp`,
+            id: store.getStateIdByKey('suctionTemp'),
             name: {
                 en: 'Air intake temperature',
                 de: 'Lufteintrittstemperatur',
@@ -302,12 +297,10 @@ export const createObjects = async (adapter: MidasAquatemp): Promise<void> => {
                 uk: 'Температура забору повітря',
                 'zh-cn': '空气摄入温度',
             },
-            type: 'number',
-            unit: '°C',
-            role: 'value.temperature',
+            ...tempState,
         },
         {
-            id: `${dpRoot}.coilTemp`,
+            id: store.getStateIdByKey('coilTemp'),
             name: {
                 en: 'Compressor temperature',
                 de: 'Kompressortemperatur',
@@ -321,12 +314,10 @@ export const createObjects = async (adapter: MidasAquatemp): Promise<void> => {
                 uk: 'Температура компресора',
                 'zh-cn': '压缩器温度',
             },
-            type: 'number',
-            unit: '°C',
-            role: 'value.temperature',
+            ...tempState,
         },
         {
-            id: `${dpRoot}.exhaust`,
+            id: store.getStateIdByKey('exhaust'),
             name: {
                 en: 'Compressor output',
                 de: 'Kompressorausgang',
@@ -340,12 +331,10 @@ export const createObjects = async (adapter: MidasAquatemp): Promise<void> => {
                 uk: 'Компресори',
                 'zh-cn': '压缩器输出',
             },
-            type: 'number',
-            unit: '°C',
-            role: 'value.temperature',
+            ...tempState,
         },
         {
-            id: `${dpRoot}.ProductCode`,
+            id: store.getStateIdByKey('ProductCode'),
             name: {
                 en: 'Productcode',
                 de: 'Produktcode',
@@ -359,11 +348,10 @@ export const createObjects = async (adapter: MidasAquatemp): Promise<void> => {
                 uk: 'Код товару',
                 'zh-cn': '产品代码',
             },
-            type: 'string',
-            role: 'state',
+            ...stringState,
         },
         {
-            id: `${dpRoot}.DeviceCode`,
+            id: store.getStateIdByKey('DeviceCode'),
             name: {
                 en: 'Device ID',
                 de: 'Geräte ID',
@@ -377,11 +365,10 @@ export const createObjects = async (adapter: MidasAquatemp): Promise<void> => {
                 uk: 'Код пристрою',
                 'zh-cn': '设备标识',
             },
-            type: 'string',
-            role: 'state',
+            ...stringState,
         },
         {
-            id: `${dpRoot}.rawJSON`,
+            id: store.getStateIdByKey('rawJSON'),
             name: {
                 en: 'JSON',
                 de: 'JSON',
@@ -399,7 +386,7 @@ export const createObjects = async (adapter: MidasAquatemp): Promise<void> => {
             role: 'state',
         },
         {
-            id: `${dpRoot}.flowSwitch`,
+            id: store.getStateIdByKey('flowSwitch'),
             name: {
                 en: 'Flow switch',
                 de: 'Strömungsschalter',
@@ -413,21 +400,16 @@ export const createObjects = async (adapter: MidasAquatemp): Promise<void> => {
                 uk: 'Перемикач потоку',
                 'zh-cn': '流程切换',
             },
-            type: 'boolean',
-            role: 'state',
+            ...booleanState,
         },
     ];
 
-    try {
-        for (const { id, name, role, unit, type, def, write } of objects) {
-            adapter.log.debug(`Create object: ${id}`);
-            await adapter.setObjectNotExistsAsync(id, {
-                type: 'state',
-                common: { read: true, write: write || false, type: type, unit, role, name, def },
-                native: {},
-            });
-        }
-    } catch (error: any) {
-        errorLogger('Error in createObjects', error, adapter);
+    for (const { id, name, role, unit, type, def, write = false, states } of objects) {
+        logger.debug(`Create object: ${id}`);
+        await adapter.extendObject(id, {
+            type: 'state',
+            common: { read: true, write, type, unit, role, name, def, states },
+            native: {},
+        });
     }
 };

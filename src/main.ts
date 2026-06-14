@@ -4,27 +4,26 @@
 
 // The adapter-core module gives you access to the core ioBroker functions
 // you need to create an
-import { initStore } from './lib/store';
-
+import type { TMode } from './lib/store';
+import { Store } from './lib/store';
 import * as utils from '@iobroker/adapter-core';
 import { createObjects } from './lib/createState';
-import { encryptPassword } from './lib/encryptPassword';
-import { setupEndpoints } from './lib/endPoints';
-import { saveValue } from './lib/saveValue';
-
-import { ensureToken, updateToken } from './lib/token';
-
-import { updateDevicePower } from './lib/updateDevicePower';
-import { updateDeviceSetTemp } from './lib/updateDeviceSetTemp';
-import { updateDeviceSilent } from './lib/updateDeviceSilent';
-import { isStateValue } from './lib/utils';
-import { errorLogger } from './lib/logging';
-
-let updateInterval: ioBroker.Interval | undefined;
-let tokenRefreshTimer: ioBroker.Interval | undefined;
+import { isDefined, isStateValue, isRelevantStateId, resolveOnOffMode } from './lib/utils';
+import { DeviceController } from './lib/deviceController';
+import { TokenManager } from './lib/tokenManager';
+import { ApiClient, ResetError } from './lib/apiClient';
 
 export class MidasAquatemp extends utils.Adapter {
     private static instance: MidasAquatemp;
+    private static tokenRefreshIntervalTime = 3600000;
+    private updateInterval?: ioBroker.Interval;
+    private tokenRefreshInterval?: ioBroker.Interval;
+    private interval: number = 60;
+    private store!: Store;
+    private silentId!: string;
+    private stateId!: string;
+    private tempSetId!: string;
+    private modeId!: string;
 
     public constructor(options: Partial<utils.AdapterOptions> = {}) {
         super({
@@ -35,126 +34,123 @@ export class MidasAquatemp extends utils.Adapter {
         this.on('unload', this.onUnload.bind(this));
         MidasAquatemp.instance = this;
     }
+
     public static getInstance(): MidasAquatemp {
         return MidasAquatemp.instance;
     }
 
     private async onReady(): Promise<void> {
-        const store = initStore();
-        const adapter = this;
-        store.adapter = this;
-        store.instance = this.instance;
-
-        const dpRoot = store.getDpRoot();
         await this.setState('info.connection', false, true);
-
-        store.username = this.config.username;
-        const password = this.config.password;
-        store.interval = this.config.refresh;
-        store.apiLevel = this.config.selectApi;
-        if (this.config.useDeviceMac) {
-            store.device = this.config.deviceMac;
+        if (!isDefined(this.instance)) {
+            this.log.error('No instance found.');
+            return;
         }
-
-        store.useDeviceMac = this.config.useDeviceMac;
-        this.log.debug(`API-Level: ${this.config.selectApi}`);
-
-        setupEndpoints();
-
-        encryptPassword(password);
-        await createObjects(adapter);
-        this.log.info('Objects created');
-        await clearValues();
-        await updateToken(adapter);
-
-        async function clearValues(): Promise<void> {
-            await saveValue({ key: 'error', value: true, stateType: 'boolean', adapter });
-            await saveValue({ key: 'consumption', value: 0, stateType: 'number', adapter });
-            await saveValue({ key: 'state', value: false, stateType: 'boolean', adapter });
-            await saveValue({ key: 'rawJSON', value: null, stateType: 'string', adapter });
+        const { username, password, selectApi, useDeviceMac, deviceMac, refresh } = this.config;
+        this.interval = refresh ?? this.interval;
+        if (username === '' || password === '' || password === undefined) {
+            this.log.error('Empty Username or Password.');
+            return;
         }
-
-        updateInterval = this.setInterval(async () => {
-            try {
-                await updateToken(adapter);
-                const mode = await this.getStateAsync(`${dpRoot}.mode`);
-
-                if (!mode?.ack && mode?.val && store.device) {
-                    await updateDevicePower(adapter, store.device, mode.val as number);
-                }
-
-                const silent = await this.getStateAsync(`${dpRoot}.silent`);
-                if (!silent?.ack && isStateValue(silent) && store.device) {
-                    await updateDeviceSilent(adapter, store.device, !!silent?.val);
-                }
-            } catch (error: any) {
-                errorLogger('Error in updateInterval', error, adapter);
+        this.store = new Store(this, username, password, this.instance, selectApi, useDeviceMac, deviceMac);
+        this.setIds();
+        const apiClient = new ApiClient(this.store);
+        const tokenManager = new TokenManager(this.store, apiClient);
+        const deviceController = new DeviceController(this.store, tokenManager, apiClient);
+        try {
+            tokenManager.setDeviceController(deviceController);
+            const currentMode = parseInt(String((await this.getStateAsync(this.modeId))?.val));
+            if (this.store.isValidMode(currentMode)) {
+                this.store.setMode(currentMode);
             }
-        }, store.interval * 1000);
 
-        tokenRefreshTimer = this.setInterval(async function () {
-            store.token = '';
-            await updateToken(adapter);
-        }, 3600000);
+            this.log.info(`API level: ${this.config.selectApi}, refresh interval: ${this.interval}s`);
 
-        this.on('stateChange', async (id, state) => {
-            try {
-                if (!state || state.ack) {
-                    return;
-                }
+            await createObjects(this.store);
+            this.log.info('Objects created');
 
-                const isRelevantId = id === `${dpRoot}.mode` || id === `${dpRoot}.silent` || id === `${dpRoot}.tempSet`;
+            await this.store.clearStateValues();
+            await tokenManager.updateTokenAndDeviceId();
 
-                if (!isRelevantId || !store.device) {
-                    return;
-                }
-                await ensureToken(adapter);
+            this.updateInterval = this.setInterval(async function () {
+                await tokenManager.updateTokenAndDeviceId();
+            }, this.interval * 1000);
 
-                if (id === `${dpRoot}.mode`) {
-                    this.log.debug(`Mode: ${JSON.stringify(state)}`);
+            this.tokenRefreshInterval = this.setInterval(async function () {
+                tokenManager.resetToken();
+                await tokenManager.updateTokenAndDeviceId();
+            }, MidasAquatemp.tokenRefreshIntervalTime);
 
-                    if (!isStateValue(state)) {
-                        this.log.warn(`Ignoring invalid mode state payload for ${id}: ${JSON.stringify(state)}`);
+            this.on('stateChange', async (id, state) => {
+                try {
+                    if (!state || state.ack) {
                         return;
                     }
 
-                    const mode = Number(state.val);
-                    const allowedModes = new Set([-1, 0, 1, 2]);
-                    if (!Number.isFinite(mode) || !Number.isInteger(mode) || !allowedModes.has(mode)) {
-                        this.log.warn(
-                            `Ignoring unsupported mode value for ${id}: ${JSON.stringify(state.val)} (allowed: -1, 0, 1, 2)`,
-                        );
+                    if (!this.isRelevant(id)) {
                         return;
                     }
 
-                    await updateDevicePower(adapter, store.device, mode);
-                    await this.setState(id, { ack: true });
-                }
+                    await tokenManager.ensureValidToken();
 
-                if (id === `${dpRoot}.silent`) {
-                    this.log.debug(`Silent: ${JSON.stringify(state)}`);
+                    if (id === this.modeId) {
+                        this.log.debug(`Mode: ${JSON.stringify(state)}`);
 
-                    if (isStateValue(state)) {
-                        await updateDeviceSilent(adapter, store.device, state.val as boolean);
+                        if (!isStateValue(state)) {
+                            this.log.warn(`Ignoring invalid mode state payload for ${id}: ${JSON.stringify(state)}`);
+                            return;
+                        }
+
+                        const mode = Number(state.val);
+
+                        if (!this.store.isValidMode(mode)) {
+                            this.log.warn(
+                                `Ignoring unsupported mode value for ${id}: ${JSON.stringify(state.val)} (allowed: -1, 0, 1, 2)`,
+                            );
+                            return;
+                        }
+
+                        await deviceController.updateDevicePower(mode);
+
+                        await this.setState(id, { ack: true });
+                    } else if (id === this.silentId) {
+                        this.log.debug(`Silent: ${JSON.stringify(state)}`);
+
+                        if (isStateValue(state)) {
+                            await deviceController.updateDeviceSilent(state.val as boolean);
+                        }
+                        await this.setState(id, { ack: true });
+                    } else if (id === this.tempSetId) {
+                        this.log.debug(`TempSet: ${JSON.stringify(state)}`);
+                        if (isStateValue(state)) {
+                            await deviceController.updateDeviceSetTemp(state.val as number);
+                        }
+                        await this.setState(id, { ack: true });
+                    } else if (id === this.stateId) {
+                        this.log.debug(`State: ${JSON.stringify(state)}`);
+                        await deviceController.updateDevicePower(this.getMode(state));
+                        await this.setState(id, { ack: true });
                     }
-                    await this.setState(id, { ack: true });
-                }
-
-                if (id === `${dpRoot}.tempSet`) {
-                    this.log.debug(`TempSet: ${JSON.stringify(state)}`);
-                    if (isStateValue(state)) {
-                        await updateDeviceSetTemp(adapter, store.device, state.val as number);
+                } catch (error) {
+                    if (error instanceof ResetError) {
+                        await this.store.resetAndHandleErrorWithSentry(`Error in stateChange (${id})`, error);
+                        return;
                     }
-                    await this.setState(id, { ack: true });
+                    this.store.logger.errorHandler(`Error in stateChange (${id})`, error);
                 }
-            } catch (error: any) {
-                errorLogger(`Error in stateChange for ${id}`, error, adapter);
-            }
-        });
+            });
+            await Promise.all([
+                this.subscribeStatesAsync(this.store.getStateIdByKey('mode')),
+                this.subscribeStatesAsync(this.store.getStateIdByKey('silent')),
+                this.subscribeStatesAsync(this.store.getStateIdByKey('tempSet')),
+                this.subscribeStatesAsync(this.store.getStateIdByKey('state')),
+            ]);
+        } catch (error) {
+            this.store.logger.errorHandler(`Error in onReady`, error);
+        }
+    }
 
-        await this.subscribeStatesAsync(`${dpRoot}.mode`);
-        await this.subscribeStatesAsync(`${dpRoot}.silent`);
-        await this.subscribeStatesAsync(`${dpRoot}.tempSet`);
+    private getMode(state: ioBroker.State): TMode {
+        return resolveOnOffMode(state.val, this.store.getMode());
     }
 
     /**
@@ -164,14 +160,25 @@ export class MidasAquatemp extends utils.Adapter {
      */
     private onUnload(callback: () => void): void {
         try {
-            this.clearInterval(updateInterval);
-            this.clearInterval(tokenRefreshTimer);
+            this.clearInterval(this.updateInterval);
+            this.clearInterval(this.tokenRefreshInterval);
 
             callback();
         } catch (e: any) {
             callback();
             this.log.error(`Error: ${e.message}`);
         }
+    }
+
+    private setIds(): void {
+        this.silentId = this.store.getStateIdByKey('silent');
+        this.stateId = this.store.getStateIdByKey('state');
+        this.tempSetId = this.store.getStateIdByKey('tempSet');
+        this.modeId = this.store.getStateIdByKey('mode');
+    }
+
+    private isRelevant(id: string): boolean {
+        return isRelevantStateId(id, [this.modeId, this.silentId, this.stateId, this.tempSetId], this.store.device);
     }
 }
 let adapter;

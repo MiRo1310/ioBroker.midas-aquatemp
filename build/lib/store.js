@@ -18,48 +18,117 @@ var __copyProps = (to, from, except, desc) => {
 var __toCommonJS = (mod) => __copyProps(__defProp({}, "__esModule", { value: true }), mod);
 var store_exports = {};
 __export(store_exports, {
-  initStore: () => initStore
+  Store: () => Store
 });
 module.exports = __toCommonJS(store_exports);
-var import_saveValue = require("./saveValue");
-let store;
-function initStore() {
-  if (!store) {
-    store = {
-      adapter: "",
-      token: null,
-      instance: null,
-      username: "",
-      encryptedPassword: "",
-      cloudURL: "",
-      apiLevel: 3,
-      interval: 6e4,
-      device: void 0,
-      product: void 0,
-      reachable: false,
-      useDeviceMac: false,
-      // ProductIDs:
-      // Gruppe 1:
-      // 1132174963097280512: Midas/Poolsana InverPro
-      AQUATEMP_POOLSANA: "1132174963097280512",
-      // Gruppe 2:
-      // 1442284873216843776:
-      AQUATEMP_OTHER1: "1442284873216843776",
-      getDpRoot: function() {
-        return `midas-aquatemp.${this.instance}`;
-      },
-      resetOnErrorHandler: async function() {
-        this.token = null;
-        this.device = "";
-        this.reachable = false;
-        await (0, import_saveValue.saveValue)({ key: "info.connection", value: false, stateType: "boolean", adapter: this.adapter });
+var import_crypto = require("crypto");
+var import_loggingController = require("./loggingController");
+class Store {
+  constructor(adapter, username, password, instance, apiLevel, useDeviceMac, deviceMac) {
+    this.adapter = adapter;
+    this.username = username;
+    this.encryptedPassword = this.encryptPassword(password);
+    this.instance = instance;
+    this.apiLevel = apiLevel != null ? apiLevel : this.apiLevel;
+    this.useDeviceMac = useDeviceMac != null ? useDeviceMac : this.useDeviceMac;
+    if (useDeviceMac) {
+      this.device = deviceMac != null ? deviceMac : this.device;
+    }
+    this.setupEndpoints();
+    this.logger = new import_loggingController.Logger(this.adapter);
+  }
+  static modes = [-1, 0, 1, 2];
+  instance;
+  apiLevel = 3;
+  useDeviceMac = false;
+  encryptedPassword;
+  cloudURL = null;
+  device;
+  product;
+  isOnline = false;
+  mode = 2;
+  logger;
+  tokenManager;
+  setTokenManager(tokenManager) {
+    this.tokenManager = tokenManager;
+  }
+  getDpRoot() {
+    return `midas-aquatemp.${this.instance}`;
+  }
+  async resetOnError() {
+    var _a;
+    (_a = this.tokenManager) == null ? void 0 : _a.resetToken();
+    this.device = "";
+    this.isOnline = false;
+    await this.saveValue("info.connection", false);
+  }
+  async resetDeviceOnly() {
+    this.device = "";
+    this.isOnline = false;
+    await this.saveValue("info.connection", false);
+  }
+  async resetAndHandleErrorWithSentry(title, e) {
+    await this.resetOnError();
+    this.logger.errorHandler(title, e);
+  }
+  setMode(mode) {
+    this.mode = mode;
+  }
+  getMode() {
+    return this.mode;
+  }
+  isValidMode(curr) {
+    return Store.modes.includes(curr);
+  }
+  async saveValue(key, value) {
+    await this.adapter.setState(this.getStateIdByKey(key), value != null ? value : null, true);
+  }
+  getStateIdByKey(key) {
+    return `${this.getDpRoot()}.${key}`;
+  }
+  async clearStateValues() {
+    await this.saveValue("error", true);
+    await this.saveValue("consumption", 0);
+    await this.saveValue("state", false);
+    await this.saveValue("rawJSON", null);
+  }
+  getSUrl() {
+    return this.apiLevel < 3 ? `${this.cloudURL}/app/device/control.json` : `${this.cloudURL}/app/device/control`;
+  }
+  getSUrlUpdateDeviceId() {
+    return this.apiLevel < 3 ? `${this.cloudURL}/app/device/getDataByCode.json` : `${this.cloudURL}/app/device/getDataByCode`;
+  }
+  getOptionsAndSUrl() {
+    const options = { password: this.encryptedPassword, type: "2" };
+    return this.apiLevel < 3 ? {
+      sUrl: `${this.cloudURL}/app/user/login.json`,
+      options: {
+        user_name: this.username,
+        ...options
+      }
+    } : {
+      sUrl: `${this.cloudURL}/app/user/login`,
+      options: {
+        userName: this.username,
+        ...options
       }
     };
   }
-  return store;
+  getUpdateDeviceStatusSUrl() {
+    return this.apiLevel < 3 ? `${this.cloudURL}/app/device/getDeviceStatus.json` : `${this.cloudURL}/app/device/getDeviceStatus`;
+  }
+  getUpdateDeviceIdSUrl() {
+    return this.apiLevel < 3 ? `${this.cloudURL}/app/device/deviceList.json` : `${this.cloudURL}/app/device/deviceList`;
+  }
+  encryptPassword(password) {
+    return (0, import_crypto.createHash)("md5").update(password).digest("hex");
+  }
+  setupEndpoints() {
+    this.cloudURL = this.apiLevel == 3 ? "https://cloud.linked-go.com:449/crmservice/api" : "https://cloud.linked-go.com/cloudservice/api";
+  }
 }
 // Annotate the CommonJS export names for ESM import in node:
 0 && (module.exports = {
-  initStore
+  Store
 });
 //# sourceMappingURL=store.js.map

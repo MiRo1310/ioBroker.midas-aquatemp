@@ -35,19 +35,21 @@ module.exports = __toCommonJS(main_exports);
 var import_store = require("./lib/store");
 var utils = __toESM(require("@iobroker/adapter-core"));
 var import_createState = require("./lib/createState");
-var import_encryptPassword = require("./lib/encryptPassword");
-var import_endPoints = require("./lib/endPoints");
-var import_saveValue = require("./lib/saveValue");
-var import_token = require("./lib/token");
-var import_updateDevicePower = require("./lib/updateDevicePower");
-var import_updateDeviceSetTemp = require("./lib/updateDeviceSetTemp");
-var import_updateDeviceSilent = require("./lib/updateDeviceSilent");
 var import_utils = require("./lib/utils");
-var import_logging = require("./lib/logging");
-let updateInterval;
-let tokenRefreshTimer;
+var import_deviceController = require("./lib/deviceController");
+var import_tokenManager = require("./lib/tokenManager");
+var import_apiClient = require("./lib/apiClient");
 class MidasAquatemp extends utils.Adapter {
   static instance;
+  static tokenRefreshIntervalTime = 36e5;
+  updateInterval;
+  tokenRefreshInterval;
+  interval = 60;
+  store;
+  silentId;
+  stateId;
+  tempSetId;
+  modeId;
   constructor(options = {}) {
     super({
       ...options,
@@ -61,100 +63,102 @@ class MidasAquatemp extends utils.Adapter {
     return MidasAquatemp.instance;
   }
   async onReady() {
-    const store = (0, import_store.initStore)();
-    const adapter2 = this;
-    store.adapter = this;
-    store.instance = this.instance;
-    const dpRoot = store.getDpRoot();
+    var _a;
     await this.setState("info.connection", false, true);
-    store.username = this.config.username;
-    const password = this.config.password;
-    store.interval = this.config.refresh;
-    store.apiLevel = this.config.selectApi;
-    if (this.config.useDeviceMac) {
-      store.device = this.config.deviceMac;
+    if (!(0, import_utils.isDefined)(this.instance)) {
+      this.log.error("No instance found.");
+      return;
     }
-    store.useDeviceMac = this.config.useDeviceMac;
-    this.log.debug(`API-Level: ${this.config.selectApi}`);
-    (0, import_endPoints.setupEndpoints)();
-    (0, import_encryptPassword.encryptPassword)(password);
-    await (0, import_createState.createObjects)(adapter2);
-    this.log.info("Objects created");
-    await clearValues();
-    await (0, import_token.updateToken)(adapter2);
-    async function clearValues() {
-      await (0, import_saveValue.saveValue)({ key: "error", value: true, stateType: "boolean", adapter: adapter2 });
-      await (0, import_saveValue.saveValue)({ key: "consumption", value: 0, stateType: "number", adapter: adapter2 });
-      await (0, import_saveValue.saveValue)({ key: "state", value: false, stateType: "boolean", adapter: adapter2 });
-      await (0, import_saveValue.saveValue)({ key: "rawJSON", value: null, stateType: "string", adapter: adapter2 });
+    const { username, password, selectApi, useDeviceMac, deviceMac, refresh } = this.config;
+    this.interval = refresh != null ? refresh : this.interval;
+    if (username === "" || password === "" || password === void 0) {
+      this.log.error("Empty Username or Password.");
+      return;
     }
-    updateInterval = this.setInterval(async () => {
-      try {
-        await (0, import_token.updateToken)(adapter2);
-        const mode = await this.getStateAsync(`${dpRoot}.mode`);
-        if (!(mode == null ? void 0 : mode.ack) && (mode == null ? void 0 : mode.val) && store.device) {
-          await (0, import_updateDevicePower.updateDevicePower)(adapter2, store.device, mode.val);
-        }
-        const silent = await this.getStateAsync(`${dpRoot}.silent`);
-        if (!(silent == null ? void 0 : silent.ack) && (0, import_utils.isStateValue)(silent) && store.device) {
-          await (0, import_updateDeviceSilent.updateDeviceSilent)(adapter2, store.device, !!(silent == null ? void 0 : silent.val));
-        }
-      } catch (error) {
-        (0, import_logging.errorLogger)("Error in updateInterval", error, adapter2);
+    this.store = new import_store.Store(this, username, password, this.instance, selectApi, useDeviceMac, deviceMac);
+    this.setIds();
+    const apiClient = new import_apiClient.ApiClient(this.store);
+    const tokenManager = new import_tokenManager.TokenManager(this.store, apiClient);
+    const deviceController = new import_deviceController.DeviceController(this.store, tokenManager, apiClient);
+    try {
+      tokenManager.setDeviceController(deviceController);
+      const currentMode = parseInt(String((_a = await this.getStateAsync(this.modeId)) == null ? void 0 : _a.val));
+      if (this.store.isValidMode(currentMode)) {
+        this.store.setMode(currentMode);
       }
-    }, store.interval * 1e3);
-    tokenRefreshTimer = this.setInterval(async function() {
-      store.token = "";
-      await (0, import_token.updateToken)(adapter2);
-    }, 36e5);
-    this.on("stateChange", async (id, state) => {
-      try {
-        if (!state || state.ack) {
-          return;
-        }
-        const isRelevantId = id === `${dpRoot}.mode` || id === `${dpRoot}.silent` || id === `${dpRoot}.tempSet`;
-        if (!isRelevantId || !store.device) {
-          return;
-        }
-        await (0, import_token.ensureToken)(adapter2);
-        if (id === `${dpRoot}.mode`) {
-          this.log.debug(`Mode: ${JSON.stringify(state)}`);
-          if (!(0, import_utils.isStateValue)(state)) {
-            this.log.warn(`Ignoring invalid mode state payload for ${id}: ${JSON.stringify(state)}`);
+      this.log.info(`API level: ${this.config.selectApi}, refresh interval: ${this.interval}s`);
+      await (0, import_createState.createObjects)(this.store);
+      this.log.info("Objects created");
+      await this.store.clearStateValues();
+      await tokenManager.updateTokenAndDeviceId();
+      this.updateInterval = this.setInterval(async function() {
+        await tokenManager.updateTokenAndDeviceId();
+      }, this.interval * 1e3);
+      this.tokenRefreshInterval = this.setInterval(async function() {
+        tokenManager.resetToken();
+        await tokenManager.updateTokenAndDeviceId();
+      }, MidasAquatemp.tokenRefreshIntervalTime);
+      this.on("stateChange", async (id, state) => {
+        try {
+          if (!state || state.ack) {
             return;
           }
-          const mode = Number(state.val);
-          const allowedModes = /* @__PURE__ */ new Set([-1, 0, 1, 2]);
-          if (!Number.isFinite(mode) || !Number.isInteger(mode) || !allowedModes.has(mode)) {
-            this.log.warn(
-              `Ignoring unsupported mode value for ${id}: ${JSON.stringify(state.val)} (allowed: -1, 0, 1, 2)`
-            );
+          if (!this.isRelevant(id)) {
             return;
           }
-          await (0, import_updateDevicePower.updateDevicePower)(adapter2, store.device, mode);
-          await this.setState(id, { ack: true });
-        }
-        if (id === `${dpRoot}.silent`) {
-          this.log.debug(`Silent: ${JSON.stringify(state)}`);
-          if ((0, import_utils.isStateValue)(state)) {
-            await (0, import_updateDeviceSilent.updateDeviceSilent)(adapter2, store.device, state.val);
+          await tokenManager.ensureValidToken();
+          if (id === this.modeId) {
+            this.log.debug(`Mode: ${JSON.stringify(state)}`);
+            if (!(0, import_utils.isStateValue)(state)) {
+              this.log.warn(`Ignoring invalid mode state payload for ${id}: ${JSON.stringify(state)}`);
+              return;
+            }
+            const mode = Number(state.val);
+            if (!this.store.isValidMode(mode)) {
+              this.log.warn(
+                `Ignoring unsupported mode value for ${id}: ${JSON.stringify(state.val)} (allowed: -1, 0, 1, 2)`
+              );
+              return;
+            }
+            await deviceController.updateDevicePower(mode);
+            await this.setState(id, { ack: true });
+          } else if (id === this.silentId) {
+            this.log.debug(`Silent: ${JSON.stringify(state)}`);
+            if ((0, import_utils.isStateValue)(state)) {
+              await deviceController.updateDeviceSilent(state.val);
+            }
+            await this.setState(id, { ack: true });
+          } else if (id === this.tempSetId) {
+            this.log.debug(`TempSet: ${JSON.stringify(state)}`);
+            if ((0, import_utils.isStateValue)(state)) {
+              await deviceController.updateDeviceSetTemp(state.val);
+            }
+            await this.setState(id, { ack: true });
+          } else if (id === this.stateId) {
+            this.log.debug(`State: ${JSON.stringify(state)}`);
+            await deviceController.updateDevicePower(this.getMode(state));
+            await this.setState(id, { ack: true });
           }
-          await this.setState(id, { ack: true });
-        }
-        if (id === `${dpRoot}.tempSet`) {
-          this.log.debug(`TempSet: ${JSON.stringify(state)}`);
-          if ((0, import_utils.isStateValue)(state)) {
-            await (0, import_updateDeviceSetTemp.updateDeviceSetTemp)(adapter2, store.device, state.val);
+        } catch (error) {
+          if (error instanceof import_apiClient.ResetError) {
+            await this.store.resetAndHandleErrorWithSentry(`Error in stateChange (${id})`, error);
+            return;
           }
-          await this.setState(id, { ack: true });
+          this.store.logger.errorHandler(`Error in stateChange (${id})`, error);
         }
-      } catch (error) {
-        (0, import_logging.errorLogger)(`Error in stateChange for ${id}`, error, adapter2);
-      }
-    });
-    await this.subscribeStatesAsync(`${dpRoot}.mode`);
-    await this.subscribeStatesAsync(`${dpRoot}.silent`);
-    await this.subscribeStatesAsync(`${dpRoot}.tempSet`);
+      });
+      await Promise.all([
+        this.subscribeStatesAsync(this.store.getStateIdByKey("mode")),
+        this.subscribeStatesAsync(this.store.getStateIdByKey("silent")),
+        this.subscribeStatesAsync(this.store.getStateIdByKey("tempSet")),
+        this.subscribeStatesAsync(this.store.getStateIdByKey("state"))
+      ]);
+    } catch (error) {
+      this.store.logger.errorHandler(`Error in onReady`, error);
+    }
+  }
+  getMode(state) {
+    return (0, import_utils.resolveOnOffMode)(state.val, this.store.getMode());
   }
   /**
    * Is called when adapter shuts down - callback has to be called under any circumstances!
@@ -163,13 +167,22 @@ class MidasAquatemp extends utils.Adapter {
    */
   onUnload(callback) {
     try {
-      this.clearInterval(updateInterval);
-      this.clearInterval(tokenRefreshTimer);
+      this.clearInterval(this.updateInterval);
+      this.clearInterval(this.tokenRefreshInterval);
       callback();
     } catch (e) {
       callback();
       this.log.error(`Error: ${e.message}`);
     }
+  }
+  setIds() {
+    this.silentId = this.store.getStateIdByKey("silent");
+    this.stateId = this.store.getStateIdByKey("state");
+    this.tempSetId = this.store.getStateIdByKey("tempSet");
+    this.modeId = this.store.getStateIdByKey("mode");
+  }
+  isRelevant(id) {
+    return (0, import_utils.isRelevantStateId)(id, [this.modeId, this.silentId, this.stateId, this.tempSetId], this.store.device);
   }
 }
 let adapter;

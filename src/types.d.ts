@@ -5,7 +5,7 @@ export interface CreateObjects {
     role: string;
     unit?: string;
     def?: any;
-    states?: string;
+    states?: Record<string, string>;
     write?: boolean;
 }
 
@@ -19,15 +19,4 @@ export interface AxiosUpdateDeviceParam {
     protocol_code?: string;
     protocolCode?: string;
     value: number | string;
-}
-
-export interface InputGetAxiosUpdateDevicePowerParams {
-    deviceCode: string;
-    value: number | string;
-    protocolCode: string;
-}
-
-export interface InputGetAxiosUpdateDeviceSetTempParams {
-    deviceCode: string;
-    sTemperature: string;
 }
