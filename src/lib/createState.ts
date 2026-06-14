@@ -61,6 +61,23 @@ export const createObjects = async (store: Store): Promise<void> => {
             ...booleanState,
         },
         {
+            id: store.getStateIdByKey('online'),
+            name: {
+                en: 'Online',
+                de: 'Online',
+                ru: 'Онлайн',
+                pt: 'Online',
+                nl: 'Online',
+                fr: 'En ligne',
+                it: 'Online',
+                es: 'En línea',
+                pl: 'Online',
+                uk: 'Онлайн',
+                'zh-cn': '在线',
+            },
+            ...booleanState,
+        },
+        {
             id: store.getStateIdByKey('consumption'),
             name: {
                 en: 'Power consumption',

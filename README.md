@@ -77,6 +77,7 @@ If you have problems, contact us.
 - FIX: Product-specific protocol codes for Poolsana vs. other devices
 - FIX: TLS certificate validation enabled by default; optional insecure mode via adapter config or environment variable
 - FIX: Invalid or missing sensor values are no longer written as `NaN`
+- FEAT: Add `online` state — boolean datapoint that indicates whether the device is currently reachable via the cloud API
 - CHORE: Update dependencies
 
 ### 1.2.5 (2025-08-02)
