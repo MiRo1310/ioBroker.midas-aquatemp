@@ -133,6 +133,8 @@ If you have problems, contact us.
 
 - (Miro1310) initial release
 
+[Older changelogs can be found there](CHANGELOG_OLD.md)
+
 ## License
 
 MIT License
