@@ -1,7 +1,7 @@
 import type { StateKey, Store, TMode } from './store';
 import type { DeviceDetails, DeviceStatus, MidasData, ObjectResultResponse, UpdateDeviceId } from '../types/types';
 import { CODES, PRODUCT_IDS } from './axiosParameter';
-import { findCodeVal, findValByCodeArray, parseFloatOrNull, parseIntOrNull } from './utils';
+import { findCodeVal, findValByCodeArray, isDefined, parseFloatOrNull, parseIntOrNull } from './utils';
 import type { TokenManager } from './tokenManager';
 import type { ApiClient } from './apiClient';
 import { ApiError, ResetError } from './apiClient';
@@ -261,7 +261,7 @@ export class DeviceController {
         const sTemperature = numericTemperature.toString().replace(',', '.');
         const result = await adapter.getStateAsync(this.store.getStateIdByKey('mode'));
 
-        if (!result?.val) {
+        if (!isDefined(result?.val)) {
             logger.warn(`Skipping temperature update: current mode is invalid (${result?.val})`);
             return;
         }
