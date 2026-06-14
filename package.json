@@ -19,7 +19,7 @@
         "url": "https://github.com/MiRo1310/ioBroker.midas-aquatemp.git"
     },
     "engines": {
-        "node": ">= 20"
+        "node": ">= 22"
     },
     "dependencies": {
         "@iobroker/adapter-core": "^3.4.1",
