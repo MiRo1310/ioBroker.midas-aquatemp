@@ -9,6 +9,7 @@ export type StateKey =
     | 'error'
     | 'mode'
     | 'info.connection'
+    | 'online'
     | 'errorLevel'
     | 'errorCode'
     | 'errorMessage'
@@ -76,12 +77,14 @@ export class Store {
         this.device = '';
         this.isOnline = false;
         await this.saveValue('info.connection', false);
+        await this.saveValue('online', false);
     }
 
     public async resetDeviceOnly(): Promise<void> {
         this.device = '';
         this.isOnline = false;
         await this.saveValue('info.connection', false);
+        await this.saveValue('online', false);
     }
 
     public async resetAndHandleErrorWithSentry(title: string, e: any): Promise<void> {

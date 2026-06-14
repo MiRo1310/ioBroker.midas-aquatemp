@@ -118,6 +118,8 @@ describe('Store', () => {
             expect(tokenManager.getValidTokenOrNull()).to.be.null;
             expect(storeV3.device).to.equal('');
             expect(storeV3.isOnline).to.be.false;
+            const online = await adapter.getStateAsync('midas-aquatemp.0.online');
+            expect(online?.val).to.be.false;
         });
     });
 
@@ -140,6 +142,8 @@ describe('Store', () => {
             expect(tokenManager.getValidTokenOrNull()).to.equal('some-token');
             expect(storeV3.device).to.equal('');
             expect(storeV3.isOnline).to.be.false;
+            const online = await adapter.getStateAsync('midas-aquatemp.0.online');
+            expect(online?.val).to.be.false;
         });
     });
 

@@ -81,6 +81,23 @@ const createObjects = async (store) => {
       ...booleanState
     },
     {
+      id: store.getStateIdByKey("online"),
+      name: {
+        en: "Online",
+        de: "Online",
+        ru: "\u041E\u043D\u043B\u0430\u0439\u043D",
+        pt: "Online",
+        nl: "Online",
+        fr: "En ligne",
+        it: "Online",
+        es: "En l\xEDnea",
+        pl: "Online",
+        uk: "\u041E\u043D\u043B\u0430\u0439\u043D",
+        "zh-cn": "\u5728\u7EBF"
+      },
+      ...booleanState
+    },
+    {
       id: store.getStateIdByKey("consumption"),
       name: {
         en: "Power consumption",

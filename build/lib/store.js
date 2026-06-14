@@ -61,11 +61,13 @@ class Store {
     this.device = "";
     this.isOnline = false;
     await this.saveValue("info.connection", false);
+    await this.saveValue("online", false);
   }
   async resetDeviceOnly() {
     this.device = "";
     this.isOnline = false;
     await this.saveValue("info.connection", false);
+    await this.saveValue("online", false);
   }
   async resetAndHandleErrorWithSentry(title, e) {
     await this.resetOnError();

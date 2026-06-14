@@ -34,6 +34,7 @@ export class DeviceController {
         const isOnline = this.isOnline(data);
         this.store.isOnline = isOnline;
         await this.store.saveValue('info.connection', isOnline);
+        await this.store.saveValue('online', isOnline);
 
         if (!isOnline) {
             this.store.logger.warn('Device is offline');
@@ -118,6 +119,7 @@ export class DeviceController {
             await this.store.saveValue('state', powerOn);
             await this.store.saveValue('mode', powerOn && mode ? parseInt(mode) : -1);
             await this.store.saveValue('info.connection', true);
+            await this.store.saveValue('online', true);
         } catch (error) {
             throw new ResetError('Error updateDeviceDetails', {
                 cause: error,
@@ -193,6 +195,7 @@ export class DeviceController {
                 return;
             }
             await this.store.saveValue('info.connection', true);
+            await this.store.saveValue('online', true);
             if (deviceCode != '' && productId) {
                 await this.updateDeviceStatus();
             }
