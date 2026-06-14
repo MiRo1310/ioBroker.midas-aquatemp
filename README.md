@@ -23,15 +23,15 @@ starts with js-controller 3.0.
 
 ### Configuration
 
-| Field | Description |
-|---|---|
-| **Username** | Your Linked-Go cloud account e-mail address. It is strongly recommended to create a dedicated second account for the adapter, as simultaneous logins from other apps may cause conflicts. |
-| **Password** | Password for the Linked-Go cloud account. |
-| **Refresh interval** | How often the adapter polls the device for new data, in seconds. Minimum is 60 seconds. |
-| **API Level** | The cloud API version used to communicate with the device. Start with **API 3** (default). If your device is not found or data is missing, try API 2 or API 1 instead. |
-| **Device MAC** | MAC address of the device as shown in the Linked-Go app. Only required when **Use Device Mac** is enabled. |
-| **Use Device Mac** | If enabled, the adapter skips the automatic device discovery and connects directly using the MAC address above. Use this if the device cannot be found via the normal device list. Note: the `flowSwitch` state may not be available in this mode on all devices. |
-| **Allow insecure TLS** | Disables TLS certificate verification. **For troubleshooting only — not recommended for normal use.** |
+| Field                  | Description                                                                                                                                                                                                                                                       |
+|------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| **Username**           | Your Linked-Go cloud account e-mail address. It is strongly recommended to create a dedicated second account for the adapter, as simultaneous logins from other apps may cause conflicts.                                                                         |
+| **Password**           | Password for the Linked-Go cloud account.                                                                                                                                                                                                                         |
+| **Refresh interval**   | How often the adapter polls the device for new data, in seconds. Minimum is 60 seconds.                                                                                                                                                                           |
+| **API Level**          | The cloud API version used to communicate with the device. Start with **API 3** (default). If your device is not found or data is missing, try API 2 or API 1 instead.                                                                                            |
+| **Device MAC**         | MAC address of the device as shown in the Linked-Go app. Only required when **Use Device Mac** is enabled.                                                                                                                                                        |
+| **Use Device Mac**     | If enabled, the adapter skips the automatic device discovery and connects directly using the MAC address above. Use this if the device cannot be found via the normal device list. Note: the `flowSwitch` state may not be available in this mode on all devices. |
+| **Allow insecure TLS** | Disables TLS certificate verification. **For troubleshooting only — not recommended for normal use.**                                                                                                                                                             |
 
 ### TLS notes
 
@@ -50,9 +50,11 @@ When insecure mode is active, the adapter logs a warning on startup.
 ### Supported devices
 
 The following devices are confirmed to work with this adapter.
-Other [Midas](https://www.midas-gmbh.de/) / Poolsana devices that use the Linked-Go cloud API may also be compatible, but this cannot be guaranteed.
+Other [Midas](https://www.midas-gmbh.de/) / Poolsana devices that use the Linked-Go cloud API may also be compatible,
+but this cannot be guaranteed.
 
-If your device is not listed and you have successfully used it with this adapter, feel free to open an issue or pull request to add it.
+If your device is not listed and you have successfully used it with this adapter, feel free to open an issue or pull
+request to add it.
 
 **Confirmed working:**
 
@@ -72,12 +74,14 @@ If you have problems, contact us.
 ### **WORK IN PROGRESS**
 
 - FIX: Compatibility with the updated Linked-Go cloud API (API level 3 with new endpoint paths and camelCase parameters)
-- FIX: Device discovery now tries both `deviceList` payload formats (default and legacy) to ensure devices are found regardless of API behaviour
+- FIX: Device discovery now tries both `deviceList` payload formats (default and legacy) to ensure devices are found
+  regardless of API behaviour
 - FIX: Numerous control and polling issues (mode, silent mode, set temperature, fault detection)
 - FIX: Product-specific protocol codes for Poolsana vs. other devices
 - FIX: TLS certificate validation enabled by default; optional insecure mode via adapter config or environment variable
 - FIX: Invalid or missing sensor values are no longer written as `NaN`
-- FEAT: Add `online` state — boolean datapoint that indicates whether the device is currently reachable via the cloud API
+- FEAT: Add `online` state — boolean datapoint that indicates whether the device is currently reachable via the cloud
+  API
 - CHORE: Update dependencies
 
 ### 1.2.5 (2025-08-02)
@@ -133,7 +137,7 @@ If you have problems, contact us.
 
 MIT License
 
-Copyright (c) 2024-2026 Miro1310 <michael.roling@gmx.de>
+Copyright (c) 2024-2026 MiRo1310 <michael.roling@gmx.de>
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
