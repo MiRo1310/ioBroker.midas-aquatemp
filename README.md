@@ -21,29 +21,31 @@ starts with js-controller 3.0.
 
 ## Documentation
 
-- Please create a second account only to use this with this adapter.
-- Than add username and password in the adapter ui.
-- Choose your api-level
+### Configuration
 
-If this don´t work you can add the device mac, which you can find in the app and check use device mac. This skips a part
-of the code, but should still work, maybe with a few limitations.
-
-- flowSwitch does not work for all devices
+| Field | Description |
+|---|---|
+| **Username** | Your Linked-Go cloud account e-mail address. It is strongly recommended to create a dedicated second account for the adapter, as simultaneous logins from other apps may cause conflicts. |
+| **Password** | Password for the Linked-Go cloud account. |
+| **Refresh interval** | How often the adapter polls the device for new data, in seconds. Minimum is 60 seconds. |
+| **API Level** | The cloud API version used to communicate with the device. Start with **API 3** (default). If your device is not found or data is missing, try API 2 or API 1 instead. |
+| **Device MAC** | MAC address of the device as shown in the Linked-Go app. Only required when **Use Device Mac** is enabled. |
+| **Use Device Mac** | If enabled, the adapter skips the automatic device discovery and connects directly using the MAC address above. Use this if the device cannot be found via the normal device list. Note: the `flowSwitch` state may not be available in this mode on all devices. |
+| **Allow insecure TLS** | Disables TLS certificate verification. **For troubleshooting only — not recommended for normal use.** |
 
 ### TLS notes
 
 TLS certificate validation is enabled by default.
 
-For troubleshooting only, insecure TLS mode can be enabled via:
+For troubleshooting only, insecure TLS mode can also be enabled via environment variable:
 
-- adapter setting: `Allow insecure TLS (not recommended)`
-- environment variable: `MIDAS_AQUATEMP_INSECURE_TLS=true`
+- `MIDAS_AQUATEMP_INSECURE_TLS=true`
 
-Optional host allowlist for insecure mode:
+Optional host allowlist to restrict insecure mode to specific hosts:
 
 - `MIDAS_AQUATEMP_INSECURE_TLS_HOSTS=host1,host2`
 
-When insecure mode is active, the adapter logs a warning.
+When insecure mode is active, the adapter logs a warning on startup.
 
 ### Supported devices
 
@@ -69,20 +71,13 @@ If you have problems, contact us.
 
 ### **WORK IN PROGRESS**
 
-- FIX: Cloud API compatibility after linked-go changes (API level 3)
-- FIX: Correct `deviceList` request payload (`productIds` no longer nested in `body`)
-- FIX: `getDeviceStatus` fault detection (`is_fault` read from object, not array)
-- FIX: TLS validation enabled by default; optional insecure mode via config/env with warning
-- FIX: Mode control uses protocol code `Mode` instead of `mode`
-- FIX: Silent mode polling called `updateDevicePower` instead of `updateDeviceSilent`
+- FIX: Compatibility with the updated Linked-Go cloud API (API level 3 with new endpoint paths and camelCase parameters)
+- FIX: Device discovery now tries both `deviceList` payload formats (default and legacy) to ensure devices are found regardless of API behaviour
+- FIX: Numerous control and polling issues (mode, silent mode, set temperature, fault detection)
 - FIX: Product-specific protocol codes for Poolsana vs. other devices
-- FIX: Temperature and consumption values only updated when device is powered on
-- FIX: Set temperature fallback (`Set_Temp`, `R02`, `R03`, `R01`)
-- FIX: Invalid numeric values are no longer written as `NaN`
-- FIX: API responses with `error_code` other than `0` are treated as errors
-- FIX: Token refresh before control commands (`ensureToken`)
+- FIX: TLS certificate validation enabled by default; optional insecure mode via adapter config or environment variable
+- FIX: Invalid or missing sensor values are no longer written as `NaN`
 - CHORE: Update dependencies
-- FIX: Value formatting and value filtering
 
 ### 1.2.5 (2025-08-02)
 
