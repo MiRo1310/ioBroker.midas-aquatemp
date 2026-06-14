@@ -21,7 +21,7 @@ __export(store_exports, {
   Store: () => Store
 });
 module.exports = __toCommonJS(store_exports);
-var import_crypto = require("crypto");
+var import_node_crypto = require("node:crypto");
 var import_loggingController = require("./loggingController");
 class Store {
   constructor(adapter, username, password, instance, apiLevel, useDeviceMac, deviceMac) {
@@ -123,7 +123,7 @@ class Store {
     return this.apiLevel < 3 ? `${this.cloudURL}/app/device/deviceList.json` : `${this.cloudURL}/app/device/deviceList`;
   }
   encryptPassword(password) {
-    return (0, import_crypto.createHash)("md5").update(password).digest("hex");
+    return (0, import_node_crypto.createHash)("md5").update(password).digest("hex");
   }
   setupEndpoints() {
     this.cloudURL = this.apiLevel == 3 ? "https://cloud.linked-go.com:449/crmservice/api" : "https://cloud.linked-go.com/cloudservice/api";

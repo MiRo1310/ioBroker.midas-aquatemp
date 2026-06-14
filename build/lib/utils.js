@@ -53,7 +53,7 @@ function resolveOnOffMode(stateVal, storedMode) {
     return -1;
   }
   const currentMode = parseInt(String(storedMode));
-  return currentMode >= 0 ? currentMode : 0;
+  return currentMode >= 0 ? currentMode : 1;
 }
 function isRelevantStateId(id, knownIds, device) {
   return knownIds.includes(id) && !!device;

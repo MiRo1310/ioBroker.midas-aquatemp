@@ -34,7 +34,7 @@ __export(apiClient_exports, {
 });
 module.exports = __toCommonJS(apiClient_exports);
 var import_axios = __toESM(require("axios"));
-var import_https = __toESM(require("https"));
+var import_node_https = __toESM(require("node:https"));
 class ApiError extends Error {
   constructor(errorCode, url) {
     super(`API error ${errorCode} for ${url}`);
@@ -55,32 +55,13 @@ class ApiClient {
   constructor(store) {
     this.store = store;
   }
-  static insecureHttpsAgent = new import_https.default.Agent({ rejectUnauthorized: false });
+  static insecureHttpsAgent = new import_node_https.default.Agent({ rejectUnauthorized: false });
   insecureTlsWarningShown = false;
-  parseBooleanEnv(value) {
-    return value === "1" || value === "true" || value === "yes" || value === "on";
-  }
-  getInsecureTlsHostAllowlist() {
-    var _a;
-    return ((_a = process.env.MIDAS_AQUATEMP_INSECURE_TLS_HOSTS) != null ? _a : "").split(",").map((host) => host.trim().toLowerCase()).filter(Boolean);
-  }
   isInsecureTlsEnabled() {
-    return this.store.adapter.config.allowInsecureTls === true || this.parseBooleanEnv(process.env.MIDAS_AQUATEMP_INSECURE_TLS);
+    return this.store.adapter.config.allowInsecureTls === true;
   }
-  canUseInsecureTlsForUrl(url) {
-    const allowlist = this.getInsecureTlsHostAllowlist();
-    if (allowlist.length === 0) {
-      return true;
-    }
-    try {
-      const { hostname } = new URL(url);
-      return allowlist.includes(hostname.toLowerCase());
-    } catch {
-      return false;
-    }
-  }
-  getHttpsAgent(url) {
-    if (!this.isInsecureTlsEnabled() || !this.canUseInsecureTlsForUrl(url)) {
+  getHttpsAgent() {
+    if (!this.isInsecureTlsEnabled()) {
       return;
     }
     if (!this.insecureTlsWarningShown) {
@@ -99,7 +80,7 @@ class ApiClient {
         "Content-Type": "application/json",
         ...tokenHeader
       },
-      httpsAgent: this.getHttpsAgent(url)
+      httpsAgent: this.getHttpsAgent()
     });
     if (result.status !== 200) {
       throw new Error(`HTTP error ${result.status} for ${url}`);

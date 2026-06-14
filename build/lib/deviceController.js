@@ -241,7 +241,7 @@ class DeviceController {
     }
     const sTemperature = numericTemperature.toString().replace(",", ".");
     const result = await adapter.getStateAsync(this.store.getStateIdByKey("mode"));
-    if (!(result == null ? void 0 : result.val)) {
+    if (!(0, import_utils.isDefined)(result == null ? void 0 : result.val)) {
       logger.warn(`Skipping temperature update: current mode is invalid (${result == null ? void 0 : result.val})`);
       return;
     }

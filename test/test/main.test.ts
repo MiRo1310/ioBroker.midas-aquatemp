@@ -44,7 +44,7 @@ describe('MidasAquatemp', () => {
         });
 
         it('falls back to 0 (kühlen) when device is turned on but stored mode is -1', () => {
-            expect(resolveOnOffMode(true, -1)).to.equal(0);
+            expect(resolveOnOffMode(true, -1)).to.equal(1);
         });
     });
 });

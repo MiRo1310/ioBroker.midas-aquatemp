@@ -30,7 +30,7 @@ export function resolveOnOffMode(stateVal: unknown, storedMode: TMode): TMode {
         return -1;
     }
     const currentMode = parseInt(String(storedMode));
-    return currentMode >= 0 ? (currentMode as TMode) : 0;
+    return currentMode >= 0 ? (currentMode as TMode) : 1;
 }
 
 export function isRelevantStateId(id: string, knownIds: string[], device?: string): boolean {
