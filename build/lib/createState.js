@@ -207,6 +207,7 @@ const createObjects = async (store) => {
       id: store.getStateIdByKey("mode"),
       name: "Modus",
       type: "number",
+      def: -1,
       states: { "-1": "off", 0: "cool", 1: "heat", 2: "auto" },
       write: true,
       role: "state"
@@ -317,6 +318,7 @@ const createObjects = async (store) => {
         "zh-cn": "\u5E94\u5426\u6E29\u5EA6"
       },
       ...tempState,
+      role: "level.temperature",
       write: true
     },
     {
@@ -419,8 +421,8 @@ const createObjects = async (store) => {
         uk: "\u0421\u041E\u041D\u0426\u0415",
         "zh-cn": "\u8D3E\u68EE"
       },
-      type: "array",
-      role: "state"
+      type: "string",
+      role: "json"
     },
     {
       id: store.getStateIdByKey("flowSwitch"),

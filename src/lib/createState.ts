@@ -187,6 +187,7 @@ export const createObjects = async (store: Store): Promise<void> => {
             id: store.getStateIdByKey('mode'),
             name: 'Modus',
             type: 'number',
+            def: -1,
             states: { '-1': 'off', 0: 'cool', 1: 'heat', 2: 'auto' },
             write: true,
             role: 'state',
@@ -297,6 +298,7 @@ export const createObjects = async (store: Store): Promise<void> => {
                 'zh-cn': '应否温度',
             },
             ...tempState,
+            role: 'level.temperature',
             write: true,
         },
         {
@@ -399,8 +401,8 @@ export const createObjects = async (store: Store): Promise<void> => {
                 uk: 'СОНЦЕ',
                 'zh-cn': '贾森',
             },
-            type: 'array',
-            role: 'state',
+            type: 'string',
+            role: 'json',
         },
         {
             id: store.getStateIdByKey('flowSwitch'),
