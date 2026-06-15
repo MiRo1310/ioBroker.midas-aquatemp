@@ -121,8 +121,15 @@
             "uk": "midas-aquatemp",
             "zh-cn": "midas-aquatemp"
         },
-        "authors": ["Miro1310 <michael.roling@gmx.de>", "oxident"],
-        "keywords": ["heat pump", "pool heating", "poolsana"],
+        "authors": [
+            "Miro1310 <michael.roling@gmx.de>",
+            "oxident"
+        ],
+        "keywords": [
+            "heat pump",
+            "pool heating",
+            "poolsana"
+        ],
         "licenseInformation": {
             "type": "free",
             "license": "MIT"
@@ -166,8 +173,12 @@
         "useDeviceMac": false,
         "allowInsecureTls": false
     },
-    "protectedNative": ["password"],
-    "encryptedNative": ["password"],
+    "protectedNative": [
+        "password"
+    ],
+    "encryptedNative": [
+        "password"
+    ],
     "objects": [],
     "instanceObjects": [
         {

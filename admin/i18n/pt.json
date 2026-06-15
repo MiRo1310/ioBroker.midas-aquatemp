@@ -2,6 +2,8 @@
     "Allow insecure TLS (not recommended)": "Permitir TLS inseguro (não recomendado)",
     "Api Level": "Nível de API",
     "Device Mac": "MAC do dispositivo",
+    "Use Device Mac": "Usar MAC do dispositivo",
+    "Username": "Nome de usuário",
     "midas-aquatemp adapter settings": "Configurações do adaptador para midas-aquatemp",
     "password": "Senha",
     "refresh": "Atualizar dados (seg)",
@@ -9,7 +11,5 @@
     "staticText1": "Api-Level 1: AquaTemp-Accounts, criado antes da v.1.5.8",
     "staticText2": "API de nível 2: contas HiTemp",
     "staticText3": "Api-Level 3: Contas AquaTemp, criadas com versões de aplicativos mais recentes",
-    "Use Device Mac": "Usar MAC do dispositivo",
-    "Username": "Nome de usuário",
     "username": "Nome de usuário"
 }

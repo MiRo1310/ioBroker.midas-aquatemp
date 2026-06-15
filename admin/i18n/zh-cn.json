@@ -2,6 +2,8 @@
     "Allow insecure TLS (not recommended)": "允许不安全的TLS（不推荐）",
     "Api Level": "API级别",
     "Device Mac": "设备MAC",
+    "Use Device Mac": "使用设备MAC",
+    "Username": "用户名",
     "midas-aquatemp adapter settings": "midas-aquatemp的适配器设置",
     "password": "密码",
     "refresh": "刷新数据（秒）",
@@ -9,7 +11,5 @@
     "staticText1": "Api 级别 1：AquaTemp-Accounts，在 v.1.5.8 之前创建",
     "staticText2": "API 级别 2：HiTemp 帐户",
     "staticText3": "Api 级别 3：AquaTemp-Accounts，使用较新的应用程序版本创建",
-    "Use Device Mac": "使用设备MAC",
-    "Username": "用户名",
     "username": "用户名"
 }

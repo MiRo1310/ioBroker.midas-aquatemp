@@ -74,13 +74,13 @@ If you have problems, contact us.
 ### **WORK IN PROGRESS**
 
 - FIX: Compatibility with the updated Linked-Go cloud API (API level 3 with new endpoint paths and camelCase parameters)
-- FIX: Device discovery now tries both `deviceList` payload formats (default and legacy) to ensure devices are found
+- FIX: Device discovery now tries both deviceList payload formats (default and legacy) to ensure devices are found
   regardless of API behaviour
 - FIX: Numerous control and polling issues (mode, silent mode, set temperature, fault detection)
 - FIX: Product-specific protocol codes for Poolsana vs. other devices
 - FIX: TLS certificate validation enabled by default; optional insecure mode via adapter config or environment variable
-- FIX: Invalid or missing sensor values are no longer written as `NaN`
-- FEAT: Add `online` state — boolean datapoint that indicates whether the device is currently reachable via the cloud
+- FIX: Invalid or missing sensor values are no longer written as NaN
+- FEAT: Add online state — boolean datapoint that indicates whether the device is currently reachable via the cloud
   API
 - CHORE: Update dependencies
 
@@ -97,41 +97,6 @@ If you have problems, contact us.
 ### 1.2.3 (2025-06-01)
 
 - FEAT: Add types, fix some errors
-
-### 1.2.2 (2025-05-31)
-
-- FIX: Reported errors by sentry
-
-### 1.2.1 (2025-05-24)
-
-- FIX: #50 Cannot read properties of undefined
-
-### 1.2.0 (2025-05-21)
-
-- FEAT: Add sentry to the adapter
-- FIX: #24 Silent mode cannot be disabled
-- FIX: #44 Cannot read properties of undefined (reading 'description')
-- FEAT: Update dependencies and migrate to eslint 9
-
-### 1.1.1 (2024-08-11)
-
-- FIX: #17 state change mode
-
-### 1.1.0 (2024-08-06)
-
-- FEAT: Remove isPoolsana check
-- FEAT: #16 Add flowSwitch
-
-### 1.0.0 (2024-07-24)
-
-- FEAT: Add writeable states
-- FEAT: Data is also updated when the heating is off
-- FIX: Get token
-- FIX: #7 Error with useStore()
-
-### 0.0.1 (11.07.2024)
-
-- (Miro1310) initial release
 
 [Older changelogs can be found there](CHANGELOG_OLD.md)
 
