@@ -1,208 +1,206 @@
 {
-    "common": {
-        "name": "midas-aquatemp",
-        "version": "1.2.5",
-        "news": {
-            "1.3.0": {
-                "en": "FIX: Compatibility with the updated Linked-Go cloud API (API level 3 with new endpoint paths and camelCase parameters)\nFIX: Device discovery now tries both deviceList payload formats (default and legacy) to ensure devices are found regardless of API behaviour\nFIX: Numerous control and polling issues (mode, silent mode, set temperature, fault detection)\nFIX: Product-specific protocol codes for Poolsana vs. other devices\nFIX: TLS certificate validation enabled by default; optional insecure mode via adapter config or environment variable\nFIX: Invalid or missing sensor values are no longer written as NaN\nFEAT: Add online state — boolean datapoint that indicates whether the device is currently reachable via the cloud API\nCHORE: Update dependencies",
-                "de": "FIX: Kompatibilität mit der aktualisierten Linked-Go Cloud-API (API-Level 3 mit neuen Endpunkt-Pfaden und camelCase-Parametern)\nFIX: Die Geräteerkennung versucht nun beide deviceList-Payload-Formate (Standard und Legacy), um Geräte unabhängig vom API-Verhalten zu finden\nFIX: Zahlreiche Steuerungs- und Abfrageprobleme behoben (Modus, Silent-Modus, Solltemperatur, Fehlererkennung)\nFIX: Produktspezifische Protokollcodes für Poolsana und andere Geräte\nFIX: TLS-Zertifikatsvalidierung standardmäßig aktiviert; optionaler unsicherer Modus über Adapterkonfiguration oder Umgebungsvariable\nFIX: Ungültige oder fehlende Sensorwerte werden nicht mehr als NaN geschrieben\nFEAT: Online-Status hinzugefügt — boolescher Datenpunkt, der anzeigt, ob das Gerät aktuell über die Cloud-API erreichbar ist\nCHORE: Abhängigkeiten aktualisiert",
-                "ru": "FIX: Совместимость с обновлённым облачным API Linked-Go (уровень API 3 с новыми путями конечных точек и параметрами в camelCase)\nFIX: Обнаружение устройств теперь пробует оба формата payload deviceList (стандартный и устаревший), чтобы устройства находились независимо от поведения API\nFIX: Исправлены многочисленные проблемы управления и опроса (режим, тихий режим, установленная температура, обнаружение ошибок)\nFIX: Специфические для продукта коды протоколов для Poolsana и других устройств\nFIX: Проверка TLS-сертификата включена по умолчанию; необязательный небезопасный режим через конфигурацию адаптера или переменную среды\nFIX: Недопустимые или отсутствующие значения датчиков больше не записываются как NaN\nFEAT: Добавлено состояние онлайн — логическая точка данных, указывающая, доступно ли устройство через облачный API\nCHORE: Обновлены зависимости",
-                "pt": "FIX: Compatibilidade com a API cloud Linked-Go atualizada (nível de API 3 com novos caminhos de endpoint e parâmetros camelCase)\nFIX: A descoberta de dispositivos agora tenta os dois formatos de payload deviceList (padrão e legado) para garantir que os dispositivos sejam encontrados independentemente do comportamento da API\nFIX: Numerosos problemas de controle e polling corrigidos (modo, modo silencioso, temperatura definida, detecção de falhas)\nFIX: Códigos de protocolo específicos do produto para Poolsana e outros dispositivos\nFIX: Validação de certificado TLS habilitada por padrão; modo inseguro opcional via configuração do adaptador ou variável de ambiente\nFIX: Valores de sensor inválidos ou ausentes não são mais gravados como NaN\nFEAT: Adicionado estado online — ponto de dados booleano que indica se o dispositivo está atualmente acessível via API cloud\nCHORE: Atualizar dependências",
-                "nl": "FIX: Compatibiliteit met de bijgewerkte Linked-Go cloud-API (API-niveau 3 met nieuwe eindpuntpaden en camelCase-parameters)\nFIX: Apparaatdetectie probeert nu beide deviceList-payload-formaten (standaard en verouderd) om apparaten te vinden ongeacht het API-gedrag\nFIX: Talrijke besturings- en poll-problemen opgelost (modus, stille modus, ingestelde temperatuur, foutdetectie)\nFIX: Productspecifieke protocolcodes voor Poolsana en andere apparaten\nFIX: TLS-certificaatvalidatie standaard ingeschakeld; optionele onveilige modus via adapterconfiguratie of omgevingsvariabele\nFIX: Ongeldige of ontbrekende sensorwaarden worden niet meer als NaN geschreven\nFEAT: Online-status toegevoegd — booleaans datapunt dat aangeeft of het apparaat momenteel bereikbaar is via de cloud-API\nCHORE: Afhankelijkheden bijgewerkt",
-                "fr": "FIX: Compatibilité avec l'API cloud Linked-Go mise à jour (niveau API 3 avec de nouveaux chemins d'endpoint et des paramètres camelCase)\nFIX: La découverte d'appareils essaie désormais les deux formats de charge utile deviceList (par défaut et hérité) pour garantir que les appareils sont trouvés quel que soit le comportement de l'API\nFIX: Nombreux problèmes de contrôle et d'interrogation corrigés (mode, mode silencieux, température de consigne, détection de pannes)\nFIX: Codes de protocole spécifiques au produit pour Poolsana et autres appareils\nFIX: Validation du certificat TLS activée par défaut ; mode non sécurisé optionnel via la configuration de l'adaptateur ou la variable d'environnement\nFIX: Les valeurs de capteur invalides ou manquantes ne sont plus écrites comme NaN\nFEAT: Ajout d'un état en ligne — point de données booléen indiquant si l'appareil est actuellement accessible via l'API cloud\nCHORE: Mise à jour des dépendances",
-                "it": "FIX: Compatibilità con l'API cloud Linked-Go aggiornata (livello API 3 con nuovi percorsi endpoint e parametri camelCase)\nFIX: Il rilevamento del dispositivo ora prova entrambi i formati di payload deviceList (predefinito e legacy) per garantire che i dispositivi vengano trovati indipendentemente dal comportamento dell'API\nFIX: Numerosi problemi di controllo e polling risolti (modalità, modalità silenziosa, temperatura impostata, rilevamento guasti)\nFIX: Codici di protocollo specifici del prodotto per Poolsana e altri dispositivi\nFIX: Validazione del certificato TLS abilitata per impostazione predefinita; modalità non sicura opzionale tramite configurazione adattatore o variabile d'ambiente\nFIX: I valori del sensore non validi o mancanti non vengono più scritti come NaN\nFEAT: Aggiunto stato online — punto dati booleano che indica se il dispositivo è attualmente raggiungibile tramite l'API cloud\nCHORE: Aggiornamento delle dipendenze",
-                "es": "FIX: Compatibilidad con la API cloud de Linked-Go actualizada (nivel de API 3 con nuevas rutas de endpoint y parámetros camelCase)\nFIX: El descubrimiento de dispositivos ahora prueba ambos formatos de payload de deviceList (predeterminado y heredado) para garantizar que los dispositivos se encuentren independientemente del comportamiento de la API\nFIX: Numerosos problemas de control y sondeo corregidos (modo, modo silencioso, temperatura establecida, detección de fallos)\nFIX: Códigos de protocolo específicos del producto para Poolsana y otros dispositivos\nFIX: Validación de certificado TLS habilitada de forma predeterminada; modo inseguro opcional a través de la configuración del adaptador o variable de entorno\nFIX: Los valores de sensor no válidos o faltantes ya no se escriben como NaN\nFEAT: Añadido estado en línea — punto de datos booleano que indica si el dispositivo es actualmente accesible a través de la API cloud\nCHORE: Actualizar dependencias",
-                "pl": "FIX: Zgodność z zaktualizowanym API chmury Linked-Go (poziom API 3 z nowymi ścieżkami punktów końcowych i parametrami camelCase)\nFIX: Wykrywanie urządzeń teraz próbuje obu formatów payload deviceList (domyślnego i starszego), aby urządzenia były znajdowane niezależnie od zachowania API\nFIX: Liczne problemy z kontrolą i odpytywaniem zostały naprawione (tryb, tryb cichy, ustawiona temperatura, wykrywanie usterek)\nFIX: Kody protokołów specyficzne dla produktu dla Poolsana i innych urządzeń\nFIX: Walidacja certyfikatu TLS domyślnie włączona; opcjonalny tryb niezabezpieczony poprzez konfigurację adaptera lub zmienną środowiskową\nFIX: Nieprawidłowe lub brakujące wartości czujników nie są już zapisywane jako NaN\nFEAT: Dodano stan online — boolowski punkt danych wskazujący, czy urządzenie jest aktualnie dostępne przez API chmury\nCHORE: Aktualizacja zależności",
-                "uk": "FIX: Сумісність з оновленим хмарним API Linked-Go (рівень API 3 з новими шляхами кінцевих точок та параметрами camelCase)\nFIX: Виявлення пристроїв тепер пробує обидва формати payload deviceList (стандартний та застарілий), щоб пристрої знаходилися незалежно від поведінки API\nFIX: Виправлено численні проблеми управління та опитування (режим, тихий режим, задана температура, виявлення несправностей)\nFIX: Специфічні для продукту коди протоколів для Poolsana та інших пристроїв\nFIX: Перевірку TLS-сертифікату включено за замовчуванням; необов'язковий небезпечний режим через конфігурацію адаптера або змінну середовища\nFIX: Недійсні або відсутні значення датчиків більше не записуються як NaN\nFEAT: Додано онлайн-стан — логічна точка даних, що вказує, чи доступний пристрій через хмарний API\nCHORE: Оновлення залежностей",
-                "zh-cn": "FIX: 与更新后的 Linked-Go 云 API 兼容（API 级别 3，具有新的端点路径和 camelCase 参数）\nFIX: 设备发现现在会尝试两种 deviceList payload 格式（默认和旧版），确保无论 API 行为如何都能找到设备\nFIX: 修复了大量控制和轮询问题（模式、静音模式、设定温度、故障检测）\nFIX: 针对 Poolsana 和其他设备的特定产品协议代码\nFIX: 默认启用 TLS 证书验证；可通过适配器配置或环境变量选择不安全模式\nFIX: 无效或缺失的传感器值不再写入为 NaN\nFEAT: 添加在线状态 — 布尔数据点，指示设备当前是否可通过云 API 访问\nCHORE: 更新依赖项"
-            },
-            "1.2.5": {
-                "en": "Add size attributes to jsonConfig\nMinimal admin version: 7.4.10\nBreaking change: minimal supported node.js version is 20.x",
-                "de": "Größe Attribute zu jsonConfig hinzufügen\nMinimal Admin-Version: ANHANG\nBreaking change: minimal unterstützt node.js version is 20.x",
-                "ru": "Добавить атрибуты размера в jsonConfig\nМинимальная версия admin: 7.4.10\nИзменения: минимальная поддержка node.js версии 20.x",
-                "pt": "Adicionar atributos de tamanho ao jsonConfig\nVersão mínima do administrador: 7.4.10\nQuebrar a alteração: versão mínima suportada do nodo.js é 20.x",
-                "nl": "Attributen voor grootte toevoegen aan jsonConfig\nMinimale admin versie: 7,4.10\nBreaking change: minimale ondersteunde node.js versie is 20.x",
-                "fr": "Ajouter des attributs de taille à jsonConfig\nVersion administrative minimale : 7.4.10\nBreaking change: la version minimale prise en charge node.js est 20.x",
-                "it": "Aggiungi attributi di dimensione a jsonConfig\nVersione Minimal admin: 7.4.10\nCambiamento di rottura: versione node.js supportata minima è 20.x",
-                "es": "Añadir atributos de tamaño a jsonConfig\nVersión de administración mínima: 7.4.10\nCambio de ruptura: la versión mínima de node.js es 20.x",
-                "pl": "Dodaj atrybuty rozmiaru do jsonConfig\nMinimalna wersja administratora: 7.4.10\nZmiana łamania: minimalna obsługiwana wersja node.js to 20.x",
-                "uk": "Додати атрибути розмірів в jsonConfig\nМінімальна версія адміністратора: 7.4.10 Р\nЗміна розривів: мінімальний підтриманий вузол.js версія 20.x",
-                "zh-cn": "添加大小属性到 jsonConfig\n最小管理员版本 : 7.4.10 (中文(简体) )\n中断更改:最小支持的节点.js版本为20x"
-            },
-            "1.2.4": {
-                "en": "Fix: Error in updateDeviceID: No device code found",
-                "de": "Fix: Fehler im UpdateDeviceID: Keine Gerätecode gefunden",
-                "ru": "Исправление: ошибка в обновленииDeviceID: Код устройства не найден",
-                "pt": "Corrigir: Erro no updateDeviceID: Nenhum código de dispositivo encontrado",
-                "nl": "Fix: Fout in updateDeviceID: Geen apparaatcode gevonden",
-                "fr": "Correction : Erreur dans la mise à jourDeviceID : Aucun code de périphérique trouvé",
-                "it": "Correzione: Errore nell'aggiornamentoDeviceID: Nessun codice del dispositivo trovato",
-                "es": "Corrección: Error en la actualizaciónDeviceID: No hay código de dispositivo encontrado",
-                "pl": "Fix: Błąd w updateDeviceID: Nie znaleziono kodu urządzenia",
-                "uk": "Виправлення: помилка в оновленніDeviceID: Не знайдено коду пристрою",
-                "zh-cn": "修正: 更新DeviceID时出错 : 未找到设备代码"
-            },
-            "1.2.3": {
-                "en": "FEAT: Add types, fix some errors",
-                "de": "FEAT: Typen hinzufügen, Fehler beheben",
-                "ru": "FEAT: Добавьте типы, исправьте некоторые ошибки",
-                "pt": "FEAT: Adicionar tipos, corrigir alguns erros",
-                "nl": "FEAT: Voeg soorten toe, repareer enkele fouten",
-                "fr": "FAT: Ajouter des types, corriger certaines erreurs",
-                "it": "FEAT: Aggiungere tipi, correggere alcuni errori",
-                "es": "FEAT: Agregar tipos, corregir algunos errores",
-                "pl": "FEAT: Dodawanie typów, naprawianie błędów",
-                "uk": "FEAT: Додати типи, виправити деякі помилки",
-                "zh-cn": "FEAT: 添加类型, 修正一些错误"
-            },
-            "1.2.2": {
-                "en": "FIX: Reported errors by sentry",
-                "de": "FIX: Gemeldete Fehler durch Versendung",
-                "ru": "FIX: Сообщения об ошибках часового",
-                "pt": "FIX: Erros reportados por remetente",
-                "nl": "FIX: Gemelde fouten door de wachtdienst",
-                "fr": "FIX: Erreurs signalées par sentinelle",
-                "it": "FIX: Errori segnalati dalla sentinella",
-                "es": "FIX: Errores reportados por centinela",
-                "pl": "FIX: Zgłoszone błędy przez wartownika",
-                "uk": "FIX: Повідомлені помилки відправником",
-                "zh-cn": "FIX:哨兵报告的错误"
-            },
-            "1.2.1": {
-                "en": "FIX: #50 Cannot read properties of undefined",
-                "de": "FIX: #50 Kann nicht lesen Eigenschaften von undefiniert",
-                "ru": "FIX: #50 Невозможно прочитать свойства неопределенного",
-                "pt": "FIX: #50 Não é possível ler propriedades indefinidas",
-                "nl": "FIX: #50 Kan eigenschappen van ongedefinieerde niet lezen",
-                "fr": "FIX: #50 Impossible de lire les propriétés non définies",
-                "it": "FIX: #50 Le proprietà di lettura non definite",
-                "es": "FIX: #50 No se pueden leer propiedades de indefinidos",
-                "pl": "FIX: # 50 Nie można odczytać właściwości nieokreślonych",
-                "uk": "FIX: #50 Не можна прочитати властивості невизначеного",
-                "zh-cn": "FIX: #50 无法读取未定义的属性"
-            },
-            "1.2.0": {
-                "en": "FEAT: Add sentry to the adapter\nFIX: #24 Silent mode cannot be disabled\nFIX: #44 Cannot read properties of undefined (reading 'description')\nFEAT: Update dependencies and migrate to eslint 9",
-                "de": "FEAT: Senden an den Adapter hinzufügen\nFIX: #24 Ruhemodus kann nicht deaktiviert werden\nFIX: #44 Kann keine Eigenschaften von undefiniert lesen (lesen 'description')\nFEAT: Aktualisieren Sie Abhängigkeiten und migrieren Sie zu Eslint 9",
-                "ru": "FEAT: Добавьте часовой к адаптеру\nFIX: #24 Безмолвный режим нельзя отключить\nFIX: #44 Невозможно прочитать свойства неопределенного (чтение описания)\nОбновление зависимостей и миграция в eslint 9",
-                "pt": "FEAT: Adicionar sentinela ao adaptador\nFIX: #24 O modo silencioso não pode ser desativado\nFIX: #44 Não é possível ler propriedades indefinidas (ler 'descrição')\nFEAT: Atualizar dependências e migrar para eslint 9",
-                "nl": "FEAT: voeg wacht aan de adapter\nFIX: #24 Stille modus kan niet worden uitgeschakeld\nFIX: #44 Kan eigenschappen van ongedefinieerde niet lezen (lees 'beschrijving')\nFEAT: Update afhankelijkheden en migreren naar eslint 9",
-                "fr": "VIANDE: Ajouter une sentinelle à l'adaptateur\nFIX: #24 Le mode silencieux ne peut pas être désactivé\nFIXE: #44 Impossible de lire les propriétés non définies (lecture de 'description')\nFeat: Mettre à jour les dépendances et migrer vers eslint 9",
-                "it": "FEAT: Aggiungere la sentinella all'adattatore\nFIX: #24 La modalità silenziosa non può essere disabilitata\nFIX: #44 Non è possibile leggere le proprietà di undefined (leggendo 'descrizione')\nFEAT: Aggiornare le dipendenze e migrare a eslint 9",
-                "es": "FEAT: Añadir el centinela al adaptador\nFIX: #24 El modo silencioso no puede ser deshabilitado\nFIX: #44 No se pueden leer propiedades indefinidas (leer 'descripción')\nFEAT: Actualizar las dependencias y migrar a eslint 9",
-                "pl": "FEAT: Dodaj wartownik do adaptera\nFIX: # 24 Tryb cichy nie może być wyłączony\nFIX: # 44 Nie można odczytać właściwości nieokreślonych (odczyt 'opis')\nFEAT: Aktualizacja zależności i migracja do eslint 9",
-                "uk": "FEAT: Додати відправку до адаптера\nFIX: #24 Безшумний режим\nFIX: #44 Не прочитайте властивості невизначеного (редагування 'description')\nFEAT: Оновити залежності і мігрувати до eslint 9",
-                "zh-cn": "FEAT: 在适配器上添加哨兵\nFIX: #24 沉默模式无法禁用\nFIX: # 44 无法读取未定义的属性( 正在读取“ 描述 ” )\nFEAT: 更新依赖性并迁移到埃斯林9"
-            },
-            "1.1.1": {
-                "en": "FIX: #17 state change mode",
-                "de": "FIX: #17 Zustandswechselmodus",
-                "ru": "FIX: #17 Режим изменения состояния",
-                "pt": "FIX: #17 modo de mudança de estado",
-                "nl": "FIX: #17 status verandering modus",
-                "fr": "FIXE: mode changement d'état #17",
-                "it": "FIX: #17 modalità di cambiamento dello stato",
-                "es": "FIX: #17 modo de cambio de estado",
-                "pl": "FIX: # 17 stan tryb zmiany",
-                "uk": "FIX: #17 Режим зміни стану",
-                "zh-cn": "FIX: # 17 状态更改模式"
-            }
-        },
-        "titleLang": {
-            "en": "Midas Aquatemp",
-            "de": "Midas Aquatemp",
-            "ru": "Мидас Акватемп",
-            "pt": "Midas Aquatemp",
-            "nl": "Midas Aquatemp",
-            "fr": "Midas Aquatemp",
-            "it": "Midas Aquatemp",
-            "es": "Midas Aquatemp",
-            "pl": "Aquatemp Midasa",
-            "uk": "Мідас Акватемп",
-            "zh-cn": "迈达斯水温"
-        },
-        "desc": {
-            "en": "midas-aquatemp",
-            "de": "midas-aquatemp",
-            "ru": "midas-aquatemp",
-            "pt": "midas-aquatemp",
-            "nl": "midas-aquatemp",
-            "fr": "midas-aquatemp",
-            "it": "midas-aquatemp",
-            "es": "midas-aquatemp",
-            "pl": "midas-aquatemp",
-            "uk": "midas-aquatemp",
-            "zh-cn": "midas-aquatemp"
-        },
-        "authors": ["Miro1310 <michael.roling@gmx.de>", "oxident"],
-        "keywords": ["heat pump", "pool heating", "poolsana"],
-        "licenseInformation": {
-            "type": "free",
-            "license": "MIT"
-        },
-        "platform": "Javascript/Node.js",
-        "icon": "midas-aquatemp.png",
-        "enabled": true,
-        "extIcon": "https://raw.githubusercontent.com/Miro1310/ioBroker.midas-aquatemp/main/admin/midas-aquatemp.png",
-        "readme": "https://github.com/Miro1310/ioBroker.midas-aquatemp/blob/main/README.md",
-        "loglevel": "info",
-        "tier": 3,
-        "mode": "daemon",
-        "type": "climate-control",
-        "compact": true,
-        "connectionType": "cloud",
-        "dataSource": "poll",
-        "adminUI": {
-            "config": "json"
-        },
-        "plugins": {
-            "sentry": {
-                "dsn": "https://a422322c4426b50f1828f24f93c597df@o4508003658498048.ingest.de.sentry.io/4509356432687184"
-            }
-        },
-        "dependencies": [
-            {
-                "js-controller": ">=6.0.11"
-            }
-        ],
-        "globalDependencies": [
-            {
-                "admin": ">=7.6.20"
-            }
-        ]
+  "common": {
+    "name": "midas-aquatemp",
+    "version": "1.3.0",
+    "news": {
+      "1.3.0": {
+        "en": "FIX: Compatibility with the updated Linked-Go cloud API (API level 3 with new endpoint paths and camelCase parameters)\nFIX: Device discovery now tries both deviceList payload formats (default and legacy) to ensure devices are found regardless of API behaviour\nFIX: Numerous control and polling issues (mode, silent mode, set temperature, fault detection)\nFIX: Product-specific protocol codes for Poolsana vs. other devices\nFIX: TLS certificate validation enabled by default; optional insecure mode via adapter config or environment variable\nFIX: Invalid or missing sensor values are no longer written as NaN\nFEAT: Add online state — boolean datapoint that indicates whether the device is currently reachable via the cloud API\nCHORE: Update dependencies",
+        "de": "FIX: Kompatibilität mit der aktualisierten Linked-Go Cloud-API (API-Level 3 mit neuen Endpunkt-Pfaden und camelCase-Parametern)\nFIX: Die Geräteerkennung versucht nun beide deviceList-Payload-Formate (Standard und Legacy), um Geräte unabhängig vom API-Verhalten zu finden\nFIX: Zahlreiche Steuerungs- und Abfrageprobleme behoben (Modus, Silent-Modus, Solltemperatur, Fehlererkennung)\nFIX: Produktspezifische Protokollcodes für Poolsana und andere Geräte\nFIX: TLS-Zertifikatsvalidierung standardmäßig aktiviert; optionaler unsicherer Modus über Adapterkonfiguration oder Umgebungsvariable\nFIX: Ungültige oder fehlende Sensorwerte werden nicht mehr als NaN geschrieben\nFEAT: Online-Status hinzugefügt — boolescher Datenpunkt, der anzeigt, ob das Gerät aktuell über die Cloud-API erreichbar ist\nCHORE: Abhängigkeiten aktualisiert",
+        "ru": "FIX: Совместимость с обновлённым облачным API Linked-Go (уровень API 3 с новыми путями конечных точек и параметрами в camelCase)\nFIX: Обнаружение устройств теперь пробует оба формата payload deviceList (стандартный и устаревший), чтобы устройства находились независимо от поведения API\nFIX: Исправлены многочисленные проблемы управления и опроса (режим, тихий режим, установленная температура, обнаружение ошибок)\nFIX: Специфические для продукта коды протоколов для Poolsana и других устройств\nFIX: Проверка TLS-сертификата включена по умолчанию; необязательный небезопасный режим через конфигурацию адаптера или переменную среды\nFIX: Недопустимые или отсутствующие значения датчиков больше не записываются как NaN\nFEAT: Добавлено состояние онлайн — логическая точка данных, указывающая, доступно ли устройство через облачный API\nCHORE: Обновлены зависимости",
+        "pt": "FIX: Compatibilidade com a API cloud Linked-Go atualizada (nível de API 3 com novos caminhos de endpoint e parâmetros camelCase)\nFIX: A descoberta de dispositivos agora tenta os dois formatos de payload deviceList (padrão e legado) para garantir que os dispositivos sejam encontrados independentemente do comportamento da API\nFIX: Numerosos problemas de controle e polling corrigidos (modo, modo silencioso, temperatura definida, detecção de falhas)\nFIX: Códigos de protocolo específicos do produto para Poolsana e outros dispositivos\nFIX: Validação de certificado TLS habilitada por padrão; modo inseguro opcional via configuração do adaptador ou variável de ambiente\nFIX: Valores de sensor inválidos ou ausentes não são mais gravados como NaN\nFEAT: Adicionado estado online — ponto de dados booleano que indica se o dispositivo está atualmente acessível via API cloud\nCHORE: Atualizar dependências",
+        "nl": "FIX: Compatibiliteit met de bijgewerkte Linked-Go cloud-API (API-niveau 3 met nieuwe eindpuntpaden en camelCase-parameters)\nFIX: Apparaatdetectie probeert nu beide deviceList-payload-formaten (standaard en verouderd) om apparaten te vinden ongeacht het API-gedrag\nFIX: Talrijke besturings- en poll-problemen opgelost (modus, stille modus, ingestelde temperatuur, foutdetectie)\nFIX: Productspecifieke protocolcodes voor Poolsana en andere apparaten\nFIX: TLS-certificaatvalidatie standaard ingeschakeld; optionele onveilige modus via adapterconfiguratie of omgevingsvariabele\nFIX: Ongeldige of ontbrekende sensorwaarden worden niet meer als NaN geschreven\nFEAT: Online-status toegevoegd — booleaans datapunt dat aangeeft of het apparaat momenteel bereikbaar is via de cloud-API\nCHORE: Afhankelijkheden bijgewerkt",
+        "fr": "FIX: Compatibilité avec l'API cloud Linked-Go mise à jour (niveau API 3 avec de nouveaux chemins d'endpoint et des paramètres camelCase)\nFIX: La découverte d'appareils essaie désormais les deux formats de charge utile deviceList (par défaut et hérité) pour garantir que les appareils sont trouvés quel que soit le comportement de l'API\nFIX: Nombreux problèmes de contrôle et d'interrogation corrigés (mode, mode silencieux, température de consigne, détection de pannes)\nFIX: Codes de protocole spécifiques au produit pour Poolsana et autres appareils\nFIX: Validation du certificat TLS activée par défaut ; mode non sécurisé optionnel via la configuration de l'adaptateur ou la variable d'environnement\nFIX: Les valeurs de capteur invalides ou manquantes ne sont plus écrites comme NaN\nFEAT: Ajout d'un état en ligne — point de données booléen indiquant si l'appareil est actuellement accessible via l'API cloud\nCHORE: Mise à jour des dépendances",
+        "it": "FIX: Compatibilità con l'API cloud Linked-Go aggiornata (livello API 3 con nuovi percorsi endpoint e parametri camelCase)\nFIX: Il rilevamento del dispositivo ora prova entrambi i formati di payload deviceList (predefinito e legacy) per garantire che i dispositivi vengano trovati indipendentemente dal comportamento dell'API\nFIX: Numerosi problemi di controllo e polling risolti (modalità, modalità silenziosa, temperatura impostata, rilevamento guasti)\nFIX: Codici di protocollo specifici del prodotto per Poolsana e altri dispositivi\nFIX: Validazione del certificato TLS abilitata per impostazione predefinita; modalità non sicura opzionale tramite configurazione adattatore o variabile d'ambiente\nFIX: I valori del sensore non validi o mancanti non vengono più scritti come NaN\nFEAT: Aggiunto stato online — punto dati booleano che indica se il dispositivo è attualmente raggiungibile tramite l'API cloud\nCHORE: Aggiornamento delle dipendenze",
+        "es": "FIX: Compatibilidad con la API cloud de Linked-Go actualizada (nivel de API 3 con nuevas rutas de endpoint y parámetros camelCase)\nFIX: El descubrimiento de dispositivos ahora prueba ambos formatos de payload de deviceList (predeterminado y heredado) para garantizar que los dispositivos se encuentren independientemente del comportamiento de la API\nFIX: Numerosos problemas de control y sondeo corregidos (modo, modo silencioso, temperatura establecida, detección de fallos)\nFIX: Códigos de protocolo específicos del producto para Poolsana y otros dispositivos\nFIX: Validación de certificado TLS habilitada de forma predeterminada; modo inseguro opcional a través de la configuración del adaptador o variable de entorno\nFIX: Los valores de sensor no válidos o faltantes ya no se escriben como NaN\nFEAT: Añadido estado en línea — punto de datos booleano que indica si el dispositivo es actualmente accesible a través de la API cloud\nCHORE: Actualizar dependencias",
+        "pl": "FIX: Zgodność z zaktualizowanym API chmury Linked-Go (poziom API 3 z nowymi ścieżkami punktów końcowych i parametrami camelCase)\nFIX: Wykrywanie urządzeń teraz próbuje obu formatów payload deviceList (domyślnego i starszego), aby urządzenia były znajdowane niezależnie od zachowania API\nFIX: Liczne problemy z kontrolą i odpytywaniem zostały naprawione (tryb, tryb cichy, ustawiona temperatura, wykrywanie usterek)\nFIX: Kody protokołów specyficzne dla produktu dla Poolsana i innych urządzeń\nFIX: Walidacja certyfikatu TLS domyślnie włączona; opcjonalny tryb niezabezpieczony poprzez konfigurację adaptera lub zmienną środowiskową\nFIX: Nieprawidłowe lub brakujące wartości czujników nie są już zapisywane jako NaN\nFEAT: Dodano stan online — boolowski punkt danych wskazujący, czy urządzenie jest aktualnie dostępne przez API chmury\nCHORE: Aktualizacja zależności",
+        "uk": "FIX: Сумісність з оновленим хмарним API Linked-Go (рівень API 3 з новими шляхами кінцевих точок та параметрами camelCase)\nFIX: Виявлення пристроїв тепер пробує обидва формати payload deviceList (стандартний та застарілий), щоб пристрої знаходилися незалежно від поведінки API\nFIX: Виправлено численні проблеми управління та опитування (режим, тихий режим, задана температура, виявлення несправностей)\nFIX: Специфічні для продукту коди протоколів для Poolsana та інших пристроїв\nFIX: Перевірку TLS-сертифікату включено за замовчуванням; необов'язковий небезпечний режим через конфігурацію адаптера або змінну середовища\nFIX: Недійсні або відсутні значення датчиків більше не записуються як NaN\nFEAT: Додано онлайн-стан — логічна точка даних, що вказує, чи доступний пристрій через хмарний API\nCHORE: Оновлення залежностей",
+        "zh-cn": "FIX: 与更新后的 Linked-Go 云 API 兼容（API 级别 3，具有新的端点路径和 camelCase 参数）\nFIX: 设备发现现在会尝试两种 deviceList payload 格式（默认和旧版），确保无论 API 行为如何都能找到设备\nFIX: 修复了大量控制和轮询问题（模式、静音模式、设定温度、故障检测）\nFIX: 针对 Poolsana 和其他设备的特定产品协议代码\nFIX: 默认启用 TLS 证书验证；可通过适配器配置或环境变量选择不安全模式\nFIX: 无效或缺失的传感器值不再写入为 NaN\nFEAT: 添加在线状态 — 布尔数据点，指示设备当前是否可通过云 API 访问\nCHORE: 更新依赖项"
+      },
+      "1.2.5": {
+        "en": "Add size attributes to jsonConfig\nMinimal admin version: 7.4.10\nBreaking change: minimal supported node.js version is 20.x",
+        "de": "Größe Attribute zu jsonConfig hinzufügen\nMinimal Admin-Version: ANHANG\nBreaking change: minimal unterstützt node.js version is 20.x",
+        "ru": "Добавить атрибуты размера в jsonConfig\nМинимальная версия admin: 7.4.10\nИзменения: минимальная поддержка node.js версии 20.x",
+        "pt": "Adicionar atributos de tamanho ao jsonConfig\nVersão mínima do administrador: 7.4.10\nQuebrar a alteração: versão mínima suportada do nodo.js é 20.x",
+        "nl": "Attributen voor grootte toevoegen aan jsonConfig\nMinimale admin versie: 7,4.10\nBreaking change: minimale ondersteunde node.js versie is 20.x",
+        "fr": "Ajouter des attributs de taille à jsonConfig\nVersion administrative minimale : 7.4.10\nBreaking change: la version minimale prise en charge node.js est 20.x",
+        "it": "Aggiungi attributi di dimensione a jsonConfig\nVersione Minimal admin: 7.4.10\nCambiamento di rottura: versione node.js supportata minima è 20.x",
+        "es": "Añadir atributos de tamaño a jsonConfig\nVersión de administración mínima: 7.4.10\nCambio de ruptura: la versión mínima de node.js es 20.x",
+        "pl": "Dodaj atrybuty rozmiaru do jsonConfig\nMinimalna wersja administratora: 7.4.10\nZmiana łamania: minimalna obsługiwana wersja node.js to 20.x",
+        "uk": "Додати атрибути розмірів в jsonConfig\nМінімальна версія адміністратора: 7.4.10 Р\nЗміна розривів: мінімальний підтриманий вузол.js версія 20.x",
+        "zh-cn": "添加大小属性到 jsonConfig\n最小管理员版本 : 7.4.10 (中文(简体) )\n中断更改:最小支持的节点.js版本为20x"
+      },
+      "1.2.4": {
+        "en": "Fix: Error in updateDeviceID: No device code found",
+        "de": "Fix: Fehler im UpdateDeviceID: Keine Gerätecode gefunden",
+        "ru": "Исправление: ошибка в обновленииDeviceID: Код устройства не найден",
+        "pt": "Corrigir: Erro no updateDeviceID: Nenhum código de dispositivo encontrado",
+        "nl": "Fix: Fout in updateDeviceID: Geen apparaatcode gevonden",
+        "fr": "Correction : Erreur dans la mise à jourDeviceID : Aucun code de périphérique trouvé",
+        "it": "Correzione: Errore nell'aggiornamentoDeviceID: Nessun codice del dispositivo trovato",
+        "es": "Corrección: Error en la actualizaciónDeviceID: No hay código de dispositivo encontrado",
+        "pl": "Fix: Błąd w updateDeviceID: Nie znaleziono kodu urządzenia",
+        "uk": "Виправлення: помилка в оновленніDeviceID: Не знайдено коду пристрою",
+        "zh-cn": "修正: 更新DeviceID时出错 : 未找到设备代码"
+      },
+      "1.2.3": {
+        "en": "FEAT: Add types, fix some errors",
+        "de": "FEAT: Typen hinzufügen, Fehler beheben",
+        "ru": "FEAT: Добавьте типы, исправьте некоторые ошибки",
+        "pt": "FEAT: Adicionar tipos, corrigir alguns erros",
+        "nl": "FEAT: Voeg soorten toe, repareer enkele fouten",
+        "fr": "FAT: Ajouter des types, corriger certaines erreurs",
+        "it": "FEAT: Aggiungere tipi, correggere alcuni errori",
+        "es": "FEAT: Agregar tipos, corregir algunos errores",
+        "pl": "FEAT: Dodawanie typów, naprawianie błędów",
+        "uk": "FEAT: Додати типи, виправити деякі помилки",
+        "zh-cn": "FEAT: 添加类型, 修正一些错误"
+      },
+      "1.2.2": {
+        "en": "FIX: Reported errors by sentry",
+        "de": "FIX: Gemeldete Fehler durch Versendung",
+        "ru": "FIX: Сообщения об ошибках часового",
+        "pt": "FIX: Erros reportados por remetente",
+        "nl": "FIX: Gemelde fouten door de wachtdienst",
+        "fr": "FIX: Erreurs signalées par sentinelle",
+        "it": "FIX: Errori segnalati dalla sentinella",
+        "es": "FIX: Errores reportados por centinela",
+        "pl": "FIX: Zgłoszone błędy przez wartownika",
+        "uk": "FIX: Повідомлені помилки відправником",
+        "zh-cn": "FIX:哨兵报告的错误"
+      },
+      "1.2.1": {
+        "en": "FIX: #50 Cannot read properties of undefined",
+        "de": "FIX: #50 Kann nicht lesen Eigenschaften von undefiniert",
+        "ru": "FIX: #50 Невозможно прочитать свойства неопределенного",
+        "pt": "FIX: #50 Não é possível ler propriedades indefinidas",
+        "nl": "FIX: #50 Kan eigenschappen van ongedefinieerde niet lezen",
+        "fr": "FIX: #50 Impossible de lire les propriétés non définies",
+        "it": "FIX: #50 Le proprietà di lettura non definite",
+        "es": "FIX: #50 No se pueden leer propiedades de indefinidos",
+        "pl": "FIX: # 50 Nie można odczytać właściwości nieokreślonych",
+        "uk": "FIX: #50 Не можна прочитати властивості невизначеного",
+        "zh-cn": "FIX: #50 无法读取未定义的属性"
+      },
+      "1.2.0": {
+        "en": "FEAT: Add sentry to the adapter\nFIX: #24 Silent mode cannot be disabled\nFIX: #44 Cannot read properties of undefined (reading 'description')\nFEAT: Update dependencies and migrate to eslint 9",
+        "de": "FEAT: Senden an den Adapter hinzufügen\nFIX: #24 Ruhemodus kann nicht deaktiviert werden\nFIX: #44 Kann keine Eigenschaften von undefiniert lesen (lesen 'description')\nFEAT: Aktualisieren Sie Abhängigkeiten und migrieren Sie zu Eslint 9",
+        "ru": "FEAT: Добавьте часовой к адаптеру\nFIX: #24 Безмолвный режим нельзя отключить\nFIX: #44 Невозможно прочитать свойства неопределенного (чтение описания)\nОбновление зависимостей и миграция в eslint 9",
+        "pt": "FEAT: Adicionar sentinela ao adaptador\nFIX: #24 O modo silencioso não pode ser desativado\nFIX: #44 Não é possível ler propriedades indefinidas (ler 'descrição')\nFEAT: Atualizar dependências e migrar para eslint 9",
+        "nl": "FEAT: voeg wacht aan de adapter\nFIX: #24 Stille modus kan niet worden uitgeschakeld\nFIX: #44 Kan eigenschappen van ongedefinieerde niet lezen (lees 'beschrijving')\nFEAT: Update afhankelijkheden en migreren naar eslint 9",
+        "fr": "VIANDE: Ajouter une sentinelle à l'adaptateur\nFIX: #24 Le mode silencieux ne peut pas être désactivé\nFIXE: #44 Impossible de lire les propriétés non définies (lecture de 'description')\nFeat: Mettre à jour les dépendances et migrer vers eslint 9",
+        "it": "FEAT: Aggiungere la sentinella all'adattatore\nFIX: #24 La modalità silenziosa non può essere disabilitata\nFIX: #44 Non è possibile leggere le proprietà di undefined (leggendo 'descrizione')\nFEAT: Aggiornare le dipendenze e migrare a eslint 9",
+        "es": "FEAT: Añadir el centinela al adaptador\nFIX: #24 El modo silencioso no puede ser deshabilitado\nFIX: #44 No se pueden leer propiedades indefinidas (leer 'descripción')\nFEAT: Actualizar las dependencias y migrar a eslint 9",
+        "pl": "FEAT: Dodaj wartownik do adaptera\nFIX: # 24 Tryb cichy nie może być wyłączony\nFIX: # 44 Nie można odczytać właściwości nieokreślonych (odczyt 'opis')\nFEAT: Aktualizacja zależności i migracja do eslint 9",
+        "uk": "FEAT: Додати відправку до адаптера\nFIX: #24 Безшумний режим\nFIX: #44 Не прочитайте властивості невизначеного (редагування 'description')\nFEAT: Оновити залежності і мігрувати до eslint 9",
+        "zh-cn": "FEAT: 在适配器上添加哨兵\nFIX: #24 沉默模式无法禁用\nFIX: # 44 无法读取未定义的属性( 正在读取“ 描述 ” )\nFEAT: 更新依赖性并迁移到埃斯林9"
+      }
     },
-    "native": {
-        "username": "",
-        "password": "",
-        "refresh": 60,
-        "deviceMac": "",
-        "useDeviceMac": false,
-        "allowInsecureTls": false
+    "titleLang": {
+      "en": "Midas Aquatemp",
+      "de": "Midas Aquatemp",
+      "ru": "Мидас Акватемп",
+      "pt": "Midas Aquatemp",
+      "nl": "Midas Aquatemp",
+      "fr": "Midas Aquatemp",
+      "it": "Midas Aquatemp",
+      "es": "Midas Aquatemp",
+      "pl": "Aquatemp Midasa",
+      "uk": "Мідас Акватемп",
+      "zh-cn": "迈达斯水温"
     },
-    "protectedNative": ["password"],
-    "encryptedNative": ["password"],
-    "objects": [],
-    "instanceObjects": [
-        {
-            "_id": "info",
-            "type": "channel",
-            "common": {
-                "name": "Information"
-            },
-            "native": {}
-        },
-        {
-            "_id": "info.connection",
-            "type": "state",
-            "common": {
-                "role": "indicator.connected",
-                "name": "Device or service connected",
-                "type": "boolean",
-                "read": true,
-                "write": false,
-                "def": false
-            },
-            "native": {}
-        }
+    "desc": {
+      "en": "midas-aquatemp",
+      "de": "midas-aquatemp",
+      "ru": "midas-aquatemp",
+      "pt": "midas-aquatemp",
+      "nl": "midas-aquatemp",
+      "fr": "midas-aquatemp",
+      "it": "midas-aquatemp",
+      "es": "midas-aquatemp",
+      "pl": "midas-aquatemp",
+      "uk": "midas-aquatemp",
+      "zh-cn": "midas-aquatemp"
+    },
+    "authors": [
+      "Miro1310 <michael.roling@gmx.de>",
+      "oxident"
+    ],
+    "keywords": [
+      "heat pump",
+      "pool heating",
+      "poolsana"
+    ],
+    "licenseInformation": {
+      "type": "free",
+      "license": "MIT"
+    },
+    "platform": "Javascript/Node.js",
+    "icon": "midas-aquatemp.png",
+    "enabled": true,
+    "extIcon": "https://raw.githubusercontent.com/Miro1310/ioBroker.midas-aquatemp/main/admin/midas-aquatemp.png",
+    "readme": "https://github.com/Miro1310/ioBroker.midas-aquatemp/blob/main/README.md",
+    "loglevel": "info",
+    "tier": 3,
+    "mode": "daemon",
+    "type": "climate-control",
+    "compact": true,
+    "connectionType": "cloud",
+    "dataSource": "poll",
+    "adminUI": {
+      "config": "json"
+    },
+    "plugins": {
+      "sentry": {
+        "dsn": "https://a422322c4426b50f1828f24f93c597df@o4508003658498048.ingest.de.sentry.io/4509356432687184"
+      }
+    },
+    "dependencies": [
+      {
+        "js-controller": ">=6.0.11"
+      }
+    ],
+    "globalDependencies": [
+      {
+        "admin": ">=7.6.20"
+      }
     ]
+  },
+  "native": {
+    "username": "",
+    "password": "",
+    "refresh": 60,
+    "deviceMac": "",
+    "useDeviceMac": false,
+    "allowInsecureTls": false
+  },
+  "protectedNative": [
+    "password"
+  ],
+  "encryptedNative": [
+    "password"
+  ],
+  "objects": [],
+  "instanceObjects": [
+    {
+      "_id": "info",
+      "type": "channel",
+      "common": {
+        "name": "Information"
+      },
+      "native": {}
+    },
+    {
+      "_id": "info.connection",
+      "type": "state",
+      "common": {
+        "role": "indicator.connected",
+        "name": "Device or service connected",
+        "type": "boolean",
+        "read": true,
+        "write": false,
+        "def": false
+      },
+      "native": {}
+    }
+  ]
 }
