@@ -1,5 +1,5 @@
 import type { CreateObjects } from '../types';
-import type { Store } from './store.ts';
+import type { Store } from './store';
 
 export const createObjects = async (store: Store): Promise<void> => {
     const { logger, adapter } = store;
