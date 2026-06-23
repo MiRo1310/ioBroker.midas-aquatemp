@@ -1,0 +1,7 @@
+{
+  "version": 3,
+  "sources": ["../../src/lib/consecutiveErrorTracker.ts"],
+  "sourcesContent": ["import type { MidasAquatemp } from '../main';\n\nexport class ConsecutiveErrorTracker {\n    private errors: unknown[] = [];\n\n    constructor(\n        private cb: (e: any) => Promise<void>,\n        private adapter: MidasAquatemp,\n        private readonly acceptedErrors = 4,\n    ) {}\n\n    public async addError(e: any): Promise<void> {\n        this.errors.push(e);\n        this.adapter.log.debug(`Error message: ${e.message}`);\n        this.adapter.log.debug(`Error stack: ${e.stack}`);\n        if (this.errors.length > this.acceptedErrors) {\n            await this.sendError(e);\n            this.resetErrors();\n        }\n    }\n\n    public resetErrors(): void {\n        this.errors = [];\n    }\n\n    async sendError(error: any): Promise<void> {\n        await this.cb(error);\n    }\n}\n"],
+  "mappings": ";;;;;;;;;;;;;;;;;;AAAA;AAAA;AAAA;AAAA;AAAA;AAEO,MAAM,wBAAwB;AAAA,EAGjC,YACY,IACA,SACS,iBAAiB,GACpC;AAHU;AACA;AACS;AAAA,EAClB;AAAA,EANK,SAAoB,CAAC;AAAA,EAQ7B,MAAa,SAAS,GAAuB;AACzC,SAAK,OAAO,KAAK,CAAC;AAClB,SAAK,QAAQ,IAAI,MAAM,kBAAkB,EAAE,OAAO,EAAE;AACpD,SAAK,QAAQ,IAAI,MAAM,gBAAgB,EAAE,KAAK,EAAE;AAChD,QAAI,KAAK,OAAO,SAAS,KAAK,gBAAgB;AAC1C,YAAM,KAAK,UAAU,CAAC;AACtB,WAAK,YAAY;AAAA,IACrB;AAAA,EACJ;AAAA,EAEO,cAAoB;AACvB,SAAK,SAAS,CAAC;AAAA,EACnB;AAAA,EAEA,MAAM,UAAU,OAA2B;AACvC,UAAM,KAAK,GAAG,KAAK;AAAA,EACvB;AACJ;",
+  "names": []
+}

@@ -35,6 +35,17 @@ export default [
         files: ['src/**/*.ts'],
         rules: {
             '@typescript-eslint/unbound-method': 'error',
+            'no-restricted-imports': [
+                'error',
+                {
+                    patterns: [
+                        {
+                            group: ['*.ts'],
+                            message: 'Do not import TypeScript files with the .ts extension.',
+                        },
+                    ],
+                },
+            ],
         },
     },
 ];

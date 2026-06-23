@@ -23,14 +23,20 @@ __export(tokenManager_exports, {
 module.exports = __toCommonJS(tokenManager_exports);
 var import_utils = require("./utils");
 var import_apiClient = require("./apiClient");
+var import_consecutiveErrorTracker = require("./consecutiveErrorTracker");
 class TokenManager {
   constructor(store, apiClient) {
     this.store = store;
     this.apiClient = apiClient;
     store.setTokenManager(this);
+    this.errorHandler = new import_consecutiveErrorTracker.ConsecutiveErrorTracker(
+      (error) => this.store.resetAndHandleErrorWithSentry("Error in updateToken", error),
+      this.store.adapter
+    );
   }
   token = null;
   deviceController;
+  errorHandler;
   setDeviceController(deviceController) {
     this.deviceController = deviceController;
   }
@@ -74,8 +80,10 @@ class TokenManager {
         return;
       }
       await this.deviceController.fetchDevice();
+      this.errorHandler.resetErrors();
     } catch (error) {
-      await this.store.resetAndHandleErrorWithSentry("Error in updateToken", error);
+      await this.store.resetOnError();
+      await this.errorHandler.addError(error);
     }
   }
   resetToken() {

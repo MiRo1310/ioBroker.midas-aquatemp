@@ -4,16 +4,21 @@ import { isDefined } from './utils';
 import type { DeviceController } from './deviceController';
 import type { ApiClient } from './apiClient';
 import { ApiError, ResetError } from './apiClient';
+import { ConsecutiveErrorTracker } from './consecutiveErrorTracker';
 
 export class TokenManager {
     private token: string | null = null;
     private deviceController?: DeviceController;
-
+    private errorHandler: ConsecutiveErrorTracker;
     constructor(
         private store: Store,
         private apiClient: ApiClient,
     ) {
         store.setTokenManager(this);
+        this.errorHandler = new ConsecutiveErrorTracker(
+            error => this.store.resetAndHandleErrorWithSentry('Error in updateToken', error),
+            this.store.adapter,
+        );
     }
 
     public setDeviceController(deviceController: DeviceController): void {
@@ -66,8 +71,10 @@ export class TokenManager {
                 return;
             }
             await this.deviceController.fetchDevice();
+            this.errorHandler.resetErrors();
         } catch (error: any) {
-            await this.store.resetAndHandleErrorWithSentry('Error in updateToken', error);
+            await this.store.resetOnError();
+            await this.errorHandler.addError(error);
         }
     }
 
