@@ -1,8 +1,21 @@
 {
   "common": {
     "name": "midas-aquatemp",
-    "version": "1.3.1",
+    "version": "1.3.2",
     "news": {
+      "1.3.2": {
+        "en": "FIX: Code style and linting issues",
+        "de": "BEHOBEN: Probleme mit Codestil und Linting",
+        "ru": "ИСПРАВЛЕНО: Проблемы со стилем кода и проверкой синтаксиса.",
+        "pt": "CORREÇÃO: Problemas de estilo de código e linting",
+        "nl": "OPGELOST: Problemen met codestijl en linting",
+        "fr": "CORRECTION : Problèmes de style de code et de linting",
+        "it": "CORREZIONE: Problemi di stile del codice e di analisi statica del codice",
+        "es": "CORRECCIÓN: Problemas de estilo de código y análisis estático.",
+        "pl": "NAPRAWIONO: Problemy ze stylem kodu i lintingiem",
+        "uk": "ВИПРАВЛЕННЯ: Проблеми зі стилем коду та лінтингом",
+        "zh-cn": "修复：代码风格和代码检查问题"
+      },
       "1.3.1": {
         "en": "FIX: Object Structure Check",
         "de": "FIX: Objektstrukturprüfung",
@@ -80,19 +93,6 @@
         "pl": "FIX: Zgłoszone błędy przez wartownika",
         "uk": "FIX: Повідомлені помилки відправником",
         "zh-cn": "FIX:哨兵报告的错误"
-      },
-      "1.2.1": {
-        "en": "FIX: #50 Cannot read properties of undefined",
-        "de": "FIX: #50 Kann nicht lesen Eigenschaften von undefiniert",
-        "ru": "FIX: #50 Невозможно прочитать свойства неопределенного",
-        "pt": "FIX: #50 Não é possível ler propriedades indefinidas",
-        "nl": "FIX: #50 Kan eigenschappen van ongedefinieerde niet lezen",
-        "fr": "FIX: #50 Impossible de lire les propriétés non définies",
-        "it": "FIX: #50 Le proprietà di lettura non definite",
-        "es": "FIX: #50 No se pueden leer propiedades de indefinidos",
-        "pl": "FIX: # 50 Nie można odczytać właściwości nieokreślonych",
-        "uk": "FIX: #50 Не можна прочитати властивості невизначеного",
-        "zh-cn": "FIX: #50 无法读取未定义的属性"
       }
     },
     "titleLang": {

@@ -59,8 +59,7 @@ If you have problems, contact us.
 	Placeholder for the next version (at the beginning of the line):
 	### **WORK IN PROGRESS**
 -->
-
-### **WORK IN PROGRESS**
+### 1.3.2 (2026-07-05)
 
 - FIX: Code style and linting issues
 
@@ -90,10 +89,6 @@ If you have problems, contact us.
 ### 1.2.4 (2025-06-01)
 
 - Fix: Error in updateDeviceID: No device code found
-
-### 1.2.3 (2025-06-01)
-
-- FEAT: Add types, fix some errors
 
 [Older changelogs can be found there](CHANGELOG_OLD.md)
 

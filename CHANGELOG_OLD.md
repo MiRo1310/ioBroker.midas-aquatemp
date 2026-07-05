@@ -34,3 +34,6 @@
 ### 0.0.1 (11.07.2024)
 
 - (Miro1310) initial release
+## 1.2.3 (2025-06-01)
+
+- FEAT: Add types, fix some errors
