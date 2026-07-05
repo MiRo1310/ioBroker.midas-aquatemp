@@ -9,16 +9,14 @@ export const toFloat = (value?: string | null): number => {
     if (value === '' || !isDefined(value)) {
         return NaN;
     }
-    const num = parseFloat(String(value).replace(',', '.'));
-    return Number.isFinite(num) ? num : NaN;
+    return parseFloat(String(value).replace(',', '.'));
 };
 
 export const toInt = (value?: string | null): number => {
     if (value === '' || !isDefined(value)) {
         return NaN;
     }
-    const num = parseInt(String(value), 10);
-    return Number.isFinite(num) ? num : NaN;
+    return parseInt(String(value), 10);
 };
 
 export function findCodeVal(result: ObjectResultResponse, code: string): string | undefined {

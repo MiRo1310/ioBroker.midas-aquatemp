@@ -34,15 +34,13 @@ const toFloat = (value) => {
   if (value === "" || !isDefined(value)) {
     return NaN;
   }
-  const num = parseFloat(String(value).replace(",", "."));
-  return Number.isFinite(num) ? num : NaN;
+  return parseFloat(String(value).replace(",", "."));
 };
 const toInt = (value) => {
   if (value === "" || !isDefined(value)) {
     return NaN;
   }
-  const num = parseInt(String(value), 10);
-  return Number.isFinite(num) ? num : NaN;
+  return parseInt(String(value), 10);
 };
 function findCodeVal(result, code) {
   var _a;
