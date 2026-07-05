@@ -16,9 +16,11 @@ import { ApiClient, ResetError } from './lib/apiClient';
 export class MidasAquatemp extends utils.Adapter {
     private static instance: MidasAquatemp;
     private static tokenRefreshIntervalTime = 3600000;
+    private static maxIntervalSeconds = 3600;
+    private static minIntervalSeconds = 60;
     private updateInterval?: ioBroker.Interval;
     private tokenRefreshInterval?: ioBroker.Interval;
-    private interval: number = 60;
+    private intervalSeconds: number = 60;
     private store!: Store;
     private silentId!: string;
     private stateId!: string;
@@ -46,7 +48,15 @@ export class MidasAquatemp extends utils.Adapter {
             return;
         }
         const { username, password, selectApi, useDeviceMac, deviceMac, refresh } = this.config;
-        this.interval = refresh ?? this.interval;
+
+        if (
+            isDefined(refresh) &&
+            refresh > MidasAquatemp.minIntervalSeconds &&
+            refresh <= MidasAquatemp.maxIntervalSeconds
+        ) {
+            this.intervalSeconds = refresh;
+        }
+
         if (username === '' || password === '' || password === undefined) {
             this.log.error('Empty Username or Password.');
             return;
@@ -63,7 +73,7 @@ export class MidasAquatemp extends utils.Adapter {
                 this.store.setMode(currentMode);
             }
 
-            this.log.info(`API level: ${this.config.selectApi}, refresh interval: ${this.interval}s`);
+            this.log.info(`API level: ${this.config.selectApi}, refresh interval: ${this.intervalSeconds}s`);
 
             await createObjects(this.store);
             this.log.info('Objects created');
@@ -73,7 +83,7 @@ export class MidasAquatemp extends utils.Adapter {
 
             this.updateInterval = this.setInterval(async function () {
                 await tokenManager.updateTokenAndDeviceId();
-            }, this.interval * 1000);
+            }, this.intervalSeconds * 1000);
 
             this.tokenRefreshInterval = this.setInterval(async function () {
                 tokenManager.resetToken();
