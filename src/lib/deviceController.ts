@@ -1,7 +1,7 @@
 import type { StateKey, Store, TMode } from './store';
 import type { DeviceDetails, DeviceStatus, MidasData, ObjectResultResponse, UpdateDeviceId } from '../types/types';
 import { CODES, PRODUCT_IDS } from './axiosParameter';
-import { findCodeVal, findValByCodeArray, isDefined, parseFloatOrNull, parseIntOrNull } from './utils';
+import { findCodeVal, findValByCodeArray, isDefined, toFloat, toInt } from './utils';
 import type { TokenManager } from './tokenManager';
 import type { ApiClient } from './apiClient';
 import { ApiError, ResetError } from './apiClient';
@@ -130,7 +130,7 @@ export class DeviceController {
 
     private getTempSetOverride(product: string, responseValue: ObjectResultResponse): number | undefined {
         if (product === '1650758828508766208') {
-            return parseFloatOrNull(findCodeVal(responseValue, 'R01'));
+            return toFloat(findCodeVal(responseValue, 'R01'));
         }
         return undefined;
     }
@@ -353,10 +353,10 @@ export class DeviceController {
         const sensorCodes = DeviceController.getSensorCodes();
 
         // T07 reports current (A); consumption (W) = current × voltage
-        const currentVal = parseFloatOrNull(findValByCodeArray(responseValue, sensorCodes.tCurrent));
-        const tVoltageVal = parseFloatOrNull(findValByCodeArray(responseValue, sensorCodes.tVoltage));
+        const currentVal = toFloat(findValByCodeArray(responseValue, sensorCodes.tCurrent));
+        const tVoltageVal = toFloat(findValByCodeArray(responseValue, sensorCodes.tVoltage));
 
-        await this.store.saveValue('consumption', currentVal * tVoltageVal);
+        await this.saveNumberIfValid('consumption', currentVal * tVoltageVal);
 
         const flowSwitchValue = findValByCodeArray(responseValue, sensorCodes.flowSwitch);
 
@@ -382,7 +382,7 @@ export class DeviceController {
     ): Promise<void> {
         const val = findValByCodeArray(res, code);
 
-        await this.saveNumberIfValid(key, int ? parseIntOrNull(val) : parseFloatOrNull(val));
+        await this.saveNumberIfValid(key, int ? toInt(val) : toFloat(val));
     }
 
     private async updateDeviceErrorMsg(): Promise<void> {
