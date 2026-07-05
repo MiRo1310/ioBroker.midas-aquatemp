@@ -1,7 +1,7 @@
 import type { StateKey, Store, TMode } from './store';
 import type { DeviceDetails, DeviceStatus, MidasData, ObjectResultResponse, UpdateDeviceId } from '../types/types';
 import { CODES, PRODUCT_IDS } from './axiosParameter';
-import { findCodeVal, findValByCodeArray, isDefined, parseFloatOrNull, parseIntOrNull } from './utils';
+import { findCodeVal, findValByCodeArray, isDefined, toFloat, toInt } from './utils';
 import type { TokenManager } from './tokenManager';
 import type { ApiClient } from './apiClient';
 import { ApiError, ResetError } from './apiClient';
@@ -130,7 +130,7 @@ export class DeviceController {
 
     private getTempSetOverride(product: string, responseValue: ObjectResultResponse): number | undefined {
         if (product === '1650758828508766208') {
-            return parseFloatOrNull(findCodeVal(responseValue, 'R01'));
+            return toFloat(findCodeVal(responseValue, 'R01'));
         }
         return undefined;
     }
@@ -352,10 +352,11 @@ export class DeviceController {
     private async saveSensors(responseValue: ObjectResultResponse): Promise<void> {
         const sensorCodes = DeviceController.getSensorCodes();
 
-        const powerVal = parseFloatOrNull(findValByCodeArray(responseValue, sensorCodes.tPower));
-        const tVoltageVal = parseFloatOrNull(findValByCodeArray(responseValue, sensorCodes.tVoltage));
+        // T07 reports current (A); consumption (W) = current × voltage
+        const currentVal = toFloat(findValByCodeArray(responseValue, sensorCodes.tCurrent));
+        const tVoltageVal = toFloat(findValByCodeArray(responseValue, sensorCodes.tVoltage));
 
-        await this.store.saveValue('consumption', powerVal * tVoltageVal);
+        await this.saveNumberIfValid('consumption', currentVal * tVoltageVal);
 
         const flowSwitchValue = findValByCodeArray(responseValue, sensorCodes.flowSwitch);
 
@@ -381,7 +382,7 @@ export class DeviceController {
     ): Promise<void> {
         const val = findValByCodeArray(res, code);
 
-        await this.saveNumberIfValid(key, int ? parseIntOrNull(val) : parseFloatOrNull(val));
+        await this.saveNumberIfValid(key, int ? toInt(val) : toFloat(val));
     }
 
     private async updateDeviceErrorMsg(): Promise<void> {
@@ -449,7 +450,7 @@ export class DeviceController {
     }
 
     private static getSensorCodes(): {
-        tPower: string[];
+        tCurrent: string[];
         tSuction: string[];
         tIn: string[];
         tOut: string[];
@@ -467,7 +468,7 @@ export class DeviceController {
             tCoil: ['T04', 'T4'],
             tAmb: ['T05', 'T5'],
             exhaust: ['T06', 'T6'],
-            tPower: ['T07', 'T7'],
+            tCurrent: ['T07', 'T7'],
             flowSwitch: ['S03', 'S3'],
             tVoltage: ['T14'],
             tRotor: ['T17'],

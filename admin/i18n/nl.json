@@ -1,5 +1,8 @@
 {
     "Allow insecure TLS (not recommended)": "Onveilige TLS toestaan (niet aanbevolen)",
+    "API 1": "API 1",
+    "API 2": "API 2",
+    "API 3": "API 3",
     "Api Level": "API-niveau",
     "Device Mac": "Apparaat-MAC",
     "Use Device Mac": "Apparaat-MAC gebruiken",
@@ -7,9 +10,7 @@
     "midas-aquatemp adapter settings": "Adapterinstellingen voor midas-aquatemp",
     "password": "Wachtwoord",
     "refresh": "Gegevens vernieuwen (sec)",
-    "staticText": "Api-Level 1: AquaTemp-Accounts, gemaakt vóór v.1.5.8, Api-Level 2: HiTemp-Accounts Api-Level 3: AquaTemp-Accounts, gemaakt met nieuwere App-versies",
     "staticText1": "Api-niveau 1: AquaTemp-Accounts, gemaakt vóór v.1.5.8",
     "staticText2": "Api-niveau 2: HiTemp-accounts",
-    "staticText3": "Api-niveau 3: AquaTemp-Accounts, gemaakt met nieuwere app-versies",
-    "username": "Gebruikersnaam"
+    "staticText3": "Api-niveau 3: AquaTemp-Accounts, gemaakt met nieuwere app-versies"
 }

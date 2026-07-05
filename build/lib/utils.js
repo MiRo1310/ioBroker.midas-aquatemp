@@ -23,26 +23,24 @@ __export(utils_exports, {
   isDefined: () => isDefined,
   isRelevantStateId: () => isRelevantStateId,
   isStateValue: () => isStateValue,
-  parseFloatOrNull: () => parseFloatOrNull,
-  parseIntOrNull: () => parseIntOrNull,
-  resolveOnOffMode: () => resolveOnOffMode
+  resolveOnOffMode: () => resolveOnOffMode,
+  toFloat: () => toFloat,
+  toInt: () => toInt
 });
 module.exports = __toCommonJS(utils_exports);
 const isDefined = (value) => value !== void 0 && value !== null;
 const isStateValue = (state) => isDefined(state) && isDefined(state == null ? void 0 : state.val);
-const parseFloatOrNull = (value) => {
+const toFloat = (value) => {
   if (value === "" || !isDefined(value)) {
-    return 0;
+    return NaN;
   }
-  const num = parseFloat(String(value).replace(",", "."));
-  return Number.isFinite(num) ? num : 0;
+  return parseFloat(String(value).replace(",", "."));
 };
-const parseIntOrNull = (value) => {
+const toInt = (value) => {
   if (value === "" || !isDefined(value)) {
-    return 0;
+    return NaN;
   }
-  const num = parseInt(String(value), 10);
-  return Number.isFinite(num) ? num : 0;
+  return parseInt(String(value), 10);
 };
 function findCodeVal(result, code) {
   var _a;
@@ -75,8 +73,8 @@ function findValByCodeArray(result, codes) {
   isDefined,
   isRelevantStateId,
   isStateValue,
-  parseFloatOrNull,
-  parseIntOrNull,
-  resolveOnOffMode
+  resolveOnOffMode,
+  toFloat,
+  toInt
 });
 //# sourceMappingURL=utils.js.map

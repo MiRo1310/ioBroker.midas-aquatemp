@@ -1,14 +1,7 @@
 import { expect } from 'chai';
 import { describe, it } from 'mocha';
 
-import {
-    findCodeVal,
-    findValByCodeArray,
-    isDefined,
-    isStateValue,
-    parseIntOrNull,
-    parseFloatOrNull,
-} from '../../src/lib/utils.ts';
+import { findCodeVal, findValByCodeArray, isDefined, isStateValue, toInt, toFloat } from '../../src/lib/utils.ts';
 
 describe('utils.ts', () => {
     describe('isDefined', () => {
@@ -39,34 +32,34 @@ describe('utils.ts', () => {
         });
     });
 
-    describe('parseFloatOrNull', () => {
-        it('returns 0 for empty input', () => {
-            expect(parseFloatOrNull('')).to.equal(0);
+    describe('toFloat', () => {
+        it('returns NaN for empty input', () => {
+            expect(toFloat('')).to.be.NaN;
         });
 
         it('parses decimal values including comma notation', () => {
-            expect(parseFloatOrNull('12.5')).to.equal(12.5);
-            expect(parseFloatOrNull('12,5')).to.equal(12.5);
-            expect(parseFloatOrNull('-2,75')).to.equal(-2.75);
+            expect(toFloat('12.5')).to.equal(12.5);
+            expect(toFloat('12,5')).to.equal(12.5);
+            expect(toFloat('-2,75')).to.equal(-2.75);
         });
 
-        it('returns 0 for invalid numeric values', () => {
-            expect(parseFloatOrNull('abc')).to.equal(0);
+        it('returns NaN for invalid numeric values', () => {
+            expect(toFloat('abc')).to.be.NaN;
         });
     });
 
-    describe('parseIntOrNull', () => {
-        it('returns 0 for empty input', () => {
-            expect(parseIntOrNull('')).to.equal(0);
+    describe('toInt', () => {
+        it('returns NaN for empty input', () => {
+            expect(toInt('')).to.be.NaN;
         });
 
         it('parses integer values', () => {
-            expect(parseIntOrNull('10')).to.equal(10);
-            expect(parseIntOrNull('-3')).to.equal(-3);
+            expect(toInt('10')).to.equal(10);
+            expect(toInt('-3')).to.equal(-3);
         });
 
-        it('returns 0 for invalid values', () => {
-            expect(parseIntOrNull('abc')).to.equal(0);
+        it('returns NaN for invalid values', () => {
+            expect(toInt('abc')).to.be.NaN;
         });
     });
 

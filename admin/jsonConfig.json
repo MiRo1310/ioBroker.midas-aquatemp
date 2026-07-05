@@ -1,126 +1,126 @@
 {
-	"i18n": true,
-	"type": "panel",
-	"items": {
-		"username": {
-			"type": "text",
-			"label": "Username",
-			"newLine": true,
-			"xl": 2,
-			"lg": 4,
-			"md": 6,
-			"sm": 8,
-			"xs": 12
-		},
-		"password": {
-			"type": "password",
-			"label": "password",
-			"newLine": true,
-			"xl": 2,
-			"lg": 4,
-			"md": 6,
-			"sm": 8,
-			"xs": 12
-		},
+    "i18n": true,
+    "type": "panel",
+    "items": {
+        "username": {
+            "type": "text",
+            "label": "Username",
+            "newLine": true,
+            "xl": 2,
+            "lg": 4,
+            "md": 6,
+            "sm": 8,
+            "xs": 12
+        },
+        "password": {
+            "type": "password",
+            "label": "password",
+            "newLine": true,
+            "xl": 2,
+            "lg": 4,
+            "md": 6,
+            "sm": 8,
+            "xs": 12
+        },
 
-		"refresh": {
-			"type": "number",
-			"label": "refresh",
-			"min": 60,
-			"default": 60,
-			"newLine": true,
-			"xl": 2,
-			"lg": 4,
-			"md": 6,
-			"sm": 8,
-			"xs": 12
-		},
-		"deviceMac": {
-			"type": "text",
-			"label": "Device Mac",
-			"newLine": true,
-			"xl": 2,
-			"lg": 4,
-			"md": 6,
-			"sm": 8,
-			"xs": 12
+        "refresh": {
+            "type": "number",
+            "label": "refresh",
+            "min": 60,
+            "max": 3600,
+            "default": 60,
+            "newLine": true,
+            "xl": 2,
+            "lg": 4,
+            "md": 6,
+            "sm": 8,
+            "xs": 12
+        },
+        "deviceMac": {
+            "type": "text",
+            "label": "Device Mac",
+            "newLine": true,
+            "xl": 2,
+            "lg": 4,
+            "md": 6,
+            "sm": 8,
+            "xs": 12
+        },
+        "useDeviceMac": {
+            "type": "checkbox",
+            "label": "Use Device Mac",
+            "xl": 2,
+            "lg": 2,
+            "md": 3,
+            "sm": 4,
+            "xs": 12
+        },
 
-		},
-		"useDeviceMac": {
-			"type": "checkbox",
-			"label": "Use Device Mac",
-			"xl": 2,
-			"lg": 2,
-			"md": 3,
-			"sm": 4,
-			"xs": 12
-		},
+        "selectApi": {
+            "type": "select",
+            "label": "Api Level",
+            "xl": 2,
+            "lg": 4,
+            "md": 6,
+            "sm": 8,
+            "xs": 12,
+            "default": 3,
 
-		"selectApi": {
-			"type": "select",
-			"label": "Api Level",
-			"xl": 2,
-			"lg": 4,
-			"md": 6,
-			"sm": 8,
-			"xs": 12,
-			"default": 3,
-
-			"options": [
-				{
-					"value": 1,
-					"label": "API 1"
-				},
-				{
-					"value": 2,
-					"label": "API 2"
-				},
-				{
-					"value": 3,
-					"label": "API 3"
-				}
-			],
-			"newLine": true
-		},
-		"allowInsecureTls": {
-			"type": "checkbox",
-			"label": "Allow insecure TLS (not recommended)",
-			"newLine": true,
-			"xl": 4,
-			"lg": 6,
-			"md": 8,
-			"sm": 12,
-			"xs": 12
-		},
-		"text1": {
-			"type": "staticText",
-			"text": "staticText1",
-			"newLine": true,
-			"xl": 12,
-			"lg": 12,
-			"md": 12,
-			"sm": 12,
-			"xs": 12
-		},
-		"text2": {
-			"type": "staticText",
-			"text": "staticText2",
-			"newLine": true,
-			"xl": 12,
-			"lg": 12,
-			"md": 12,
-			"sm": 12,
-			"xs": 12
-		},
-		"text3": {
-			"type": "staticText",
-			"text": "staticText3",
-			"newLine": true,
-			"xl": 12,
-			"lg": 12,
-			"md": 12,
-			"sm": 12,
-			"xs": 12
-		}
-	}
+            "options": [
+                {
+                    "value": 1,
+                    "label": "API 1"
+                },
+                {
+                    "value": 2,
+                    "label": "API 2"
+                },
+                {
+                    "value": 3,
+                    "label": "API 3"
+                }
+            ],
+            "newLine": true
+        },
+        "allowInsecureTls": {
+            "type": "checkbox",
+            "label": "Allow insecure TLS (not recommended)",
+            "newLine": true,
+            "xl": 4,
+            "lg": 6,
+            "md": 8,
+            "sm": 12,
+            "xs": 12
+        },
+        "text1": {
+            "type": "staticText",
+            "text": "staticText1",
+            "newLine": true,
+            "xl": 12,
+            "lg": 12,
+            "md": 12,
+            "sm": 12,
+            "xs": 12
+        },
+        "text2": {
+            "type": "staticText",
+            "text": "staticText2",
+            "newLine": true,
+            "xl": 12,
+            "lg": 12,
+            "md": 12,
+            "sm": 12,
+            "xs": 12
+        },
+        "text3": {
+            "type": "staticText",
+            "text": "staticText3",
+            "newLine": true,
+            "xl": 12,
+            "lg": 12,
+            "md": 12,
+            "sm": 12,
+            "xs": 12
+        }
+    }
 }

@@ -125,7 +125,7 @@ class DeviceController {
   }
   getTempSetOverride(product, responseValue) {
     if (product === "1650758828508766208") {
-      return (0, import_utils.parseFloatOrNull)((0, import_utils.findCodeVal)(responseValue, "R01"));
+      return (0, import_utils.toFloat)((0, import_utils.findCodeVal)(responseValue, "R01"));
     }
     return void 0;
   }
@@ -302,9 +302,9 @@ class DeviceController {
   };
   async saveSensors(responseValue) {
     const sensorCodes = DeviceController.getSensorCodes();
-    const powerVal = (0, import_utils.parseFloatOrNull)((0, import_utils.findValByCodeArray)(responseValue, sensorCodes.tPower));
-    const tVoltageVal = (0, import_utils.parseFloatOrNull)((0, import_utils.findValByCodeArray)(responseValue, sensorCodes.tVoltage));
-    await this.store.saveValue("consumption", powerVal * tVoltageVal);
+    const currentVal = (0, import_utils.toFloat)((0, import_utils.findValByCodeArray)(responseValue, sensorCodes.tCurrent));
+    const tVoltageVal = (0, import_utils.toFloat)((0, import_utils.findValByCodeArray)(responseValue, sensorCodes.tVoltage));
+    await this.saveNumberIfValid("consumption", currentVal * tVoltageVal);
     const flowSwitchValue = (0, import_utils.findValByCodeArray)(responseValue, sensorCodes.flowSwitch);
     await this.saveSensorNumber("exhaust", responseValue, sensorCodes.exhaust);
     await this.saveSensorNumber("suctionTemp", responseValue, sensorCodes.tSuction);
@@ -321,7 +321,7 @@ class DeviceController {
   }
   async saveSensorNumber(key, res, code, int) {
     const val = (0, import_utils.findValByCodeArray)(res, code);
-    await this.saveNumberIfValid(key, int ? (0, import_utils.parseIntOrNull)(val) : (0, import_utils.parseFloatOrNull)(val));
+    await this.saveNumberIfValid(key, int ? (0, import_utils.toInt)(val) : (0, import_utils.toFloat)(val));
   }
   async updateDeviceErrorMsg() {
     var _a, _b, _c, _d, _e, _f, _g, _h, _i, _j, _k, _l, _m, _n, _o, _p;
@@ -386,7 +386,7 @@ class DeviceController {
       tCoil: ["T04", "T4"],
       tAmb: ["T05", "T5"],
       exhaust: ["T06", "T6"],
-      tPower: ["T07", "T7"],
+      tCurrent: ["T07", "T7"],
       flowSwitch: ["S03", "S3"],
       tVoltage: ["T14"],
       tRotor: ["T17"]

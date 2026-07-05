@@ -56,6 +56,7 @@ class ApiClient {
     this.store = store;
   }
   static insecureHttpsAgent = new import_node_https.default.Agent({ rejectUnauthorized: false });
+  static DEFAULT_TIMEOUT = 10 * 1e3;
   insecureTlsWarningShown = false;
   isInsecureTlsEnabled() {
     return this.store.adapter.config.allowInsecureTls === true;
@@ -72,15 +73,16 @@ class ApiClient {
     }
     return ApiClient.insecureHttpsAgent;
   }
-  async request(url, options, token) {
+  async request(url, data, token) {
     var _a, _b, _c, _d;
     const tokenHeader = token ? { "x-token": token } : {};
-    const result = await import_axios.default.post(url, options, {
+    const result = await import_axios.default.post(url, data, {
       headers: {
         "Content-Type": "application/json",
         ...tokenHeader
       },
-      httpsAgent: this.getHttpsAgent()
+      httpsAgent: this.getHttpsAgent(),
+      timeout: ApiClient.DEFAULT_TIMEOUT
     });
     if (result.status !== 200) {
       throw new Error(`HTTP error ${result.status} for ${url}`);
