@@ -33,7 +33,8 @@ starts with js-controller 3.0.
 | **Use Device Mac**     | If enabled, the adapter skips the automatic device discovery and connects directly using the MAC address above. Use this if the device cannot be found via the normal device list. Note: the `flowSwitch` state may not be available in this mode on all devices. |
 | **Allow insecure TLS** | Disables TLS certificate verification. **For troubleshooting only — not recommended for normal use.**                                                                                                                                                             |
 
-TLS certificate validation is enabled by default. It can only be disabled via the **Allow insecure TLS** adapter setting above; when active, the adapter logs a warning on startup.
+TLS certificate validation is enabled by default. It can only be disabled via the **Allow insecure TLS** adapter setting
+above; when active, the adapter logs a warning on startup.
 
 ### Supported devices
 
@@ -58,6 +59,11 @@ If you have problems, contact us.
 	Placeholder for the next version (at the beginning of the line):
 	### **WORK IN PROGRESS**
 -->
+
+### **WORK IN PROGRESS**
+
+- FIX: Code style and linting issues
+
 ### 1.3.1 (2026-06-15)
 
 - FIX: Object Structure Check

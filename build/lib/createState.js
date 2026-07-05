@@ -205,7 +205,19 @@ const createObjects = async (store) => {
     },
     {
       id: store.getStateIdByKey("mode"),
-      name: "Modus",
+      name: {
+        en: "Mode",
+        de: "Modus",
+        ru: "\u0420\u0435\u0436\u0438\u043C",
+        pt: "Modo",
+        nl: "Modus",
+        fr: "Mode",
+        it: "Modalit\xE0",
+        es: "Modo",
+        pl: "Tryb",
+        uk: "\u0420\u0435\u0436\u0438\u043C",
+        "zh-cn": "\u6A21\u5F0F"
+      },
       type: "number",
       def: -1,
       states: { "-1": "off", 0: "cool", 1: "heat", 2: "auto" },
@@ -305,17 +317,17 @@ const createObjects = async (store) => {
     {
       id: store.getStateIdByKey("tempSet"),
       name: {
-        en: "Should temperature",
+        en: "Target temperature",
         de: "Solltemperatur",
-        ru: "\u0414\u043E\u043B\u0436\u043D\u0430 \u0431\u044B\u0442\u044C \u0442\u0435\u043C\u043F\u0435\u0440\u0430\u0442\u0443\u0440\u0430",
-        pt: "Temperatura do ombro",
-        nl: "Moet temperatuur",
-        fr: "Temp\xE9rature",
-        it: "Dovrebbe temperatura",
-        es: "Tener temperatura",
-        pl: "Temperatura powinna",
-        uk: "\u0422\u0435\u043C\u043F\u0435\u0440\u0430\u0442\u0443\u0440\u0430",
-        "zh-cn": "\u5E94\u5426\u6E29\u5EA6"
+        ru: "\u0417\u0430\u0434\u0430\u043D\u043D\u0430\u044F \u0442\u0435\u043C\u043F\u0435\u0440\u0430\u0442\u0443\u0440\u0430",
+        pt: "Temperatura de refer\xEAncia",
+        nl: "Ingestelde temperatuur",
+        fr: "Temp\xE9rature de consigne",
+        it: "Temperatura impostata",
+        es: "Temperatura de consigna",
+        pl: "Temperatura zadana",
+        uk: "\u0417\u0430\u0434\u0430\u043D\u0430 \u0442\u0435\u043C\u043F\u0435\u0440\u0430\u0442\u0443\u0440\u0430",
+        "zh-cn": "\u8BBE\u5B9A\u6E29\u5EA6"
       },
       ...tempState,
       role: "level.temperature",

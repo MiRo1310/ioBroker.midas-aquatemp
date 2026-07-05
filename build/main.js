@@ -42,9 +42,11 @@ var import_apiClient = require("./lib/apiClient");
 class MidasAquatemp extends utils.Adapter {
   static instance;
   static tokenRefreshIntervalTime = 36e5;
+  static maxIntervalSeconds = 3600;
+  static minIntervalSeconds = 60;
   updateInterval;
   tokenRefreshInterval;
-  interval = 60;
+  intervalSeconds = 60;
   store;
   silentId;
   stateId;
@@ -70,7 +72,9 @@ class MidasAquatemp extends utils.Adapter {
       return;
     }
     const { username, password, selectApi, useDeviceMac, deviceMac, refresh } = this.config;
-    this.interval = refresh != null ? refresh : this.interval;
+    if ((0, import_utils.isDefined)(refresh) && refresh > MidasAquatemp.minIntervalSeconds && refresh <= MidasAquatemp.maxIntervalSeconds) {
+      this.intervalSeconds = refresh;
+    }
     if (username === "" || password === "" || password === void 0) {
       this.log.error("Empty Username or Password.");
       return;
@@ -86,14 +90,14 @@ class MidasAquatemp extends utils.Adapter {
       if (this.store.isValidMode(currentMode)) {
         this.store.setMode(currentMode);
       }
-      this.log.info(`API level: ${this.config.selectApi}, refresh interval: ${this.interval}s`);
+      this.log.info(`API level: ${this.config.selectApi}, refresh interval: ${this.intervalSeconds}s`);
       await (0, import_createState.createObjects)(this.store);
       this.log.info("Objects created");
       await this.store.clearStateValues();
       await tokenManager.updateTokenAndDeviceId();
       this.updateInterval = this.setInterval(async function() {
         await tokenManager.updateTokenAndDeviceId();
-      }, this.interval * 1e3);
+      }, this.intervalSeconds * 1e3);
       this.tokenRefreshInterval = this.setInterval(async function() {
         tokenManager.resetToken();
         await tokenManager.updateTokenAndDeviceId();
