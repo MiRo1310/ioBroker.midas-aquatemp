@@ -33,19 +33,7 @@ starts with js-controller 3.0.
 | **Use Device Mac**     | If enabled, the adapter skips the automatic device discovery and connects directly using the MAC address above. Use this if the device cannot be found via the normal device list. Note: the `flowSwitch` state may not be available in this mode on all devices. |
 | **Allow insecure TLS** | Disables TLS certificate verification. **For troubleshooting only — not recommended for normal use.**                                                                                                                                                             |
 
-### TLS notes
-
-TLS certificate validation is enabled by default.
-
-For troubleshooting only, insecure TLS mode can also be enabled via environment variable:
-
-- `MIDAS_AQUATEMP_INSECURE_TLS=true`
-
-Optional host allowlist to restrict insecure mode to specific hosts:
-
-- `MIDAS_AQUATEMP_INSECURE_TLS_HOSTS=host1,host2`
-
-When insecure mode is active, the adapter logs a warning on startup.
+TLS certificate validation is enabled by default. It can only be disabled via the **Allow insecure TLS** adapter setting above; when active, the adapter logs a warning on startup.
 
 ### Supported devices
 
