@@ -352,10 +352,11 @@ export class DeviceController {
     private async saveSensors(responseValue: ObjectResultResponse): Promise<void> {
         const sensorCodes = DeviceController.getSensorCodes();
 
-        const powerVal = parseFloatOrNull(findValByCodeArray(responseValue, sensorCodes.tPower));
+        // T07 reports current (A); consumption (W) = current × voltage
+        const currentVal = parseFloatOrNull(findValByCodeArray(responseValue, sensorCodes.tCurrent));
         const tVoltageVal = parseFloatOrNull(findValByCodeArray(responseValue, sensorCodes.tVoltage));
 
-        await this.store.saveValue('consumption', powerVal * tVoltageVal);
+        await this.store.saveValue('consumption', currentVal * tVoltageVal);
 
         const flowSwitchValue = findValByCodeArray(responseValue, sensorCodes.flowSwitch);
 
@@ -449,7 +450,7 @@ export class DeviceController {
     }
 
     private static getSensorCodes(): {
-        tPower: string[];
+        tCurrent: string[];
         tSuction: string[];
         tIn: string[];
         tOut: string[];
@@ -467,7 +468,7 @@ export class DeviceController {
             tCoil: ['T04', 'T4'],
             tAmb: ['T05', 'T5'],
             exhaust: ['T06', 'T6'],
-            tPower: ['T07', 'T7'],
+            tCurrent: ['T07', 'T7'],
             flowSwitch: ['S03', 'S3'],
             tVoltage: ['T14'],
             tRotor: ['T17'],
