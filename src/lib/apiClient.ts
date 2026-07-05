@@ -24,7 +24,9 @@ export class ResetError extends Error {
 
 export class ApiClient {
     private static insecureHttpsAgent = new https.Agent({ rejectUnauthorized: false });
+    private static readonly DEFAULT_TIMEOUT = 10 * 1000;
     private insecureTlsWarningShown = false;
+
     constructor(private readonly store: Store) {}
 
     private isInsecureTlsEnabled(): boolean {
@@ -48,17 +50,18 @@ export class ApiClient {
 
     public async request<T extends { error_code?: string | number }>(
         url: string,
-        options: unknown,
+        data: unknown,
         token?: string | null,
     ): Promise<T> {
         const tokenHeader = token ? { 'x-token': token } : {};
 
-        const result = await axios.post<T>(url, options, {
+        const result = await axios.post<T>(url, data, {
             headers: {
                 'Content-Type': 'application/json',
                 ...tokenHeader,
             },
             httpsAgent: this.getHttpsAgent(),
+            timeout: ApiClient.DEFAULT_TIMEOUT,
         });
 
         if (result.status !== 200) {
