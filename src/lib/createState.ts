@@ -59,6 +59,7 @@ export const createObjects = async (store: Store): Promise<void> => {
                 'zh-cn': '连接',
             },
             ...booleanState,
+            role: 'indicator.connected',
         },
         {
             id: store.getStateIdByKey('online'),
@@ -76,6 +77,7 @@ export const createObjects = async (store: Store): Promise<void> => {
                 'zh-cn': '在线',
             },
             ...booleanState,
+            role: 'indicator.reachable',
         },
         {
             id: store.getStateIdByKey('consumption'),
@@ -130,6 +132,7 @@ export const createObjects = async (store: Store): Promise<void> => {
                 'zh-cn': '错误',
             },
             ...booleanState,
+            role: 'indicator.error',
         },
         {
             id: store.getStateIdByKey('errorCode'),
@@ -147,6 +150,7 @@ export const createObjects = async (store: Store): Promise<void> => {
                 'zh-cn': '错误代码',
             },
             ...stringState,
+            role: 'text',
         },
         {
             id: store.getStateIdByKey('errorLevel'),
@@ -164,6 +168,7 @@ export const createObjects = async (store: Store): Promise<void> => {
                 'zh-cn': '错误级别',
             },
             type: 'number',
+            def: 0,
             role: 'state',
         },
         {
@@ -182,6 +187,7 @@ export const createObjects = async (store: Store): Promise<void> => {
                 'zh-cn': '错误消息',
             },
             ...stringState,
+            role: 'text',
         },
         {
             id: store.getStateIdByKey('mode'),
@@ -202,7 +208,7 @@ export const createObjects = async (store: Store): Promise<void> => {
             def: -1,
             states: { '-1': 'off', 0: 'cool', 1: 'heat', 2: 'auto' },
             write: true,
-            role: 'state',
+            role: 'level.mode.airconditioner',
         },
         {
             id: store.getStateIdByKey('rotor'),
@@ -222,7 +228,7 @@ export const createObjects = async (store: Store): Promise<void> => {
             type: 'number',
             unit: 'rpm',
             def: 0,
-            role: 'state',
+            role: 'value',
         },
         {
             id: store.getStateIdByKey('silent'),
@@ -241,6 +247,7 @@ export const createObjects = async (store: Store): Promise<void> => {
             },
             ...booleanState,
             write: true,
+            role: 'switch.mode.silent',
         },
         {
             id: store.getStateIdByKey('state'),
@@ -259,6 +266,7 @@ export const createObjects = async (store: Store): Promise<void> => {
             },
             ...booleanState,
             write: true,
+            role: 'switch.power',
         },
         {
             id: store.getStateIdByKey('tempIn'),
@@ -380,6 +388,7 @@ export const createObjects = async (store: Store): Promise<void> => {
                 'zh-cn': '产品代码',
             },
             ...stringState,
+            role: 'info.model',
         },
         {
             id: store.getStateIdByKey('DeviceCode'),
@@ -397,6 +406,7 @@ export const createObjects = async (store: Store): Promise<void> => {
                 'zh-cn': '设备标识',
             },
             ...stringState,
+            role: 'info.serial',
         },
         {
             id: store.getStateIdByKey('rawJSON'),
@@ -432,6 +442,7 @@ export const createObjects = async (store: Store): Promise<void> => {
                 'zh-cn': '流程切换',
             },
             ...booleanState,
+            role: 'sensor',
         },
     ];
 
