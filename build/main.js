@@ -72,8 +72,12 @@ class MidasAquatemp extends utils.Adapter {
       return;
     }
     const { username, password, selectApi, useDeviceMac, deviceMac, refresh } = this.config;
-    if ((0, import_utils.isDefined)(refresh) && refresh > MidasAquatemp.minIntervalSeconds && refresh <= MidasAquatemp.maxIntervalSeconds) {
+    if ((0, import_utils.isDefined)(refresh) && refresh >= MidasAquatemp.minIntervalSeconds && refresh <= MidasAquatemp.maxIntervalSeconds) {
       this.intervalSeconds = refresh;
+    } else if ((0, import_utils.isDefined)(refresh)) {
+      this.log.warn(
+        `Configured refresh interval ${refresh}s is out of range (${MidasAquatemp.minIntervalSeconds}-${MidasAquatemp.maxIntervalSeconds}s). Using default of ${this.intervalSeconds}s instead.`
+      );
     }
     if (username === "" || password === "" || password === void 0) {
       this.log.error("Empty Username or Password.");

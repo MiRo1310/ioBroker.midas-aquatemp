@@ -51,10 +51,14 @@ export class MidasAquatemp extends utils.Adapter {
 
         if (
             isDefined(refresh) &&
-            refresh > MidasAquatemp.minIntervalSeconds &&
+            refresh >= MidasAquatemp.minIntervalSeconds &&
             refresh <= MidasAquatemp.maxIntervalSeconds
         ) {
             this.intervalSeconds = refresh;
+        } else if (isDefined(refresh)) {
+            this.log.warn(
+                `Configured refresh interval ${refresh}s is out of range (${MidasAquatemp.minIntervalSeconds}-${MidasAquatemp.maxIntervalSeconds}s). Using default of ${this.intervalSeconds}s instead.`,
+            );
         }
 
         if (username === '' || password === '' || password === undefined) {

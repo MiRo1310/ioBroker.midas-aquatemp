@@ -59,6 +59,11 @@ If you have problems, contact us.
 	Placeholder for the next version (at the beginning of the line):
 	### **WORK IN PROGRESS**
 -->
+
+### **WORK IN PROGRESS**
+
+- FIX: #126 Repository checker and Claude Review for latest repro
+
 ### 1.3.2 (2026-07-05)
 
 - FIX: Code style and linting issues

@@ -78,7 +78,8 @@ const createObjects = async (store) => {
         uk: "\u041F\u0456\u0434\u043A\u043B\u044E\u0447\u0435\u043D\u043D\u044F",
         "zh-cn": "\u8FDE\u63A5"
       },
-      ...booleanState
+      ...booleanState,
+      role: "indicator.connected"
     },
     {
       id: store.getStateIdByKey("online"),
@@ -95,7 +96,8 @@ const createObjects = async (store) => {
         uk: "\u041E\u043D\u043B\u0430\u0439\u043D",
         "zh-cn": "\u5728\u7EBF"
       },
-      ...booleanState
+      ...booleanState,
+      role: "indicator.reachable"
     },
     {
       id: store.getStateIdByKey("consumption"),
@@ -149,7 +151,8 @@ const createObjects = async (store) => {
         uk: "\u041F\u043E\u043C\u0438\u043B\u043A\u0430",
         "zh-cn": "\u9519\u8BEF"
       },
-      ...booleanState
+      ...booleanState,
+      role: "indicator.error"
     },
     {
       id: store.getStateIdByKey("errorCode"),
@@ -166,7 +169,8 @@ const createObjects = async (store) => {
         uk: "\u041A\u043E\u0434 \u043F\u043E\u043C\u0438\u043B\u043A\u0438",
         "zh-cn": "\u9519\u8BEF\u4EE3\u7801"
       },
-      ...stringState
+      ...stringState,
+      role: "text"
     },
     {
       id: store.getStateIdByKey("errorLevel"),
@@ -184,6 +188,7 @@ const createObjects = async (store) => {
         "zh-cn": "\u9519\u8BEF\u7EA7\u522B"
       },
       type: "number",
+      def: 0,
       role: "state"
     },
     {
@@ -201,7 +206,8 @@ const createObjects = async (store) => {
         uk: "\u041F\u043E\u043C\u0438\u043B\u043A\u0430",
         "zh-cn": "\u9519\u8BEF\u6D88\u606F"
       },
-      ...stringState
+      ...stringState,
+      role: "text"
     },
     {
       id: store.getStateIdByKey("mode"),
@@ -222,7 +228,7 @@ const createObjects = async (store) => {
       def: -1,
       states: { "-1": "off", 0: "cool", 1: "heat", 2: "auto" },
       write: true,
-      role: "state"
+      role: "level.mode.airconditioner"
     },
     {
       id: store.getStateIdByKey("rotor"),
@@ -242,7 +248,7 @@ const createObjects = async (store) => {
       type: "number",
       unit: "rpm",
       def: 0,
-      role: "state"
+      role: "value"
     },
     {
       id: store.getStateIdByKey("silent"),
@@ -260,7 +266,8 @@ const createObjects = async (store) => {
         "zh-cn": "\u5B89\u9759"
       },
       ...booleanState,
-      write: true
+      write: true,
+      role: "switch.mode.silent"
     },
     {
       id: store.getStateIdByKey("state"),
@@ -278,7 +285,8 @@ const createObjects = async (store) => {
         "zh-cn": "\u72B6\u6001"
       },
       ...booleanState,
-      write: true
+      write: true,
+      role: "switch.power"
     },
     {
       id: store.getStateIdByKey("tempIn"),
@@ -399,7 +407,8 @@ const createObjects = async (store) => {
         uk: "\u041A\u043E\u0434 \u0442\u043E\u0432\u0430\u0440\u0443",
         "zh-cn": "\u4EA7\u54C1\u4EE3\u7801"
       },
-      ...stringState
+      ...stringState,
+      role: "info.model"
     },
     {
       id: store.getStateIdByKey("DeviceCode"),
@@ -416,7 +425,8 @@ const createObjects = async (store) => {
         uk: "\u041A\u043E\u0434 \u043F\u0440\u0438\u0441\u0442\u0440\u043E\u044E",
         "zh-cn": "\u8BBE\u5907\u6807\u8BC6"
       },
-      ...stringState
+      ...stringState,
+      role: "info.serial"
     },
     {
       id: store.getStateIdByKey("rawJSON"),
@@ -451,7 +461,8 @@ const createObjects = async (store) => {
         uk: "\u041F\u0435\u0440\u0435\u043C\u0438\u043A\u0430\u0447 \u043F\u043E\u0442\u043E\u043A\u0443",
         "zh-cn": "\u6D41\u7A0B\u5207\u6362"
       },
-      ...booleanState
+      ...booleanState,
+      role: "sensor"
     }
   ];
   for (const { id, name, role, unit, type, def, write = false, states } of objects) {
