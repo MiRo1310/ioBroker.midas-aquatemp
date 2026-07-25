@@ -38,9 +38,8 @@ above; when active, the adapter logs a warning on startup.
 
 ### Supported devices
 
-The following devices are confirmed to work with this adapter.
-Other [Midas](https://www.midas-gmbh.de/) / Poolsana devices that use the Linked-Go cloud API may also be compatible,
-but this cannot be guaranteed.
+The following devices are confirmed to work with this adapter. Other [Midas](https://www.midas-gmbh.de/) / Poolsana
+devices that use the Linked-Go cloud API may also be compatible, but this cannot be guaranteed.
 
 If your device is not listed and you have successfully used it with this adapter, feel free to open an issue or pull
 request to add it.
@@ -62,6 +61,7 @@ If you have problems, contact us.
 
 ### **WORK IN PROGRESS**
 
+- FIX: #138 Correct power consumption calculation to handle decimal values
 - FIX: #126 Repository checker and Claude Review for latest repro
 
 ### 1.3.2 (2026-07-05)
@@ -81,8 +81,7 @@ If you have problems, contact us.
 - FIX: Product-specific protocol codes for Poolsana vs. other devices
 - FIX: TLS certificate validation enabled by default; optional insecure mode via adapter config or environment variable
 - FIX: Invalid or missing sensor values are no longer written as NaN
-- FEAT: Add online state — boolean datapoint that indicates whether the device is currently reachable via the cloud
-  API
+- FEAT: Add online state — boolean datapoint that indicates whether the device is currently reachable via the cloud API
 - CHORE: Update dependencies
 
 ### 1.2.5 (2025-08-02)
@@ -103,20 +102,15 @@ MIT License
 
 Copyright (c) 2024-2026 MiRo1310 <michael.roling@gmx.de>
 
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
+Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated
+documentation files (the "Software"), to deal in the Software without restriction, including without limitation the
+rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit
+persons to whom the Software is furnished to do so, subject to the following conditions:
 
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
+The above copyright notice and this permission notice shall be included in all copies or substantial portions of the
+Software.
 
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE
+WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR
+COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
+OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.

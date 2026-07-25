@@ -352,11 +352,11 @@ export class DeviceController {
     private async saveSensors(responseValue: ObjectResultResponse): Promise<void> {
         const sensorCodes = DeviceController.getSensorCodes();
 
-        // T07 reports current (A); consumption (W) = current × voltage
-        const currentVal = toFloat(findValByCodeArray(responseValue, sensorCodes.tCurrent));
+        // T07 reports current in 0.1 A steps; consumption (W) = current × voltage
+        const currentAmpere = toFloat(findValByCodeArray(responseValue, sensorCodes.tCurrent)) / 10; // Temporary fix until it was fixed by producer
         const tVoltageVal = toFloat(findValByCodeArray(responseValue, sensorCodes.tVoltage));
 
-        await this.saveNumberIfValid('consumption', currentVal * tVoltageVal);
+        await this.saveNumberIfValid('consumption', currentAmpere * tVoltageVal);
 
         const flowSwitchValue = findValByCodeArray(responseValue, sensorCodes.flowSwitch);
 
