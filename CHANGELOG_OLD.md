@@ -1,5 +1,13 @@
 # Older changes
 
+## 1.2.4 (2025-06-01)
+
+- Fix: Error in updateDeviceID: No device code found
+
+## 1.2.3 (2025-06-01)
+
+- FEAT: Add types, fix some errors
+
 ### 1.2.2 (2025-05-31)
 
 - FIX: Reported errors by sentry
@@ -29,11 +37,8 @@
 - FEAT: Add writeable states
 - FEAT: Data is also updated when the heating is off
 - FIX: Get token
-- FIX: #7 Error with useStore()
+- FIX: #7 Error with useStore ()
 
 ### 0.0.1 (11.07.2024)
 
 - (Miro1310) initial release
-## 1.2.3 (2025-06-01)
-
-- FEAT: Add types, fix some errors

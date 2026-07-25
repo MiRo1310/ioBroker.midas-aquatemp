@@ -1,9 +1,9 @@
 {
   "common": {
     "name": "midas-aquatemp",
-    "version": "1.3.2",
+    "version": "1.3.3",
     "news": {
-       "1.3.3": {
+      "1.3.3": {
         "en": "FIX: #138 Correct power consumption calculation to handle decimal values\nFIX: #126 Repository checker and Claude Review for latest repro",
         "de": "BEHOBEN: #138 Korrektur der Leistungsverbrauchsberechnung zur Behandlung von Dezimalwerten\nBEHOBEN: #126 Repository-Checker und Claude Review für neuestes Repro",
         "ru": "ИСПРАВЛЕНО: #138 Исправлен расчёт потребляемой мощности для корректной обработки дробных значений\nИСПРАВЛЕНО: #126 Проверка репозитория и Claude Review для последнего репро",
@@ -93,19 +93,6 @@
         "pl": "FEAT: Dodawanie typów, naprawianie błędów",
         "uk": "FEAT: Додати типи, виправити деякі помилки",
         "zh-cn": "FEAT: 添加类型, 修正一些错误"
-      },
-      "1.2.2": {
-        "en": "FIX: Reported errors by sentry",
-        "de": "FIX: Gemeldete Fehler durch Versendung",
-        "ru": "FIX: Сообщения об ошибках часового",
-        "pt": "FIX: Erros reportados por remetente",
-        "nl": "FIX: Gemelde fouten door de wachtdienst",
-        "fr": "FIX: Erreurs signalées par sentinelle",
-        "it": "FIX: Errori segnalati dalla sentinella",
-        "es": "FIX: Errores reportados por centinela",
-        "pl": "FIX: Zgłoszone błędy przez wartownika",
-        "uk": "FIX: Повідомлені помилки відправником",
-        "zh-cn": "FIX:哨兵报告的错误"
       }
     },
     "titleLang": {

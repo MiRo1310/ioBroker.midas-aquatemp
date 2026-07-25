@@ -58,8 +58,7 @@ If you have problems, contact us.
 	Placeholder for the next version (at the beginning of the line):
 	### **WORK IN PROGRESS**
 -->
-
-### **WORK IN PROGRESS**
+### 1.3.3 (2026-07-25)
 
 - FIX: #138 Correct power consumption calculation to handle decimal values
 - FIX: #126 Repository checker and Claude Review for latest repro
@@ -89,10 +88,6 @@ If you have problems, contact us.
 - Add size attributes to jsonConfig
 - Minimal admin version: 7.4.10
 - Breaking change: minimal supported node.js version is 20.x
-
-### 1.2.4 (2025-06-01)
-
-- Fix: Error in updateDeviceID: No device code found
 
 [Older changelogs can be found there](CHANGELOG_OLD.md)
 
