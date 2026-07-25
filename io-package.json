@@ -3,6 +3,19 @@
     "name": "midas-aquatemp",
     "version": "1.3.2",
     "news": {
+       "1.3.3": {
+        "en": "FIX: #138 Correct power consumption calculation to handle decimal values\nFIX: #126 Repository checker and Claude Review for latest repro",
+        "de": "BEHOBEN: #138 Korrektur der Leistungsverbrauchsberechnung zur Behandlung von Dezimalwerten\nBEHOBEN: #126 Repository-Checker und Claude Review für neuestes Repro",
+        "ru": "ИСПРАВЛЕНО: #138 Исправлен расчёт потребляемой мощности для корректной обработки дробных значений\nИСПРАВЛЕНО: #126 Проверка репозитория и Claude Review для последнего репро",
+        "pt": "CORREÇÃO: #138 Correção do cálculo de consumo de energia para lidar com valores decimais\nCORREÇÃO: #126 Verificador de repositório e Claude Review para a última reprodução",
+        "nl": "OPGELOST: #138 Correctie van de stroomverbruiksberekening voor decimale waarden\nOPGELOST: #126 Repository-checker en Claude Review voor de nieuwste repro",
+        "fr": "CORRECTION : #138 Correction du calcul de la consommation électrique pour gérer les valeurs décimales\nCORRECTION : #126 Vérificateur de dépôt et Claude Review pour la dernière reproduction",
+        "it": "CORREZIONE: #138 Corretto il calcolo del consumo energetico per gestire i valori decimali\nCORREZIONE: #126 Controllo del repository e Claude Review per l'ultima riproduzione",
+        "es": "CORRECCIÓN: #138 Corrección del cálculo de consumo de energía para manejar valores decimales\nCORRECCIÓN: #126 Verificador de repositorio y Claude Review para la última reproducción",
+        "pl": "NAPRAWIONO: #138 Poprawiono obliczanie zużycia energii w celu obsługi wartości dziesiętnych\nNAPRAWIONO: #126 Sprawdzanie repozytorium i Claude Review dla najnowszej repro",
+        "uk": "ВИПРАВЛЕННЯ: #138 Виправлено розрахунок споживання електроенергії для обробки десяткових значень\nВИПРАВЛЕННЯ: #126 Перевірка репозиторію та Claude Review для останнього репро",
+        "zh-cn": "修复：#138 修正功耗计算以正确处理小数值\n修复：#126 最新复现的仓库检查器和 Claude Review"
+      },
       "1.3.2": {
         "en": "FIX: Code style and linting issues",
         "de": "BEHOBEN: Probleme mit Codestil und Linting",
