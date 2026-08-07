@@ -58,6 +58,10 @@ If you have problems, contact us.
 	Placeholder for the next version (at the beginning of the line):
 	### **WORK IN PROGRESS**
 -->
+
+### **WORK IN PROGRESS**
+- (ioBroker-Bot) Adapter requires admin >= 7.8.23 now.
+
 ### 1.3.3 (2026-07-25)
 
 - FIX: #138 Correct power consumption calculation to handle decimal values
