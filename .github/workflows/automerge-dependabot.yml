@@ -8,7 +8,7 @@ on:
   # Trigger when a PR is opened or updated
   # WARNING: This needs to be run in the PR base, DO NOT build untrusted code in this action
   pull_request_target:
-    types: [ opened, synchronize, reopened ]
+    types: [opened, synchronize, reopened]
 
 jobs:
   auto-merge:
@@ -19,7 +19,7 @@ jobs:
     permissions:
       contents: write
       pull-requests: write
-    
+      
     steps:
       - name: Auto-merge Dependabot PRs
         uses: iobroker-bot-orga/action-automerge-dependabot@v1
