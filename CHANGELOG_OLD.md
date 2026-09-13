@@ -1,4 +1,9 @@
 # Older changes
+## 1.2.5 (2025-08-02)
+
+- Add size attributes to jsonConfig
+- Minimal admin version: 7.4.10
+- Breaking change: minimal supported node.js version is 20.x
 
 ## 1.2.4 (2025-06-01)
 

@@ -1,8 +1,21 @@
 {
   "common": {
     "name": "midas-aquatemp",
-    "version": "1.3.3",
+    "version": "1.3.4",
     "news": {
+      "1.3.4": {
+        "en": "Adapter requires admin >= 7.8.23 now.\nFIX: #161 No sensor data when useDeviceMac is enabled (device discovery via deviceList was required internally even though it is skipped in this mode)",
+        "de": "Adapter benötigt jetzt admin >= 7.8.23.\nFIX: #161 Keine Sensordaten bei UseDeviceMac (Gerätesuche über DeviceList war intern nötig, aber in diesem Modus übersprungen)",
+        "ru": "Теперь для адаптера требуется администратор >= 7.8.23.\nИСПРАВЛЕНИЕ: #161 Отсутствие данных датчиков при включенном UseDeviceMac (обнаружение устройств с помощью DeviceList требовалось внутренне, хотя в этом режиме оно и пропущено)",
+        "pt": "Agora o adaptador exige admin >= 7.8.23.\nCORREÇÃO: #161 Sem dados do sensor quando o UseDeviceMac está ativado (a descoberta via DeviceList era necessária internamente, mas é ignorada)",
+        "nl": "Voor de adapter is nu admin >= 7.8.23 vereist.\nOPLOSSING: #161 Geen sensorgegevens wanneer UseDeviceMac is ingeschakeld (apparaatdetectie via DeviceList was intern vereist, ook al wordt dat in deze modus overgeslagen)",
+        "fr": "Adapter nécessite admin >= 7.8.23.\nCORRECTIF : #161 Aucune donnée de capteur lorsque UseDeviceMac est activé (la découverte des appareils via DeviceList était requise en interne, même si ce mode est ignoré)",
+        "it": "Adapter richiede admin >= 7.8.23 ora.\nFIX: #161 Nessun dato del sensore se UseDeviceMac è abilitato (il rilevamento dei dispositivi tramite DeviceList è saltato)",
+        "es": "El adaptador ahora necesita admin >= 7.8.23\nFIX: #161 No hay datos de sensores cuando UseDeviceMac está activado (era necesario detectar el dispositivo a través de DeviceList aunque se omite en este modo)",
+        "pl": "Adapter wymaga teraz administratora >= 7.8.23.\nPOPRAWKA: #161 Brak danych czujnika, gdy funkcja useDeviceMac jest włączona (wykrywanie urządzenia przez DeviceList było wymagane wewnętrznie, mimo że jest pominięte w tym trybie)",
+        "uk": "Адаптер вимагає адміністратора >= 7.8.23 зараз.\nВИПРАВЛЕННЯ: #161 Немає даних датчика, коли увімкнено useDeviceMac (виявлення пристрою через DeviceList було потрібно внутрішньо, навіть якщо він пропущений у цьому режимі)",
+        "zh-cn": "适配器现在需要管理员 >= 7.8.23。\n修复：#161 启用 useDeviceMac 时没有传感器数据（尽管在此模式下跳过了设备列表，但内部仍需要通过 deviceList 进行设备发现）"
+      },
       "1.3.3": {
         "en": "FIX: #138 Correct power consumption calculation to handle decimal values\nFIX: #126 Repository checker and Claude Review for latest repro",
         "de": "BEHOBEN: #138 Korrektur der Leistungsverbrauchsberechnung zur Behandlung von Dezimalwerten\nBEHOBEN: #126 Repository-Checker und Claude Review für neuestes Repro",
@@ -80,19 +93,6 @@
         "pl": "Fix: Błąd w updateDeviceID: Nie znaleziono kodu urządzenia",
         "uk": "Виправлення: помилка в оновленніDeviceID: Не знайдено коду пристрою",
         "zh-cn": "修正: 更新DeviceID时出错 : 未找到设备代码"
-      },
-      "1.2.3": {
-        "en": "FEAT: Add types, fix some errors",
-        "de": "FEAT: Typen hinzufügen, Fehler beheben",
-        "ru": "FEAT: Добавьте типы, исправьте некоторые ошибки",
-        "pt": "FEAT: Adicionar tipos, corrigir alguns erros",
-        "nl": "FEAT: Voeg soorten toe, repareer enkele fouten",
-        "fr": "FAT: Ajouter des types, corriger certaines erreurs",
-        "it": "FEAT: Aggiungere tipi, correggere alcuni errori",
-        "es": "FEAT: Agregar tipos, corregir algunos errores",
-        "pl": "FEAT: Dodawanie typów, naprawianie błędów",
-        "uk": "FEAT: Додати типи, виправити деякі помилки",
-        "zh-cn": "FEAT: 添加类型, 修正一些错误"
       }
     },
     "titleLang": {
