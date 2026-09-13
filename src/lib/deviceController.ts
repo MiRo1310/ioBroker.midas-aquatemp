@@ -18,6 +18,7 @@ export class DeviceController {
     public async updateDeviceStatus(): Promise<void> {
         const res = this.getTokenAndDevice();
         if (!res) {
+            this.store.logger.debug('updateDeviceStatus: skipped, no valid token or device');
             return;
         }
 
@@ -71,9 +72,12 @@ export class DeviceController {
     }
 
     public async updateDeviceDetails(): Promise<void> {
-        const { product, logger } = this.store;
+        const { product, device, logger } = this.store;
         const token = this.tokenManager.getValidTokenOrNull();
-        if (!token || !product) {
+        if (!token || !device) {
+            logger.debug(
+                `updateDeviceDetails: skipped, no valid token or device (token: ${!!token}, device: ${!!device})`,
+            );
             return;
         }
 
@@ -128,7 +132,7 @@ export class DeviceController {
         }
     }
 
-    private getTempSetOverride(product: string, responseValue: ObjectResultResponse): number | undefined {
+    private getTempSetOverride(product: string | undefined, responseValue: ObjectResultResponse): number | undefined {
         if (product === '1650758828508766208') {
             return toFloat(findCodeVal(responseValue, 'R01'));
         }
@@ -139,6 +143,7 @@ export class DeviceController {
         const { logger } = this.store;
         const token = this.tokenManager.getValidTokenOrNull();
         if (!token) {
+            logger.debug('fetchDevice: skipped, no valid token');
             return;
         }
 
@@ -272,6 +277,7 @@ export class DeviceController {
         }
         const res = this.getTokenAndDevice();
         if (!res) {
+            logger.debug('updateDeviceSetTemp: skipped, no valid token or device');
             return;
         }
         const data = await this.apiClient.request<MidasData>(
@@ -290,6 +296,7 @@ export class DeviceController {
         const silentMode = silent ? '1' : '0';
         const res = this.getTokenAndDevice();
         if (!res) {
+            logger.debug('updateDeviceSilent: skipped, no valid token or device');
             return;
         }
         const data = await this.apiClient.request<MidasData>(
@@ -386,9 +393,10 @@ export class DeviceController {
     }
 
     private async updateDeviceErrorMsg(): Promise<void> {
-        const { apiLevel, cloudURL } = this.store;
+        const { apiLevel, cloudURL, logger } = this.store;
         const res = this.getTokenAndDevice();
         if (!res) {
+            logger.debug('updateDeviceErrorMsg: skipped, no valid token or device');
             return;
         }
         const sURL =
@@ -429,6 +437,7 @@ export class DeviceController {
 
         const res = this.getTokenAndDevice();
         if (!res) {
+            logger.debug('updateDeviceMode: skipped, no valid token or device');
             return;
         }
         const data = await this.apiClient.request<MidasData>(

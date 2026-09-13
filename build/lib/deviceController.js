@@ -34,6 +34,7 @@ class DeviceController {
   async updateDeviceStatus() {
     const res = this.getTokenAndDevice();
     if (!res) {
+      this.store.logger.debug("updateDeviceStatus: skipped, no valid token or device");
       return;
     }
     const payload = this.isApiLevelLessThan3() ? { device_code: res.device } : { deviceCode: res.device };
@@ -77,9 +78,12 @@ class DeviceController {
   }
   async updateDeviceDetails() {
     var _a, _b, _c;
-    const { product, logger } = this.store;
+    const { product, device, logger } = this.store;
     const token = this.tokenManager.getValidTokenOrNull();
-    if (!token || !product) {
+    if (!token || !device) {
+      logger.debug(
+        `updateDeviceDetails: skipped, no valid token or device (token: ${!!token}, device: ${!!device})`
+      );
       return;
     }
     try {
@@ -134,6 +138,7 @@ class DeviceController {
     const { logger } = this.store;
     const token = this.tokenManager.getValidTokenOrNull();
     if (!token) {
+      logger.debug("fetchDevice: skipped, no valid token");
       return;
     }
     try {
@@ -251,6 +256,7 @@ class DeviceController {
     }
     const res = this.getTokenAndDevice();
     if (!res) {
+      logger.debug("updateDeviceSetTemp: skipped, no valid token or device");
       return;
     }
     const data = await this.apiClient.request(
@@ -267,6 +273,7 @@ class DeviceController {
     const silentMode = silent ? "1" : "0";
     const res = this.getTokenAndDevice();
     if (!res) {
+      logger.debug("updateDeviceSilent: skipped, no valid token or device");
       return;
     }
     const data = await this.apiClient.request(
@@ -325,9 +332,10 @@ class DeviceController {
   }
   async updateDeviceErrorMsg() {
     var _a, _b, _c, _d, _e, _f, _g, _h, _i, _j, _k, _l, _m, _n, _o, _p;
-    const { apiLevel, cloudURL } = this.store;
+    const { apiLevel, cloudURL, logger } = this.store;
     const res = this.getTokenAndDevice();
     if (!res) {
+      logger.debug("updateDeviceErrorMsg: skipped, no valid token or device");
       return;
     }
     const sURL = apiLevel < 3 ? `${cloudURL}/app/device/getFaultDataByDeviceCode.json` : `${cloudURL}/app/device/getFaultDataByDeviceCode`;
@@ -361,6 +369,7 @@ class DeviceController {
     const { logger } = this.store;
     const res = this.getTokenAndDevice();
     if (!res) {
+      logger.debug("updateDeviceMode: skipped, no valid token or device");
       return;
     }
     const data = await this.apiClient.request(
