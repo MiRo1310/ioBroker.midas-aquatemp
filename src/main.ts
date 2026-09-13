@@ -101,6 +101,7 @@ export class MidasAquatemp extends utils.Adapter {
                     }
 
                     if (!this.isRelevant(id)) {
+                        this.log.debug(`Ignoring state change for ${id}: not relevant or no device known yet`);
                         return;
                     }
 

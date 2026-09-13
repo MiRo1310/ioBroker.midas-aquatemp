@@ -320,10 +320,22 @@ describe('DeviceController', () => {
             expect(apiClient.callCount).to.equal(0);
         });
 
-        it('makes no API call when product is missing', async () => {
-            store.product = undefined;
+        it('makes no API call when device is missing', async () => {
+            store.device = undefined;
             await controller.updateDeviceDetails();
             expect(apiClient.callCount).to.equal(0);
+        });
+
+        it('still processes details when only product is missing (useDeviceMac)', async () => {
+            store.product = undefined;
+            const client = makeSequentialApiClient(makeDetailsResponse());
+            controller = new DeviceController(store, tokenManager, client);
+
+            await controller.updateDeviceDetails();
+
+            expect(client.callCount).to.equal(1);
+            const state = await adapter.getStateAsync('midas-aquatemp.0.state');
+            expect(state?.val).to.equal(true);
         });
 
         it('saves state=true and mode from API when power is on', async () => {

@@ -112,6 +112,7 @@ class MidasAquatemp extends utils.Adapter {
             return;
           }
           if (!this.isRelevant(id)) {
+            this.log.debug(`Ignoring state change for ${id}: not relevant or no device known yet`);
             return;
           }
           await tokenManager.ensureValidToken();
