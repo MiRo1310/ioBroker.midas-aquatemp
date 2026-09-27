@@ -5,13 +5,15 @@
 // The adapter-core module gives you access to the core ioBroker functions
 // you need to create an
 import type { TMode } from './lib/store';
-import { DEFAULT_CONSUMPTION_FACTOR, isConsumptionFactor, Store } from './lib/store';
+import { DEFAULT_CONSUMPTION_FACTOR, Store } from './lib/store';
 import * as utils from '@iobroker/adapter-core';
 import { createObjects } from './lib/createState';
-import { isDefined, isStateValue, isRelevantStateId, resolveOnOffMode } from './lib/utils';
+import { isDefined, isRelevantStateId, isStateValue, resolveOnOffMode } from './lib/utils';
 import { DeviceController } from './lib/deviceController';
 import { TokenManager } from './lib/tokenManager';
 import { ApiClient, ResetError } from './lib/apiClient';
+import { isConsumptionFactor, isInstanceNumber, isUsername } from './lib/types';
+import { Password } from './lib/valueObject';
 
 export class MidasAquatemp extends utils.Adapter {
     private static instance: MidasAquatemp;
@@ -43,7 +45,8 @@ export class MidasAquatemp extends utils.Adapter {
 
     private async onReady(): Promise<void> {
         await this.setState('info.connection', false, true);
-        if (!isDefined(this.instance)) {
+        const instanceNumber = this.instance;
+        if (!isInstanceNumber(instanceNumber)) {
             this.log.error('No instance found.');
             return;
         }
@@ -70,15 +73,22 @@ export class MidasAquatemp extends utils.Adapter {
             );
         }
 
-        if (username === '' || password === '' || password === undefined) {
-            this.log.error('Empty Username or Password.');
+        const pw = Password.create(password);
+        if (!pw) {
+            this.log.error('Please add a valid password, your current password is empty');
             return;
         }
+
+        if (!isUsername(username)) {
+            this.log.error('Empty Username');
+            return;
+        }
+
         this.store = new Store(
             this,
             username,
-            password,
-            this.instance,
+            pw,
+            instanceNumber,
             validConsumptionFactor,
             selectApi,
             useDeviceMac,

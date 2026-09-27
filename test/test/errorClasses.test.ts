@@ -5,6 +5,7 @@ import { ApiError, ResetError } from '../../src/lib/apiClient.ts';
 import { Logger } from '../../src/lib/loggingController.ts';
 import type { MidasAquatemp } from '../../src/main.ts';
 import { utils } from '@iobroker/testing';
+import 'sinon-chai';
 
 const { adapter } = utils.unit.createMocks({});
 

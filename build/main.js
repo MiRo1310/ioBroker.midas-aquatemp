@@ -39,6 +39,8 @@ var import_utils = require("./lib/utils");
 var import_deviceController = require("./lib/deviceController");
 var import_tokenManager = require("./lib/tokenManager");
 var import_apiClient = require("./lib/apiClient");
+var import_types = require("./lib/types");
+var import_valueObject = require("./lib/valueObject");
 class MidasAquatemp extends utils.Adapter {
   static instance;
   static tokenRefreshIntervalTime = 36e5;
@@ -67,7 +69,8 @@ class MidasAquatemp extends utils.Adapter {
   async onReady() {
     var _a;
     await this.setState("info.connection", false, true);
-    if (!(0, import_utils.isDefined)(this.instance)) {
+    const instanceNumber = this.instance;
+    if (!(0, import_types.isInstanceNumber)(instanceNumber)) {
       this.log.error("No instance found.");
       return;
     }
@@ -80,22 +83,27 @@ class MidasAquatemp extends utils.Adapter {
       );
     }
     let validConsumptionFactor = import_store.DEFAULT_CONSUMPTION_FACTOR;
-    if ((0, import_store.isConsumptionFactor)(consumptionFactor)) {
+    if ((0, import_types.isConsumptionFactor)(consumptionFactor)) {
       validConsumptionFactor = consumptionFactor;
     } else {
       this.log.warn(
         `Configured consumption factor ${consumptionFactor} is invalid (must be > 0). Using default of ${import_store.DEFAULT_CONSUMPTION_FACTOR} instead.`
       );
     }
-    if (username === "" || password === "" || password === void 0) {
-      this.log.error("Empty Username or Password.");
+    const pw = import_valueObject.Password.create(password);
+    if (!pw) {
+      this.log.error("Please add a valid password, your current password is empty");
+      return;
+    }
+    if (!(0, import_types.isUsername)(username)) {
+      this.log.error("Empty Username");
       return;
     }
     this.store = new import_store.Store(
       this,
       username,
-      password,
-      this.instance,
+      pw,
+      instanceNumber,
       validConsumptionFactor,
       selectApi,
       useDeviceMac,

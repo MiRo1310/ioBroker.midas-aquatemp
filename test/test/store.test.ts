@@ -1,12 +1,15 @@
-import { createHash } from 'crypto';
 import { expect } from 'chai';
 import { beforeEach, describe, it } from 'mocha';
-
 import { DEFAULT_CONSUMPTION_FACTOR, Store } from '../../src/lib/store.ts';
 import type { MidasAquatemp } from '../../src/main.ts';
 import { TokenManager } from '../../src/lib/tokenManager.ts';
 import { ApiClient } from '../../src/lib/apiClient.ts';
 import { utils } from '@iobroker/testing';
+import type { InstanceNumber, UserName } from '../../src/lib/types.ts';
+import { Password } from '../../src/lib/valueObject.ts';
+
+const TEST_INSTANCE_NUMBER = 0 as InstanceNumber;
+const TEST_PASSWORD = Password.create('pass') as Password;
 
 const { adapter } = utils.unit.createMocks({});
 
@@ -16,9 +19,9 @@ describe('Store', () => {
     beforeEach(() => {
         store = new Store(
             adapter as unknown as MidasAquatemp,
-            'user@test.com',
-            'password123',
-            0,
+            'user@test.com' as UserName,
+            Password.create('password123') as Password,
+            TEST_INSTANCE_NUMBER,
             DEFAULT_CONSUMPTION_FACTOR,
         );
     });
@@ -29,25 +32,14 @@ describe('Store', () => {
         });
 
         it('includes instance number in the path', () => {
-            const s = new Store(adapter as unknown as MidasAquatemp, 'user', 'pass', 5, DEFAULT_CONSUMPTION_FACTOR);
+            const s = new Store(
+                adapter as unknown as MidasAquatemp,
+                'user' as UserName,
+                TEST_PASSWORD,
+                5 as InstanceNumber,
+                DEFAULT_CONSUMPTION_FACTOR,
+            );
             expect(s.getStateIdByKey('state')).to.equal('midas-aquatemp.5.state');
-        });
-    });
-
-    describe('encryptedPassword', () => {
-        it('stores password as MD5 hash', () => {
-            const expected = createHash('md5').update('password123').digest('hex');
-            expect(store.encryptedPassword).to.equal(expected);
-        });
-
-        it('produces a 32-character hex string', () => {
-            expect(store.encryptedPassword).to.match(/^[a-f0-9]{32}$/);
-        });
-
-        it('different passwords produce different hashes', () => {
-            const s1 = new Store(adapter as unknown as MidasAquatemp, 'user', 'pass1', 0, DEFAULT_CONSUMPTION_FACTOR);
-            const s2 = new Store(adapter as unknown as MidasAquatemp, 'user', 'pass2', 0, DEFAULT_CONSUMPTION_FACTOR);
-            expect(s1.encryptedPassword).to.not.equal(s2.encryptedPassword);
         });
     });
 
@@ -89,7 +81,14 @@ describe('Store', () => {
         });
 
         it('applies custom apiLevel', () => {
-            const s = new Store(adapter as unknown as MidasAquatemp, 'u', 'p', 0, DEFAULT_CONSUMPTION_FACTOR, 2);
+            const s = new Store(
+                adapter as unknown as MidasAquatemp,
+                'u' as UserName,
+                TEST_PASSWORD,
+                TEST_INSTANCE_NUMBER,
+                DEFAULT_CONSUMPTION_FACTOR,
+                2,
+            );
             expect(s.apiLevel).to.equal(2);
         });
 
@@ -97,9 +96,9 @@ describe('Store', () => {
             const mac = 'AA:BB:CC:DD:EE:FF';
             const s = new Store(
                 adapter as unknown as MidasAquatemp,
-                'u',
-                'p',
-                0,
+                'u' as UserName,
+                TEST_PASSWORD,
+                TEST_INSTANCE_NUMBER,
                 DEFAULT_CONSUMPTION_FACTOR,
                 3,
                 true,
@@ -112,9 +111,9 @@ describe('Store', () => {
         it('ignores deviceMac when useDeviceMac is false', () => {
             const s = new Store(
                 adapter as unknown as MidasAquatemp,
-                'u',
-                'p',
-                0,
+                'u' as UserName,
+                TEST_PASSWORD,
+                TEST_INSTANCE_NUMBER,
                 DEFAULT_CONSUMPTION_FACTOR,
                 3,
                 false,
@@ -130,9 +129,9 @@ describe('Store', () => {
         beforeEach(() => {
             storeV3 = new Store(
                 adapter as unknown as MidasAquatemp,
-                'user@test.com',
-                'pass',
-                0,
+                'user@test.com' as UserName,
+                TEST_PASSWORD,
+                TEST_INSTANCE_NUMBER,
                 DEFAULT_CONSUMPTION_FACTOR,
                 3,
             );
@@ -160,9 +159,9 @@ describe('Store', () => {
         beforeEach(() => {
             storeV3 = new Store(
                 adapter as unknown as MidasAquatemp,
-                'user@test.com',
-                'pass',
-                0,
+                'user@test.com' as UserName,
+                TEST_PASSWORD,
+                TEST_INSTANCE_NUMBER,
                 DEFAULT_CONSUMPTION_FACTOR,
                 3,
             );
@@ -213,9 +212,9 @@ describe('Store', () => {
         it('includes instance number in the path', () => {
             const store1 = new Store(
                 adapter as unknown as MidasAquatemp,
-                'user',
-                'pass',
-                5,
+                'user' as UserName,
+                TEST_PASSWORD,
+                5 as InstanceNumber,
                 DEFAULT_CONSUMPTION_FACTOR,
             );
             expect(store1.getStateIdByKey('state')).to.equal('midas-aquatemp.5.state');
