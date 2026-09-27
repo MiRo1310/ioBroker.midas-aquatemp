@@ -59,6 +59,10 @@ If you have problems, contact us.
 	### **WORK IN PROGRESS**
 -->
 
+### **WORK IN PROGRESS**
+
+- FIX: Detected issues by repository checker
+
 ### 1.3.4 (2026-09-13)
 
 - CHORE: (ioBroker-Bot) Adapter requires admin >= 7.8.23 now.
