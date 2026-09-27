@@ -164,7 +164,8 @@
         "refresh": 60,
         "deviceMac": "",
         "useDeviceMac": false,
-        "allowInsecureTls": false
+        "allowInsecureTls": false,
+        "consumptionFactor": 1
     },
     "protectedNative": ["password"],
     "encryptedNative": ["password"],

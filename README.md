@@ -62,6 +62,7 @@ If you have problems, contact us.
 ### **WORK IN PROGRESS**
 
 - FIX: Detected issues by repository checker
+- FIX: #163 Add faktor input for power consumption calculation (default: 1.0)
 
 ### 1.3.4 (2026-09-13)
 

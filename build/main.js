@@ -71,7 +71,7 @@ class MidasAquatemp extends utils.Adapter {
       this.log.error("No instance found.");
       return;
     }
-    const { username, password, selectApi, useDeviceMac, deviceMac, refresh } = this.config;
+    const { username, password, selectApi, useDeviceMac, deviceMac, refresh, consumptionFactor } = this.config;
     if ((0, import_utils.isDefined)(refresh) && refresh >= MidasAquatemp.minIntervalSeconds && refresh <= MidasAquatemp.maxIntervalSeconds) {
       this.intervalSeconds = refresh;
     } else if ((0, import_utils.isDefined)(refresh)) {
@@ -79,11 +79,28 @@ class MidasAquatemp extends utils.Adapter {
         `Configured refresh interval ${refresh}s is out of range (${MidasAquatemp.minIntervalSeconds}-${MidasAquatemp.maxIntervalSeconds}s). Using default of ${this.intervalSeconds}s instead.`
       );
     }
+    let validConsumptionFactor = import_store.DEFAULT_CONSUMPTION_FACTOR;
+    if ((0, import_store.isConsumptionFactor)(consumptionFactor)) {
+      validConsumptionFactor = consumptionFactor;
+    } else {
+      this.log.warn(
+        `Configured consumption factor ${consumptionFactor} is invalid (must be > 0). Using default of ${import_store.DEFAULT_CONSUMPTION_FACTOR} instead.`
+      );
+    }
     if (username === "" || password === "" || password === void 0) {
       this.log.error("Empty Username or Password.");
       return;
     }
-    this.store = new import_store.Store(this, username, password, this.instance, selectApi, useDeviceMac, deviceMac);
+    this.store = new import_store.Store(
+      this,
+      username,
+      password,
+      this.instance,
+      validConsumptionFactor,
+      selectApi,
+      useDeviceMac,
+      deviceMac
+    );
     this.setIds();
     const apiClient = new import_apiClient.ApiClient(this.store);
     const tokenManager = new import_tokenManager.TokenManager(this.store, apiClient);

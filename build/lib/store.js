@@ -18,15 +18,22 @@ var __copyProps = (to, from, except, desc) => {
 var __toCommonJS = (mod) => __copyProps(__defProp({}, "__esModule", { value: true }), mod);
 var store_exports = {};
 __export(store_exports, {
-  Store: () => Store
+  DEFAULT_CONSUMPTION_FACTOR: () => DEFAULT_CONSUMPTION_FACTOR,
+  Store: () => Store,
+  isConsumptionFactor: () => isConsumptionFactor
 });
 module.exports = __toCommonJS(store_exports);
 var import_node_crypto = require("node:crypto");
 var import_loggingController = require("./loggingController");
+const DEFAULT_CONSUMPTION_FACTOR = 1;
+function isConsumptionFactor(value) {
+  return typeof value === "number" && Number.isFinite(value) && value > 0;
+}
 class Store {
-  constructor(adapter, username, password, instance, apiLevel, useDeviceMac, deviceMac) {
+  constructor(adapter, username, password, instance, consumptionFactor, apiLevel, useDeviceMac, deviceMac) {
     this.adapter = adapter;
     this.username = username;
+    this.consumptionFactor = consumptionFactor;
     this.encryptedPassword = this.encryptPassword(password);
     this.instance = instance;
     this.apiLevel = apiLevel != null ? apiLevel : this.apiLevel;
@@ -49,6 +56,9 @@ class Store {
   mode = 2;
   logger;
   tokenManager;
+  getConsumptionFactor() {
+    return this.consumptionFactor;
+  }
   setTokenManager(tokenManager) {
     this.tokenManager = tokenManager;
   }
@@ -131,6 +141,8 @@ class Store {
 }
 // Annotate the CommonJS export names for ESM import in node:
 0 && (module.exports = {
-  Store
+  DEFAULT_CONSUMPTION_FACTOR,
+  Store,
+  isConsumptionFactor
 });
 //# sourceMappingURL=store.js.map

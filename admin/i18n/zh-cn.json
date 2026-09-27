@@ -12,5 +12,6 @@
     "refresh": "刷新数据（秒）",
     "staticText1": "Api 级别 1：AquaTemp-Accounts，在 v.1.5.8 之前创建",
     "staticText2": "API 级别 2：HiTemp 帐户",
-    "staticText3": "Api 级别 3：AquaTemp-Accounts，使用较新的应用程序版本创建"
+    "staticText3": "Api 级别 3：AquaTemp-Accounts，使用较新的应用程序版本创建",
+    "consumptionFactor": "功耗校正系数"
 }

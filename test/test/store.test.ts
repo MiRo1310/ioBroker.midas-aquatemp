@@ -2,7 +2,7 @@ import { createHash } from 'crypto';
 import { expect } from 'chai';
 import { beforeEach, describe, it } from 'mocha';
 
-import { Store } from '../../src/lib/store.ts';
+import { DEFAULT_CONSUMPTION_FACTOR, Store } from '../../src/lib/store.ts';
 import type { MidasAquatemp } from '../../src/main.ts';
 import { TokenManager } from '../../src/lib/tokenManager.ts';
 import { ApiClient } from '../../src/lib/apiClient.ts';
@@ -14,7 +14,13 @@ describe('Store', () => {
     let store: Store;
 
     beforeEach(() => {
-        store = new Store(adapter as unknown as MidasAquatemp, 'user@test.com', 'password123', 0);
+        store = new Store(
+            adapter as unknown as MidasAquatemp,
+            'user@test.com',
+            'password123',
+            0,
+            DEFAULT_CONSUMPTION_FACTOR,
+        );
     });
 
     describe('getDpRoot', () => {
@@ -23,7 +29,7 @@ describe('Store', () => {
         });
 
         it('includes instance number in the path', () => {
-            const s = new Store(adapter as unknown as MidasAquatemp, 'user', 'pass', 5);
+            const s = new Store(adapter as unknown as MidasAquatemp, 'user', 'pass', 5, DEFAULT_CONSUMPTION_FACTOR);
             expect(s.getStateIdByKey('state')).to.equal('midas-aquatemp.5.state');
         });
     });
@@ -39,8 +45,8 @@ describe('Store', () => {
         });
 
         it('different passwords produce different hashes', () => {
-            const s1 = new Store(adapter as unknown as MidasAquatemp, 'user', 'pass1', 0);
-            const s2 = new Store(adapter as unknown as MidasAquatemp, 'user', 'pass2', 0);
+            const s1 = new Store(adapter as unknown as MidasAquatemp, 'user', 'pass1', 0, DEFAULT_CONSUMPTION_FACTOR);
+            const s2 = new Store(adapter as unknown as MidasAquatemp, 'user', 'pass2', 0, DEFAULT_CONSUMPTION_FACTOR);
             expect(s1.encryptedPassword).to.not.equal(s2.encryptedPassword);
         });
     });
@@ -83,19 +89,37 @@ describe('Store', () => {
         });
 
         it('applies custom apiLevel', () => {
-            const s = new Store(adapter as unknown as MidasAquatemp, 'u', 'p', 0, 2);
+            const s = new Store(adapter as unknown as MidasAquatemp, 'u', 'p', 0, DEFAULT_CONSUMPTION_FACTOR, 2);
             expect(s.apiLevel).to.equal(2);
         });
 
         it('sets device from deviceMac when useDeviceMac is true', () => {
             const mac = 'AA:BB:CC:DD:EE:FF';
-            const s = new Store(adapter as unknown as MidasAquatemp, 'u', 'p', 0, 3, true, mac);
+            const s = new Store(
+                adapter as unknown as MidasAquatemp,
+                'u',
+                'p',
+                0,
+                DEFAULT_CONSUMPTION_FACTOR,
+                3,
+                true,
+                mac,
+            );
             expect(s.device).to.equal(mac);
             expect(s.useDeviceMac).to.be.true;
         });
 
         it('ignores deviceMac when useDeviceMac is false', () => {
-            const s = new Store(adapter as unknown as MidasAquatemp, 'u', 'p', 0, 3, false, 'AA:BB:CC');
+            const s = new Store(
+                adapter as unknown as MidasAquatemp,
+                'u',
+                'p',
+                0,
+                DEFAULT_CONSUMPTION_FACTOR,
+                3,
+                false,
+                'AA:BB:CC',
+            );
             expect(s.device).to.be.undefined;
         });
     });
@@ -104,7 +128,14 @@ describe('Store', () => {
         let tokenManager: TokenManager;
         let storeV3: Store;
         beforeEach(() => {
-            storeV3 = new Store(adapter as unknown as MidasAquatemp, 'user@test.com', 'pass', 0, 3);
+            storeV3 = new Store(
+                adapter as unknown as MidasAquatemp,
+                'user@test.com',
+                'pass',
+                0,
+                DEFAULT_CONSUMPTION_FACTOR,
+                3,
+            );
             const apiClient = new ApiClient(storeV3);
             tokenManager = new TokenManager(storeV3, apiClient);
         });
@@ -127,7 +158,14 @@ describe('Store', () => {
         let tokenManager: TokenManager;
         let storeV3: Store;
         beforeEach(() => {
-            storeV3 = new Store(adapter as unknown as MidasAquatemp, 'user@test.com', 'pass', 0, 3);
+            storeV3 = new Store(
+                adapter as unknown as MidasAquatemp,
+                'user@test.com',
+                'pass',
+                0,
+                DEFAULT_CONSUMPTION_FACTOR,
+                3,
+            );
             const apiClient = new ApiClient(storeV3);
             tokenManager = new TokenManager(storeV3, apiClient);
         });
@@ -173,7 +211,13 @@ describe('Store', () => {
         });
 
         it('includes instance number in the path', () => {
-            const store1 = new Store(adapter as unknown as MidasAquatemp, 'user', 'pass', 5);
+            const store1 = new Store(
+                adapter as unknown as MidasAquatemp,
+                'user',
+                'pass',
+                5,
+                DEFAULT_CONSUMPTION_FACTOR,
+            );
             expect(store1.getStateIdByKey('state')).to.equal('midas-aquatemp.5.state');
         });
     });

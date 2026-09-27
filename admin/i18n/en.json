@@ -12,5 +12,6 @@
     "staticText2": "Api-Level 2: HiTemp-Accounts",
     "staticText3": "Api-Level 3: AquaTemp-Accounts, created with newer app versions",
     "Use Device Mac": "Use Device Mac",
-    "Username": "Username"
+    "Username": "Username",
+    "consumptionFactor": "Consumption correction factor"
 }

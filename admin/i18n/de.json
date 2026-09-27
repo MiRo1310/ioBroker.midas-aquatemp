@@ -12,5 +12,6 @@
     "refresh": "Daten aktualisieren (Sek.)",
     "staticText1": "Api-Level 1: AquaTemp-Accounts, erstellt vor v.1.5.8",
     "staticText2": "API-Level 2: HiTemp-Konten",
-    "staticText3": "Api-Level 3: AquaTemp-Accounts, erstellt mit neueren App-Versionen"
+    "staticText3": "Api-Level 3: AquaTemp-Accounts, erstellt mit neueren App-Versionen",
+    "consumptionFactor": "Korrekturfaktor Verbrauch"
 }

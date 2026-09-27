@@ -1,6 +1,6 @@
 import { expect } from 'chai';
 import { beforeEach, describe, it } from 'mocha';
-import { Store } from '../../src/lib/store.ts';
+import { DEFAULT_CONSUMPTION_FACTOR, Store } from '../../src/lib/store.ts';
 import type { MidasAquatemp } from '../../src/main.ts';
 import { utils } from '@iobroker/testing';
 
@@ -10,8 +10,22 @@ describe('Store endpoint methods', () => {
     let storeV3: Store;
     let storeV2: Store;
     beforeEach(() => {
-        storeV3 = new Store(adapter as unknown as MidasAquatemp, 'user@test.com', 'pass', 0, 3);
-        storeV2 = new Store(adapter as unknown as MidasAquatemp, 'user@test.com', 'pass', 0, 2);
+        storeV3 = new Store(
+            adapter as unknown as MidasAquatemp,
+            'user@test.com',
+            'pass',
+            0,
+            DEFAULT_CONSUMPTION_FACTOR,
+            3,
+        );
+        storeV2 = new Store(
+            adapter as unknown as MidasAquatemp,
+            'user@test.com',
+            'pass',
+            0,
+            DEFAULT_CONSUMPTION_FACTOR,
+            2,
+        );
     });
 
     describe('cloudURL (set in constructor)', () => {

@@ -12,5 +12,6 @@
     "refresh": "Odśwież dane (s)",
     "staticText1": "Api-Level 1: Konta AquaTemp, utworzone przed wersją 1.5.8",
     "staticText2": "Poziom API 2: Konta HiTemp",
-    "staticText3": "Api-Level 3: Konta AquaTemp, utworzone przy użyciu nowszej wersji aplikacji"
+    "staticText3": "Api-Level 3: Konta AquaTemp, utworzone przy użyciu nowszej wersji aplikacji",
+    "consumptionFactor": "Współczynnik korekty zużycia"
 }
