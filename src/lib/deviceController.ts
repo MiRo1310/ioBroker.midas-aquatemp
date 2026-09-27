@@ -360,7 +360,8 @@ export class DeviceController {
         const sensorCodes = DeviceController.getSensorCodes();
 
         // T07 reports current in 0.1 A steps; consumption (W) = current × voltage
-        const currentAmpere = toFloat(findValByCodeArray(responseValue, sensorCodes.tCurrent)) / 10; // Temporary fix until it was fixed by producer
+        const currentAmpere =
+            toFloat(findValByCodeArray(responseValue, sensorCodes.tCurrent)) / this.store.getConsumptionFactor(); // Temporary fix until it was fixed by producer
         const tVoltageVal = toFloat(findValByCodeArray(responseValue, sensorCodes.tVoltage));
 
         await this.saveNumberIfValid('consumption', currentAmpere * tVoltageVal);

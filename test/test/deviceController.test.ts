@@ -2,7 +2,7 @@ import { expect } from 'chai';
 import { beforeEach, describe, it } from 'mocha';
 
 import { DeviceController } from '../../src/lib/deviceController.ts';
-import { Store } from '../../src/lib/store.ts';
+import { DEFAULT_CONSUMPTION_FACTOR, Store } from '../../src/lib/store.ts';
 import { TokenManager } from '../../src/lib/tokenManager.ts';
 import type { ApiClient } from '../../src/lib/apiClient.ts';
 import { ResetError } from '../../src/lib/apiClient.ts';
@@ -59,7 +59,7 @@ describe('DeviceController', () => {
     let controller: DeviceController;
 
     beforeEach(() => {
-        store = new Store(adapter as unknown as MidasAquatemp, 'user', 'pass', 0);
+        store = new Store(adapter as unknown as MidasAquatemp, 'user', 'pass', 0, DEFAULT_CONSUMPTION_FACTOR);
         store.device = 'DEVICE_CODE';
         apiClient = makeApiClient();
         tokenManager = new TokenManager(store, apiClient);

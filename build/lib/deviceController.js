@@ -309,7 +309,7 @@ class DeviceController {
   };
   async saveSensors(responseValue) {
     const sensorCodes = DeviceController.getSensorCodes();
-    const currentAmpere = (0, import_utils.toFloat)((0, import_utils.findValByCodeArray)(responseValue, sensorCodes.tCurrent)) / 10;
+    const currentAmpere = (0, import_utils.toFloat)((0, import_utils.findValByCodeArray)(responseValue, sensorCodes.tCurrent)) / this.store.getConsumptionFactor();
     const tVoltageVal = (0, import_utils.toFloat)((0, import_utils.findValByCodeArray)(responseValue, sensorCodes.tVoltage));
     await this.saveNumberIfValid("consumption", currentAmpere * tVoltageVal);
     const flowSwitchValue = (0, import_utils.findValByCodeArray)(responseValue, sensorCodes.flowSwitch);

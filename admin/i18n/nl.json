@@ -12,5 +12,6 @@
     "refresh": "Gegevens vernieuwen (sec)",
     "staticText1": "Api-niveau 1: AquaTemp-Accounts, gemaakt vóór v.1.5.8",
     "staticText2": "Api-niveau 2: HiTemp-accounts",
-    "staticText3": "Api-niveau 3: AquaTemp-Accounts, gemaakt met nieuwere app-versies"
+    "staticText3": "Api-niveau 3: AquaTemp-Accounts, gemaakt met nieuwere app-versies",
+    "consumptionFactor": "Correctiefactor verbruik"
 }

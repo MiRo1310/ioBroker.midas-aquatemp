@@ -11,6 +11,7 @@ declare global {
 			deviceMac: string;
 			useDeviceMac: boolean;
 			allowInsecureTls?: boolean;
+			consumptionFactor: number;
 		}
 	}
 }

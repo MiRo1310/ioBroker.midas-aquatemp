@@ -12,5 +12,6 @@
     "refresh": "Actualiser les données (sec)",
     "staticText1": "Api-Niveau 1 : Comptes AquaTemp, créés avant la v.1.5.8",
     "staticText2": "API niveau 2 : comptes HiTemp",
-    "staticText3": "Api-Niveau 3 : Comptes AquaTemp, créés avec des versions d'application plus récentes"
+    "staticText3": "Api-Niveau 3 : Comptes AquaTemp, créés avec des versions d'application plus récentes",
+    "consumptionFactor": "Facteur de correction de la consommation"
 }

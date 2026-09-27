@@ -121,6 +121,18 @@
             "md": 12,
             "sm": 12,
             "xs": 12
+        },
+
+        "consumptionFactor": {
+            "type": "number",
+            "label": "consumptionFactor",
+            "default": 1,
+            "newLine": true,
+            "xl": 2,
+            "lg": 4,
+            "md": 6,
+            "sm": 8,
+            "xs": 12
         }
     }
 }

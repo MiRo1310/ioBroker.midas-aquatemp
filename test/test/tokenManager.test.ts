@@ -3,7 +3,7 @@ import { beforeEach, describe, it } from 'mocha';
 
 import { TokenManager } from '../../src/lib/tokenManager.ts';
 import { ApiClient } from '../../src/lib/apiClient.ts';
-import { Store } from '../../src/lib/store.ts';
+import { DEFAULT_CONSUMPTION_FACTOR, Store } from '../../src/lib/store.ts';
 import type { MidasAquatemp } from '../../src/main.ts';
 import { utils } from '@iobroker/testing';
 
@@ -15,7 +15,7 @@ describe('TokenManager', () => {
     let tokenManager: TokenManager;
 
     beforeEach(() => {
-        store = new Store(adapter as unknown as MidasAquatemp, 'user@test.com', 'pass', 0);
+        store = new Store(adapter as unknown as MidasAquatemp, 'user@test.com', 'pass', 0, DEFAULT_CONSUMPTION_FACTOR);
         apiClient = new ApiClient(store);
         tokenManager = new TokenManager(store, apiClient);
     });
@@ -148,7 +148,16 @@ describe('TokenManager', () => {
         it('calls updateDeviceStatus instead of fetchDevice when useDeviceMac is true', async () => {
             let fetchDeviceCalled = false;
             let updateStatusCalled = false;
-            const storeWithMac = new Store(adapter as unknown as MidasAquatemp, 'user', 'pass', 0, 3, true, 'AA:BB:CC');
+            const storeWithMac = new Store(
+                adapter as unknown as MidasAquatemp,
+                'user',
+                'pass',
+                0,
+                DEFAULT_CONSUMPTION_FACTOR,
+                3,
+                true,
+                'AA:BB:CC',
+            );
             const client = {
                 request: () => ({ error_code: '0', objectResult: { 'x-token': 'token' } }),
             } as unknown as ApiClient;

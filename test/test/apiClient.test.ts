@@ -5,7 +5,7 @@ import MockAdapter from 'axios-mock-adapter';
 import 'chai-as-promised';
 
 import { ApiClient } from '../../src/lib/apiClient.ts';
-import { Store } from '../../src/lib/store.ts';
+import { DEFAULT_CONSUMPTION_FACTOR, Store } from '../../src/lib/store.ts';
 import type { MidasAquatemp } from '../../src/main.ts';
 import { utils } from '@iobroker/testing';
 
@@ -50,7 +50,7 @@ describe('ApiClient', () => {
 
         beforeEach(() => {
             mock = new MockAdapter(axios);
-            store = new Store(adapter as unknown as MidasAquatemp, 'user', 'pass', 0);
+            store = new Store(adapter as unknown as MidasAquatemp, 'user', 'pass', 0, DEFAULT_CONSUMPTION_FACTOR);
             client = new ApiClient(store);
         });
 

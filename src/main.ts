@@ -5,7 +5,7 @@
 // The adapter-core module gives you access to the core ioBroker functions
 // you need to create an
 import type { TMode } from './lib/store';
-import { Store } from './lib/store';
+import { DEFAULT_CONSUMPTION_FACTOR, isConsumptionFactor, Store } from './lib/store';
 import * as utils from '@iobroker/adapter-core';
 import { createObjects } from './lib/createState';
 import { isDefined, isStateValue, isRelevantStateId, resolveOnOffMode } from './lib/utils';
@@ -47,7 +47,7 @@ export class MidasAquatemp extends utils.Adapter {
             this.log.error('No instance found.');
             return;
         }
-        const { username, password, selectApi, useDeviceMac, deviceMac, refresh } = this.config;
+        const { username, password, selectApi, useDeviceMac, deviceMac, refresh, consumptionFactor } = this.config;
 
         if (
             isDefined(refresh) &&
@@ -61,11 +61,29 @@ export class MidasAquatemp extends utils.Adapter {
             );
         }
 
+        let validConsumptionFactor = DEFAULT_CONSUMPTION_FACTOR;
+        if (isConsumptionFactor(consumptionFactor)) {
+            validConsumptionFactor = consumptionFactor;
+        } else {
+            this.log.warn(
+                `Configured consumption factor ${consumptionFactor} is invalid (must be > 0). Using default of ${DEFAULT_CONSUMPTION_FACTOR} instead.`,
+            );
+        }
+
         if (username === '' || password === '' || password === undefined) {
             this.log.error('Empty Username or Password.');
             return;
         }
-        this.store = new Store(this, username, password, this.instance, selectApi, useDeviceMac, deviceMac);
+        this.store = new Store(
+            this,
+            username,
+            password,
+            this.instance,
+            validConsumptionFactor,
+            selectApi,
+            useDeviceMac,
+            deviceMac,
+        );
         this.setIds();
         const apiClient = new ApiClient(this.store);
         const tokenManager = new TokenManager(this.store, apiClient);

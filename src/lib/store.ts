@@ -30,6 +30,21 @@ export type StateKey =
     | 'state'
     | 'exhaust';
 
+declare const consumptionFactorBrand: unique symbol;
+
+/**
+ * A validated divisor for the raw current value (finite, > 0).
+ * Branded so that a plain `number` (e.g. instance or apiLevel) can't be passed by accident —
+ * obtain one only via {@link isConsumptionFactor} or {@link DEFAULT_CONSUMPTION_FACTOR}.
+ */
+export type ConsumptionFactor = number & { readonly [consumptionFactorBrand]: true };
+
+export const DEFAULT_CONSUMPTION_FACTOR = 1 as ConsumptionFactor;
+
+export function isConsumptionFactor(value: unknown): value is ConsumptionFactor {
+    return typeof value === 'number' && Number.isFinite(value) && value > 0;
+}
+
 export class Store {
     static readonly modes: TMode[] = [-1, 0, 1, 2];
     public readonly instance: number;
@@ -49,6 +64,7 @@ export class Store {
         public readonly username: string,
         password: string,
         instance: number,
+        private consumptionFactor: ConsumptionFactor,
         apiLevel?: number,
         useDeviceMac?: boolean,
         deviceMac?: string,
@@ -62,6 +78,10 @@ export class Store {
         }
         this.setupEndpoints();
         this.logger = new Logger(this.adapter);
+    }
+
+    public getConsumptionFactor(): ConsumptionFactor {
+        return this.consumptionFactor;
     }
 
     public setTokenManager(tokenManager: TokenManager): void {
