@@ -8,6 +8,11 @@ import type { ApiClient } from '../../src/lib/apiClient.ts';
 import { ResetError } from '../../src/lib/apiClient.ts';
 import type { MidasAquatemp } from '../../src/main.ts';
 import { utils } from '@iobroker/testing';
+import type { InstanceNumber, UserName } from '../../src/lib/types.ts';
+import { Password } from '../../src/lib/valueObject.ts';
+
+const TEST_INSTANCE_NUMBER = 0 as InstanceNumber;
+const TEST_PASSWORD = Password.create('pass') as Password;
 
 const { adapter } = utils.unit.createMocks({});
 
@@ -59,7 +64,13 @@ describe('DeviceController', () => {
     let controller: DeviceController;
 
     beforeEach(() => {
-        store = new Store(adapter as unknown as MidasAquatemp, 'user', 'pass', 0, DEFAULT_CONSUMPTION_FACTOR);
+        store = new Store(
+            adapter as unknown as MidasAquatemp,
+            'user' as UserName,
+            TEST_PASSWORD,
+            TEST_INSTANCE_NUMBER,
+            DEFAULT_CONSUMPTION_FACTOR,
+        );
         store.device = 'DEVICE_CODE';
         apiClient = makeApiClient();
         tokenManager = new TokenManager(store, apiClient);

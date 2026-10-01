@@ -1,7 +1,8 @@
 import type { MidasAquatemp } from '../main';
-import { createHash } from 'node:crypto';
 import { Logger } from './loggingController';
 import type { TokenManager } from './tokenManager';
+import type { ConsumptionFactor, InstanceNumber, UserName } from './types';
+import type { Password } from './valueObject';
 
 export type TMode = -1 | 0 | 1 | 2;
 
@@ -30,27 +31,12 @@ export type StateKey =
     | 'state'
     | 'exhaust';
 
-declare const consumptionFactorBrand: unique symbol;
-
-/**
- * A validated divisor for the raw current value (finite, > 0).
- * Branded so that a plain `number` (e.g. instance or apiLevel) can't be passed by accident —
- * obtain one only via {@link isConsumptionFactor} or {@link DEFAULT_CONSUMPTION_FACTOR}.
- */
-export type ConsumptionFactor = number & { readonly [consumptionFactorBrand]: true };
-
 export const DEFAULT_CONSUMPTION_FACTOR = 1 as ConsumptionFactor;
-
-export function isConsumptionFactor(value: unknown): value is ConsumptionFactor {
-    return typeof value === 'number' && Number.isFinite(value) && value > 0;
-}
 
 export class Store {
     static readonly modes: TMode[] = [-1, 0, 1, 2];
-    public readonly instance: number;
     public readonly apiLevel: number = 3;
     public readonly useDeviceMac: boolean = false;
-    public readonly encryptedPassword: string;
     public cloudURL: string | null = null;
     public device?: string;
     public product?: string;
@@ -61,16 +47,14 @@ export class Store {
 
     constructor(
         public readonly adapter: MidasAquatemp,
-        public readonly username: string,
-        password: string,
-        instance: number,
+        public readonly username: UserName,
+        private readonly password: Password,
+        public readonly instance: InstanceNumber,
         private consumptionFactor: ConsumptionFactor,
         apiLevel?: number,
         useDeviceMac?: boolean,
         deviceMac?: string,
     ) {
-        this.encryptedPassword = this.encryptPassword(password);
-        this.instance = instance;
         this.apiLevel = apiLevel ?? this.apiLevel;
         this.useDeviceMac = useDeviceMac ?? this.useDeviceMac;
         if (useDeviceMac) {
@@ -152,13 +136,13 @@ export class Store {
     public getOptionsAndSUrl(): {
         sUrl: string;
         options: {
-            userName?: string;
+            userName?: UserName;
             user_name?: string;
             password: string;
             type: string;
         };
     } {
-        const options = { password: this.encryptedPassword, type: '2' };
+        const options = { password: this.password.hashed, type: '2' };
         return this.apiLevel < 3
             ? {
                   sUrl: `${this.cloudURL}/app/user/login.json`,
@@ -186,10 +170,6 @@ export class Store {
         return this.apiLevel < 3
             ? `${this.cloudURL}/app/device/deviceList.json`
             : `${this.cloudURL}/app/device/deviceList`;
-    }
-
-    private encryptPassword(password: string): string {
-        return createHash('md5').update(password).digest('hex');
     }
 
     private setupEndpoints(): void {

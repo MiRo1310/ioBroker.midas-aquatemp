@@ -3,6 +3,11 @@ import { beforeEach, describe, it } from 'mocha';
 import { DEFAULT_CONSUMPTION_FACTOR, Store } from '../../src/lib/store.ts';
 import type { MidasAquatemp } from '../../src/main.ts';
 import { utils } from '@iobroker/testing';
+import type { InstanceNumber, UserName } from '../../src/lib/types.ts';
+import { Password } from '../../src/lib/valueObject.ts';
+
+const TEST_INSTANCE_NUMBER = 0 as InstanceNumber;
+const TEST_PASSWORD = Password.create('pass') as Password;
 
 const { adapter } = utils.unit.createMocks({});
 
@@ -12,17 +17,17 @@ describe('Store endpoint methods', () => {
     beforeEach(() => {
         storeV3 = new Store(
             adapter as unknown as MidasAquatemp,
-            'user@test.com',
-            'pass',
-            0,
+            'user@test.com' as UserName,
+            TEST_PASSWORD,
+            TEST_INSTANCE_NUMBER,
             DEFAULT_CONSUMPTION_FACTOR,
             3,
         );
         storeV2 = new Store(
             adapter as unknown as MidasAquatemp,
-            'user@test.com',
-            'pass',
-            0,
+            'user@test.com' as UserName,
+            TEST_PASSWORD,
+            TEST_INSTANCE_NUMBER,
             DEFAULT_CONSUMPTION_FACTOR,
             2,
         );

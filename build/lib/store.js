@@ -19,23 +19,18 @@ var __toCommonJS = (mod) => __copyProps(__defProp({}, "__esModule", { value: tru
 var store_exports = {};
 __export(store_exports, {
   DEFAULT_CONSUMPTION_FACTOR: () => DEFAULT_CONSUMPTION_FACTOR,
-  Store: () => Store,
-  isConsumptionFactor: () => isConsumptionFactor
+  Store: () => Store
 });
 module.exports = __toCommonJS(store_exports);
-var import_node_crypto = require("node:crypto");
 var import_loggingController = require("./loggingController");
 const DEFAULT_CONSUMPTION_FACTOR = 1;
-function isConsumptionFactor(value) {
-  return typeof value === "number" && Number.isFinite(value) && value > 0;
-}
 class Store {
   constructor(adapter, username, password, instance, consumptionFactor, apiLevel, useDeviceMac, deviceMac) {
     this.adapter = adapter;
     this.username = username;
-    this.consumptionFactor = consumptionFactor;
-    this.encryptedPassword = this.encryptPassword(password);
+    this.password = password;
     this.instance = instance;
+    this.consumptionFactor = consumptionFactor;
     this.apiLevel = apiLevel != null ? apiLevel : this.apiLevel;
     this.useDeviceMac = useDeviceMac != null ? useDeviceMac : this.useDeviceMac;
     if (useDeviceMac) {
@@ -45,10 +40,8 @@ class Store {
     this.logger = new import_loggingController.Logger(this.adapter);
   }
   static modes = [-1, 0, 1, 2];
-  instance;
   apiLevel = 3;
   useDeviceMac = false;
-  encryptedPassword;
   cloudURL = null;
   device;
   product;
@@ -111,7 +104,7 @@ class Store {
     return this.apiLevel < 3 ? `${this.cloudURL}/app/device/getDataByCode.json` : `${this.cloudURL}/app/device/getDataByCode`;
   }
   getOptionsAndSUrl() {
-    const options = { password: this.encryptedPassword, type: "2" };
+    const options = { password: this.password.hashed, type: "2" };
     return this.apiLevel < 3 ? {
       sUrl: `${this.cloudURL}/app/user/login.json`,
       options: {
@@ -132,9 +125,6 @@ class Store {
   getUpdateDeviceIdSUrl() {
     return this.apiLevel < 3 ? `${this.cloudURL}/app/device/deviceList.json` : `${this.cloudURL}/app/device/deviceList`;
   }
-  encryptPassword(password) {
-    return (0, import_node_crypto.createHash)("md5").update(password).digest("hex");
-  }
   setupEndpoints() {
     this.cloudURL = this.apiLevel == 3 ? "https://cloud.linked-go.com:449/crmservice/api" : "https://cloud.linked-go.com/cloudservice/api";
   }
@@ -142,7 +132,6 @@ class Store {
 // Annotate the CommonJS export names for ESM import in node:
 0 && (module.exports = {
   DEFAULT_CONSUMPTION_FACTOR,
-  Store,
-  isConsumptionFactor
+  Store
 });
 //# sourceMappingURL=store.js.map
